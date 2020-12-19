@@ -1,0 +1,93 @@
+{
+  "editor.formatOnSave": true,
+  "css.validate": false,
+  "less.validate": false,
+  "scss.validate": false,
+  "scss.lint.duplicateProperties": "error",
+  "css.lint.duplicateProperties": "error",
+  "less.lint.zeroUnits": "error",
+  "html.validate.scripts": false,
+  "html.format.enable": false,
+  "javascript.validate.enable": false,
+  "typescript.validate.enable": false,
+  "javascript.format.enable": false,
+  "typescript.format.enable": false,
+  "json.format.enable": false,
+  "json.schemaDownload.enable": false,
+  "typescript.tsdk": "./node_modules/typescript/lib", // 代替 vscode 的 ts 语法智能提示
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+    // "source.fixAll.stylelint": true // 不需要stylelint，prettier就足够了
+  },
+  "eslint.format.enable": false,
+  "eslint.workingDirectories": ["*"],
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact", "vue"],
+  "eslint.options": {
+    //指定vscode的eslint所处理的文件的后缀
+    "extensions": [".js", ".ts", ".tsx", ".jsx", ".vue"]
+  },
+  // "[javascript]": {
+  //   "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  // },
+  // "[javascriptreact]": {
+  //   "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  // },
+  // "[typescript]": {
+  //   "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  // },
+  // "[typescriptreact]": {
+  //   "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  // },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[less]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[scss]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "search.exclude": {
+    "**/.git": true,
+    "**/node_modules": true
+  },
+  "cSpell.words": [],
+  "cSpell.ignoreWords": ["execa", "antd"],
+  "cSpell.ignorePaths": [
+    "node_modules", // this will ignore anything the node_modules directory
+    "**/node_modules", // the same for this one
+    "**/node_modules/**", // the same for this one
+    "node_modules/**", // Doesn't currently work due to how the current working directory is determined.
+    "vscode-extension", //
+    ".git", // Ignore the .git directory
+    "*.dll", // Ignore all .dll files.
+    "**/*.dll", // Ignore all .dll files
+    ".eslintrc",
+    ".vscode/**",
+    "**/package.json"
+  ]
+}

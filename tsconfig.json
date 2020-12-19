@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "noImplicitAny": false,
+    "module": "commonjs",
+    "target": "es5",
+    "jsx": "react",
+    "lib": ["es5", "es6", "dom", "es2019"],
+    "experimentalDecorators": true,
+    "downlevelIteration": true,
+    "baseUrl": ".",
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "paths": {
+      "@manager/*": ["src/sales-manager/*"],
+      "@src/*": ["src/*"]
+    }
+  },
+  "include": ["**/*.{ts,tsx}"],
+  "exclude": ["node_modules"]
+}
