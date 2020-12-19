@@ -109,9 +109,20 @@ module.exports = {
         test: /\.css$/,
         loaders: ['style-loader', { loader: 'css-loader', options: { importLoaders: 1 } }],
       },
+      // {
+      //   test: /\.(jpe?g|png|gif|svg)$/i,
+      //   loaders: ['file-loader?hash=sha512&digest=hex&name=img/[name].[ext]&publicPath=/public'],
+      // },
+      // webpack 5
       {
-        test: /\.(jpe?g|png|gif|svg)$/i,
-        loaders: ['file-loader?hash=sha512&digest=hex&name=img/[name].[ext]&publicPath=/public'],
+        test: /\.(?:ico|gif|png|jpg|jpeg)$/i,
+        type: 'asset/resource',
+        // asset/resource等同file-loader，asset/inline等同url-loader，asset/source等同raw-loader
+        // asset等同automatically chooses between exporting a data URI and emitting a separate file. Previously achievable by using url-loader with asset size limit
+      },
+      {
+        test: /\.(woff(2)?|eot|ttf|otf|svg|)$/,
+        type: 'asset/inline',
       },
     ],
   },

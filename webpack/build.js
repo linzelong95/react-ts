@@ -17,6 +17,8 @@ const environment = {
 // 执行 webpack
 if (mode === 'dev' || mode === 'development') {
   environment.NODE_ENV = 'development'
+  // webpack 5用这个
+  // execa('webpack serve', ['--config', 'webpack/webpack.development.js'], { cwd, env: environment, buffer: false, stdio: 'inherit' })
   execa('webpack-dev-server', ['--config', 'webpack/webpack.development.js'], { cwd, env: environment, buffer: false, stdio: 'inherit' })
 }
 

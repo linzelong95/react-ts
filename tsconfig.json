@@ -13,8 +13,9 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "paths": {
-      "@manager/*": ["src/sales-manager/*"],
-      "@src/*": ["src/*"]
+      "@src/*": ["src/*"],
+      "@components/*": ["src/components/*"],
+      "@common/*": ["src/common/*"]
     }
   },
   "include": ["**/*.{ts,tsx}"],
