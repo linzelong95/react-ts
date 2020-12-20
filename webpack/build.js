@@ -34,10 +34,10 @@ if (mode === 'build-all') {
 
   environment.NODE_ENV = 'production'
   environment.BUILD_MODULES = folders.join('&')
-  execa('webpack', ['--config', 'webpack/webpack.prod.js'], { cwd, env: environment, buffer: false, stdio: 'inherit' })
+  execa('webpack', ['--config', 'webpack/webpack.production.js'], { cwd, env: environment, buffer: false, stdio: 'inherit' })
 }
 
 if (mode === 'analyzer') {
   environment.NODE_ENV = 'production'
-  execa('webpack', ['--profile', '--config', 'webpack/webpack.prod.js'], { cwd, env: environment, buffer: false, stdio: 'inherit' })
+  execa('webpack', ['--profile', '--config', 'webpack/webpack.production.js'], { cwd, env: environment, buffer: false, stdio: 'inherit' })
 }

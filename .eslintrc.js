@@ -58,13 +58,13 @@ module.exports = {
     'standard/no-callback-literal': 'off',
     'react/jsx-handler-names': 'off',
     'unicorn/no-reduce': 'off',
-    '@typescript-eslint/explicit-module-boundary-types': 'off',
+    'react/react-in-jsx-scope': 'error',
     // 允许使用new RegExp
     'prefer-regex-literals': 'off',
     // 允许使用require导入变量
     '@typescript-eslint/no-var-requires': 'off',
-    'react/react-in-jsx-scope': 'error',
     '@typescript-eslint/no-extra-semi': 'off', // 跟prettier规则冲突
+    '@typescript-eslint/no-explicit-any': 'off', // 允许使用ts的any类型
     // 下面两行配置解决'React' was used before it was defined的报错
     'no-use-before-define': 'off',
     '@typescript-eslint/no-use-before-define': ['error'],

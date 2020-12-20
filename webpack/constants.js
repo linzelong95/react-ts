@@ -20,9 +20,6 @@ const path = require('path')
 //   // 动态生成每次的 ReleaseTag
 //   variables.RELEASE_TAG = `${os.userInfo().username}-${Date.now()}`
 
-//   // 动态生成要编译的模块
-//   variables.BUILD_MODULES = process.env.BUILD_MODULES.split('&').filter((m) => !['common'].includes(m))
-
 //   return variables
 // })()
 
@@ -30,8 +27,11 @@ const path = require('path')
 const PROJECT_PATH = path.resolve(__dirname, '../')
 // 项目所在根目录的名称
 const PROJECT_NAME = path.parse(PROJECT_PATH).name
+// 动态生成要编译的模块,目前除了跟路径，只有base单独作为一个模块打包
+const BUILD_MODULES = process.env.BUILD_MODULES.split('&').filter((m) => ['base'].includes(m))
 
 module.exports = {
   PROJECT_PATH,
   PROJECT_NAME,
+  BUILD_MODULES,
 }
