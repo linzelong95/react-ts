@@ -58,6 +58,7 @@ module.exports = {
     'standard/no-callback-literal': 'off',
     'react/jsx-handler-names': 'off',
     'unicorn/no-reduce': 'off',
+    'unicorn/explicit-length-check': 'off', // 允许length不跟某个值比较， 如'xxx'.length?1:0
     'react/react-in-jsx-scope': 'error',
     // 允许使用new RegExp
     'prefer-regex-literals': 'off',

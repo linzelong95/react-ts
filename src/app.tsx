@@ -1,13 +1,15 @@
 import React from 'react'
+import './app.less'
+import './app2.less'
 
 function App(): JSX.Element {
   return (
-    <div className="App">
-      <header className="App-header">
+    <div className="app">
+      <header className="app-header">
         <p>
-          Edit55 <code>src/App.js</code> and save to reload.
+          Edit66 <code>src/App.js</code> and save to reload.
         </p>
-        <a className="App-link" href="https://reactjs.org" target="_blank" rel="noopener noreferrer">
+        <a className="app-link" href="https://reactjs.org" target="_blank" rel="noopener noreferrer">
           Learn React
         </a>
       </header>

@@ -30,7 +30,6 @@ module.exports = merge(commonConfig, {
     clientLogLevel: 'silent', // 日志等级
     disableHostCheck: true,
     quiet: true,
-    contentBase: path.join(__dirname, '../dist'),
     historyApiFallback: { disableDotRule: true },
     watchOptions: {
       poll: true,

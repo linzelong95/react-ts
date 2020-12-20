@@ -18,14 +18,13 @@ const commonConfig = require('./webpack.common')
 
 // 常量
 const CONSTANTS = require('./constants')
-const { PROJECT_PATH } = CONSTANTS
-// const cleanPaths = CONSTANTS.BUILD_MODULES.reduce((allCleanPaths, currentModule) => [...allCleanPaths, `js/${currentModule}/*`, `css/${currentModule}/*`], [])
+const { PROJECT_PATH, BUILD_MODULES } = CONSTANTS
 
 const productionConfig = {
   mode: 'production',
 
   output: {
-    filename: 'js/[name].[hash:8].js',
+    filename: `[name]/js/[hash:8].js`,
     path: path.resolve(__dirname, '../dist'),
   },
 
@@ -48,14 +47,14 @@ const productionConfig = {
 
   plugins: [
     new MiniCssExtractPlugin({
-      filename: 'css/[name].[hash:8].css',
+      filename: '[name]/css/[hash:8].css',
     }),
 
     // 删除无用文件
     new CleanWebpackPlugin({
       dry: false,
       dangerouslyAllowCleanPatternsOutsideProject: true,
-      // cleanOnceBeforeBuildPatterns: cleanPaths,
+      cleanOnceBeforeBuildPatterns: BUILD_MODULES.length ? BUILD_MODULES.map((moduleName) => `${moduleName}/**/*`) : ['index.html', 'index/**/*'],
     }),
 
     // 去除无用样式,webpack 5暂时不兼容

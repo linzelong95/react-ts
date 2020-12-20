@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import '@src/index.global.less'
+import '@src/style/index.global.less'
 import App from '@src/app'
 
 if (module && module.hot) {

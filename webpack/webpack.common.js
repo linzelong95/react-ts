@@ -6,6 +6,7 @@
 // const os = require('os')
 const path = require('path')
 const webpack = require('webpack')
+const glob = require('glob')
 
 const autoprefixer = require('autoprefixer')
 // const ManifestPlugin = require('webpack-manifest-plugin')
@@ -18,29 +19,30 @@ const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin')
 
 // 常量
 const CONSTANTS = require('./constants')
-const { PROJECT_PATH } = CONSTANTS
+const { PROJECT_PATH, BUILD_MODULES } = CONSTANTS
 const externals = require('./externals')
 
 // 环境
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // 生成要编译的模块
-// const entry = CONSTANTS.BUILD_MODULES.reduce((entryObject, currentModule) => {
-//   entryObject[currentModule] = `./src/${currentModule}`
-//   return entryObject
-// }, {})
-
-// 如果打包的是 base，externals 不被忽略
-// if (CONSTANTS.BUILD_MODULES.includes('base')) {
-//   externals = {}
-// }
+const operatedModules = BUILD_MODULES.length
+  ? BUILD_MODULES.reduce((entryObject, currentModule) => {
+      entryObject[currentModule] = `./src/${currentModule}`
+      return entryObject
+    }, {})
+  : { index: `./src/index.tsx` }
 
 module.exports = {
   // 应用入口
-  entry: './src',
+  // entry: Object.keys(moduleEntry).length ? moduleEntry : './src',
+  entry: operatedModules,
 
   // 主路径
   context: path.resolve(__dirname, '../'),
+
+  // 如果打包的是 base，externals 不被忽略
+  externals: BUILD_MODULES.includes('base') ? {} : externals,
 
   // 路径及 alias 配置
   resolve: {
@@ -128,9 +130,45 @@ module.exports = {
 
   // 插件
   plugins: [
-    new MiniCssExtractPlugin(),
     new HtmlWebpackPlugin({
-      template: path.resolve(PROJECT_PATH, './src/public/index.html'),
+      // template: path.resolve(PROJECT_PATH, './src/public/index.html'), // ./src/public/index.html可以删了
+      inject: false,
+      template: require('html-webpack-template'),
+      appMountId: 'root',
+      mobile: true,
+      lang: 'en-US',
+      meta: [
+        {
+          name: 'description',
+          content: 'A better default template for html-webpack-plugin.',
+        },
+      ],
+      // links: [
+      //   'https://fonts.googleapis.com/css?family=Roboto',
+      //   {
+      //     href: '/apple-touch-icon.png',
+      //     rel: 'apple-touch-icon',
+      //     sizes: '180x180',
+      //   },
+      //   {
+      //     href: '/favicon-32x32.png',
+      //     rel: 'icon',
+      //     sizes: '32x32',
+      //     type: 'image/png',
+      //   },
+      // ],
+
+      scripts: isDevelopment
+        ? [
+            ...glob
+              .sync(`${path.resolve(PROJECT_PATH, './dist')}/base/js/*.js`, { nodir: true })
+              .map((pathname) => path.relative(path.resolve(PROJECT_PATH), pathname)),
+            'js/index.js',
+          ]
+        : glob
+            .sync(`${path.resolve(PROJECT_PATH, './dist')}/**/*.js`, { nodir: true }) // TODO;bug
+            .map((pathname) => path.relative(path.resolve(PROJECT_PATH, './dist'), pathname)),
+      title: 'My App',
       filename: 'index.html',
       cache: false, // 特别重要：防止之后使用v6版本 copy-webpack-plugin 时代码修改一刷新页面为空问题。
       minify: isDevelopment
@@ -198,8 +236,6 @@ module.exports = {
     //   })
     // }),
   ],
-
-  externals,
 
   performance: {
     hints: false,
