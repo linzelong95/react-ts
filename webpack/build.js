@@ -13,19 +13,19 @@ const environment = {
 }
 
 // 执行 webpack
-if (mode === 'dev' || mode === 'development') {
+if (mode === 'dev') {
   environment.NODE_ENV = 'development'
   // webpack 5用这个
-  execa('webpack serve', ['--config', 'webpack/webpack.development.js'], { cwd, env: environment, buffer: false, stdio: 'inherit' })
+  execa('webpack', ['serve', '--config', 'webpack/webpack.development.js'], { cwd, env: environment, buffer: false, stdio: 'inherit' })
   // execa('webpack-dev-server', ['--config', 'webpack/webpack.development.js'], { cwd, env: environment, buffer: false, stdio: 'inherit' })
 }
 
-if (mode === 'build' || mode === 'production') {
+if (mode === 'build') {
   environment.NODE_ENV = 'production'
   execa('webpack', ['--config', 'webpack/webpack.production.js'], { cwd, env: environment, buffer: false, stdio: 'inherit' })
 }
 
-if (mode === 'build-all' || mode === 'production') {
+if (mode === 'build-all') {
   const files = fs.readdirSync(path.resolve(__dirname, '../src'), { withFileTypes: true })
   const folders = files
     .filter((file) => file.isDirectory())

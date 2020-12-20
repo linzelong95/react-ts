@@ -1,6 +1,6 @@
 const path = require('path')
 const webpack = require('webpack')
-const merge = require('webpack-merge')
+const { merge } = require('webpack-merge')
 
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 // 找到没有用到的废弃文件
@@ -18,7 +18,9 @@ module.exports = merge(commonConfig, {
   },
 
   // DEV 配置
-  devtool: 'cheap-module-eval-source-map',
+  devtool: 'eval-cheap-module-source-map',
+  watch: true,
+  target: 'web',
   devServer: {
     port: 9000,
     hot: true, // 热更新
@@ -28,7 +30,11 @@ module.exports = merge(commonConfig, {
     clientLogLevel: 'silent', // 日志等级
     disableHostCheck: true,
     quiet: true,
+    contentBase: path.join(__dirname, '../dist'),
     historyApiFallback: { disableDotRule: true },
+    watchOptions: {
+      poll: true,
+    },
     proxy: {
       '/api/': {
         target: 'http://111.222.333.333:3001',
@@ -47,7 +53,6 @@ module.exports = merge(commonConfig, {
 
   // 插件
   plugins: [
-    new webpack.HotModuleReplacementPlugin(),
     new MiniCssExtractPlugin({
       filename: 'css/[name].css',
     }),
@@ -55,5 +60,6 @@ module.exports = merge(commonConfig, {
     //   failOnUnused: true,
     //   patterns: ['./src/**/*.*'],
     // }),
+    new webpack.HotModuleReplacementPlugin(),
   ],
 })
