@@ -5,6 +5,7 @@ module.exports = {
     useJSXTextNode: true,
     ecmaVersion: 11,
     sourceType: 'module',
+    // allowImportExportEverywhere: true,
   },
   settings: {
     react: {
@@ -30,7 +31,6 @@ module.exports = {
   // 全局变量的校验规则
   globals: {
     _: 'readonly',
-    Raven: 'readonly',
   },
   env: {
     browser: true,
@@ -77,7 +77,6 @@ module.exports = {
         '@typescript-eslint/indent': ['error', 2],
         '@typescript-eslint/explicit-module-boundary-types': 'warn',
         '@typescript-eslint/no-var-requires': 'warn',
-        'react/react-in-jsx-scope': 'warn',
         // "@typescript-eslint/class-name-casing": ["error"],// 兼容性有问题，先取消
         '@typescript-eslint/class-name-casing': 'off',
         '@typescript-eslint/type-annotation-spacing': ['error'],

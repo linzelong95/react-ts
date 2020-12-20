@@ -1,10 +1,8 @@
-// "node ./bin/build.js dev"
-
 const path = require('path')
 const fs = require('fs')
 const execa = require('execa')
 
-const modules = process.argv.slice(3)
+const modules = process.argv.slice(3) // 目前是没有多模块的，该字段暂时无意义
 const mode = process.argv[2]
 const cwd = path.resolve(__dirname, '../')
 const environment = {
@@ -18,13 +16,13 @@ const environment = {
 if (mode === 'dev' || mode === 'development') {
   environment.NODE_ENV = 'development'
   // webpack 5用这个
-  // execa('webpack serve', ['--config', 'webpack/webpack.development.js'], { cwd, env: environment, buffer: false, stdio: 'inherit' })
-  execa('webpack-dev-server', ['--config', 'webpack/webpack.development.js'], { cwd, env: environment, buffer: false, stdio: 'inherit' })
+  execa('webpack serve', ['--config', 'webpack/webpack.development.js'], { cwd, env: environment, buffer: false, stdio: 'inherit' })
+  // execa('webpack-dev-server', ['--config', 'webpack/webpack.development.js'], { cwd, env: environment, buffer: false, stdio: 'inherit' })
 }
 
 if (mode === 'build' || mode === 'production') {
   environment.NODE_ENV = 'production'
-  execa('webpack', ['-p', '--config', 'webpack/webpack.production.js'], { cwd, env: environment, buffer: false, stdio: 'inherit' })
+  execa('webpack', ['--config', 'webpack/webpack.production.js'], { cwd, env: environment, buffer: false, stdio: 'inherit' })
 }
 
 if (mode === 'build-all' || mode === 'production') {
@@ -36,7 +34,7 @@ if (mode === 'build-all' || mode === 'production') {
 
   environment.NODE_ENV = 'production'
   environment.BUILD_MODULES = folders.join('&')
-  execa('webpack', ['-p', '--config', 'webpack/webpack.prod.js'], { cwd, env: environment, buffer: false, stdio: 'inherit' })
+  execa('webpack', ['--config', 'webpack/webpack.prod.js'], { cwd, env: environment, buffer: false, stdio: 'inherit' })
 }
 
 if (mode === 'analyzer') {

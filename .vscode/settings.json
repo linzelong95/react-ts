@@ -9,7 +9,7 @@
   "html.validate.scripts": false,
   "html.format.enable": false,
   "javascript.validate.enable": false,
-  "typescript.validate.enable": false,
+  // "typescript.validate.enable": false,
   "javascript.format.enable": false,
   "typescript.format.enable": false,
   "json.format.enable": false,

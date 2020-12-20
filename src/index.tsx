@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import './index.css'
-import App from './app'
+import '@src/index.global.less'
+import App from '@src/app'
 
 if (module && module.hot) {
   module.hot.accept()

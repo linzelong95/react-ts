@@ -19,26 +19,25 @@ const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin')
 // 常量
 const CONSTANTS = require('./constants')
 const { PROJECT_PATH } = CONSTANTS
-let externals = require('./externals')
+const externals = require('./externals')
 
 // 环境
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // 生成要编译的模块
-const entry = CONSTANTS.BUILD_MODULES.reduce((entryObject, currentModule) => {
-  entryObject[currentModule] = `./src/${currentModule}`
-  return entryObject
-}, {})
+// const entry = CONSTANTS.BUILD_MODULES.reduce((entryObject, currentModule) => {
+//   entryObject[currentModule] = `./src/${currentModule}`
+//   return entryObject
+// }, {})
 
 // 如果打包的是 base，externals 不被忽略
-if (CONSTANTS.BUILD_MODULES.includes('base')) {
-  externals = {}
-}
+// if (CONSTANTS.BUILD_MODULES.includes('base')) {
+//   externals = {}
+// }
 
 module.exports = {
   // 应用入口
-  // 根据 ENV 动态生成
-  entry,
+  entry: './src',
 
   // 主路径
   context: path.resolve(__dirname, '../'),
@@ -91,8 +90,8 @@ module.exports = {
         use: [
           isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader,
           { loader: 'css-loader', options: { importLoaders: 1, modules: true } },
-          { loader: 'postcss-loader', options: { plugins: [autoprefixer] } },
-          { loader: 'less-loader', options: { javascriptEnabled: true } },
+          { loader: 'postcss-loader', options: { postcssOptions: { plugins: [autoprefixer] } } },
+          { loader: 'less-loader' },
         ],
       },
       {
@@ -101,17 +100,17 @@ module.exports = {
         use: [
           isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader,
           { loader: 'css-loader', options: { importLoaders: 1 } },
-          { loader: 'postcss-loader', options: { plugins: [autoprefixer] } },
-          { loader: 'less-loader', options: { javascriptEnabled: true } },
+          { loader: 'postcss-loader', options: { postcssOptions: { plugins: [autoprefixer] } } },
+          { loader: 'less-loader' },
         ],
       },
       {
         test: /\.css$/,
-        loaders: ['style-loader', { loader: 'css-loader', options: { importLoaders: 1 } }],
+        use: ['style-loader', { loader: 'css-loader', options: { importLoaders: 1 } }],
       },
       // {
       //   test: /\.(jpe?g|png|gif|svg)$/i,
-      //   loaders: ['file-loader?hash=sha512&digest=hex&name=img/[name].[ext]&publicPath=/public'],
+      //   loader: ['file-loader?hash=sha512&digest=hex&name=img/[name].[ext]&publicPath=/public'],
       // },
       // webpack 5
       {
@@ -129,6 +128,7 @@ module.exports = {
 
   // 插件
   plugins: [
+    new MiniCssExtractPlugin(),
     new HtmlWebpackPlugin({
       template: path.resolve(PROJECT_PATH, './src/public/index.html'),
       filename: 'index.html',
@@ -151,13 +151,18 @@ module.exports = {
           },
     }),
 
-    // 带名称导出模块
-    new webpack.NamedModulesPlugin(),
+    // 带名称导出模块,webpack 5 改为optimization.moduleIds: 'named'
+    // new webpack.NamedModulesPlugin(),
 
     // TS 类型检查
+    // new ForkTsCheckerWebpackPlugin({
+    //   reportFiles: ['./src/**/*.{ts,tsx}'],
+    //   tsconfig: './tsconfig.json',
+    // }),
     new ForkTsCheckerWebpackPlugin({
-      reportFiles: ['./src/**/*.{ts,tsx}'],
-      tsconfig: './tsconfig.json',
+      eslint: {
+        files: './src/**/*.{ts,tsx,js,jsx}',
+      },
     }),
 
     // 优化错误展示
@@ -165,6 +170,7 @@ module.exports = {
 
     // 进度条
     new ProgressBarPlugin(),
+    // new webpack.ProgressPlugin(), // webpack自带
 
     // ...CONSTANTS.BUILD_MODULES.map((mdl) => {
     //   // 生成 Manifest 文件

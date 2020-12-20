@@ -1,3 +1,4 @@
+const path = require('path')
 const webpack = require('webpack')
 const merge = require('webpack-merge')
 
@@ -12,14 +13,14 @@ module.exports = merge(commonConfig, {
   mode: 'development',
 
   output: {
-    filename: 'js/[name]/[name].js',
-    publicPath: 'http://127.0.0.1:7002/dev-static/',
+    filename: 'js/[name].js',
+    path: path.resolve(__dirname, '../dist'),
   },
 
   // DEV 配置
   devtool: 'cheap-module-eval-source-map',
   devServer: {
-    port: 8080,
+    port: 9000,
     hot: true, // 热更新
     open: true, // 打开默认浏览器
     compress: true, // 是否启用 gzip 压缩
@@ -27,7 +28,6 @@ module.exports = merge(commonConfig, {
     clientLogLevel: 'silent', // 日志等级
     disableHostCheck: true,
     quiet: true,
-    // publicPath: '/dev-static/',
     historyApiFallback: { disableDotRule: true },
     proxy: {
       '/api/': {
@@ -49,7 +49,7 @@ module.exports = merge(commonConfig, {
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
     new MiniCssExtractPlugin({
-      filename: 'css/[name]/[name].css',
+      filename: 'css/[name].css',
     }),
     // new UnusedFilesWebpackPlugin({
     //   failOnUnused: true,
