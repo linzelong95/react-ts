@@ -1,7 +1,7 @@
 {
-  "name": "react-ts-quick-starter",
+  "name": "yyy",
   "version": "1.0.0",
-  "description": "Quickly create react + typescript project development environment and scaffold for developing npm package components",
+  "description": "xxx",
   "main": "index.js",
   "scripts": {
     "dev": "node ./webpack/build.js dev",
@@ -11,13 +11,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vortesnail/react-ts-quick-starter.git"
+    "url": "xx"
   },
   "keywords": [
     "react-project",
     "typescript-project",
-    "react-typescript",
-    "react-ts-quick-starter"
+    "react-typescript"
   ],
   "author": {
     "name": "vortesnail",
