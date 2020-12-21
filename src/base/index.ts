@@ -18,9 +18,6 @@ import axios from 'axios'
 
 // 公共样式
 
-// moment 设置语言
-moment.locale('zh-cn')
-
 // 注入全局变量
 ;(window as any).React = React
 ;(window as any).ReactDOM = ReactDOM
