@@ -1,13 +1,12 @@
 import React from 'react'
 import './app.less'
-import './app2.less'
 
 function App(): JSX.Element {
   return (
     <div className="app">
       <header className="app-header">
         <p>
-          Edit66 <code>src/App.js</code> and save to reload.
+          Editgh66 <code>src/App.js</code> and save to reload.
         </p>
         <a className="app-link" href="https://reactjs.org" target="_blank" rel="noopener noreferrer">
           Learn React

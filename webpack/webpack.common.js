@@ -1,11 +1,6 @@
-// 必要的参数检查
-// if (!process.env.BUILD_MODULES) {
-//   throw new Error('必须要添加要编译的 app 名，例如 npm run dev index 或 npm run build index')
-// }
-
 // const os = require('os')
 const path = require('path')
-const webpack = require('webpack')
+// const webpack = require('webpack')
 const glob = require('glob')
 
 const autoprefixer = require('autoprefixer')
@@ -17,10 +12,11 @@ const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin')
 
+const externals = require('./externals')
+
 // 常量
 const CONSTANTS = require('./constants')
-const { PROJECT_PATH, BUILD_MODULES } = CONSTANTS
-const externals = require('./externals')
+const { PROJECT_PATH, BUILD_MODULES, COMMON_MODULES } = CONSTANTS
 
 // 环境
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -33,9 +29,31 @@ const operatedModules = BUILD_MODULES.length
     }, {})
   : { index: `./src/index.tsx` }
 
+class MyInjectCustomScriptsPlugin {
+  constructor(options) {
+    this.options = options
+  }
+
+  // TODO:如何通过直接向webpack打包的文件注入自己的js来达到目的?
+  apply(compiler) {
+    const { paths } = this.options
+    compiler.hooks.compilation.tap('MyInjectCustomScriptsPlugin', (compilation) => {
+      HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync('MyInjectCustomScriptsPlugin', (data, callback) => {
+        const scripts = paths.reduce((jsString, path) => {
+          jsString += `<script src=${path}></script>`
+          return jsString
+        }, '')
+        const { html } = data
+        const firstScriptIndex = html.indexOf('<script')
+        data.html = html.slice(0, firstScriptIndex) + scripts + html.slice(firstScriptIndex)
+        callback(undefined, data)
+      })
+    })
+  }
+}
+
 module.exports = {
   // 应用入口
-  // entry: Object.keys(moduleEntry).length ? moduleEntry : './src',
   entry: operatedModules,
 
   // 主路径
@@ -69,7 +87,7 @@ module.exports = {
           {
             loader: 'eslint-loader',
             options: {
-              // fix: true, // 不要自动fix
+              fix: false,
               emitError: true,
             },
           },
@@ -130,73 +148,42 @@ module.exports = {
 
   // 插件
   plugins: [
-    new HtmlWebpackPlugin({
-      // template: path.resolve(PROJECT_PATH, './src/public/index.html'), // ./src/public/index.html可以删了
-      inject: false,
-      template: require('html-webpack-template'),
-      appMountId: 'root',
-      mobile: true,
-      lang: 'en-US',
-      meta: [
-        {
-          name: 'description',
-          content: 'A better default template for html-webpack-plugin.',
-        },
-      ],
-      // links: [
-      //   'https://fonts.googleapis.com/css?family=Roboto',
-      //   {
-      //     href: '/apple-touch-icon.png',
-      //     rel: 'apple-touch-icon',
-      //     sizes: '180x180',
-      //   },
-      //   {
-      //     href: '/favicon-32x32.png',
-      //     rel: 'icon',
-      //     sizes: '32x32',
-      //     type: 'image/png',
-      //   },
-      // ],
-
-      scripts: isDevelopment
-        ? [
-            ...glob
+    ...(!BUILD_MODULES.length
+      ? [
+          new HtmlWebpackPlugin({
+            template: path.resolve(PROJECT_PATH, './src/public/index.html'),
+            filename: 'index.html',
+            cache: false, // 特别重要：防止之后使用v6版本 copy-webpack-plugin 时代码修改一刷新页面为空问题。
+            minify: isDevelopment
+              ? false
+              : {
+                  removeAttributeQuotes: true,
+                  collapseWhitespace: true,
+                  removeComments: true,
+                  collapseBooleanAttributes: true,
+                  collapseInlineTagWhitespace: true,
+                  removeRedundantAttributes: true,
+                  removeScriptTypeAttributes: true,
+                  removeStyleLinkTypeAttributes: true,
+                  minifyCSS: true,
+                  minifyJS: true,
+                  minifyURLs: true,
+                  useShortDoctype: true,
+                },
+          }),
+          new MyInjectCustomScriptsPlugin({
+            paths: glob
+              // .sync(`${path.resolve(PROJECT_PATH, './dist')}/{${COMMON_MODULES.join(',')}}/js/*.js`, { nodir: true })
               .sync(`${path.resolve(PROJECT_PATH, './dist')}/base/js/*.js`, { nodir: true })
-              .map((pathname) => path.relative(path.resolve(PROJECT_PATH), pathname)),
-            'js/index.js',
-          ]
-        : glob
-            .sync(`${path.resolve(PROJECT_PATH, './dist')}/**/*.js`, { nodir: true }) // TODO;bug
-            .map((pathname) => path.relative(path.resolve(PROJECT_PATH, './dist'), pathname)),
-      title: 'My App',
-      filename: 'index.html',
-      cache: false, // 特别重要：防止之后使用v6版本 copy-webpack-plugin 时代码修改一刷新页面为空问题。
-      minify: isDevelopment
-        ? false
-        : {
-            removeAttributeQuotes: true,
-            collapseWhitespace: true,
-            removeComments: true,
-            collapseBooleanAttributes: true,
-            collapseInlineTagWhitespace: true,
-            removeRedundantAttributes: true,
-            removeScriptTypeAttributes: true,
-            removeStyleLinkTypeAttributes: true,
-            minifyCSS: true,
-            minifyJS: true,
-            minifyURLs: true,
-            useShortDoctype: true,
-          },
-    }),
+              .map((pathname) => path.relative(path.resolve(PROJECT_PATH, isDevelopment ? '' : './dist'), pathname)),
+          }),
+        ]
+      : []),
 
     // 带名称导出模块,webpack 5 改为optimization.moduleIds: 'named'
     // new webpack.NamedModulesPlugin(),
 
     // TS 类型检查
-    // new ForkTsCheckerWebpackPlugin({
-    //   reportFiles: ['./src/**/*.{ts,tsx}'],
-    //   tsconfig: './tsconfig.json',
-    // }),
     new ForkTsCheckerWebpackPlugin({
       eslint: {
         files: './src/**/*.{ts,tsx,js,jsx}',

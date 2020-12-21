@@ -41,7 +41,7 @@ module.exports = {
     'prettier/prettier': 'error',
     'jsx-quotes': ['error', 'prefer-double'],
     'comma-dangle': ['error', 'always-multiline'],
-    'operator-linebreak': ['error', 'before'],
+    'operator-linebreak': 'off', // 与prettier冲突，关闭校验
     'space-before-function-paren': 'off', // 与prettier冲突，关闭校验
     'react/prop-types': 'off',
     'react/jsx-no-bind': 'off',
