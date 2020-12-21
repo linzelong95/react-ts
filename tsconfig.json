@@ -16,7 +16,8 @@
       "@src/*": ["src/*"],
       "@components/*": ["src/components/*"],
       "@common/*": ["src/common/*"],
-      "@public/*": ["src/public/*"]
+      "@public/*": ["src/public/*"],
+      "@store/*": ["src/store/*"]
     }
   },
   "include": ["./src/**/*"],
