@@ -27,3 +27,12 @@ declare module '*.png' {
   const path: string
   export default path
 }
+
+declare module '*.css'
+declare module '*.less'
+// declare module '*.svg';
+// declare module '*.png';
+declare module '*.json' {
+  const content: object
+  export default content
+}

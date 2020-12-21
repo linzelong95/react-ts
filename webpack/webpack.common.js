@@ -136,6 +136,9 @@ module.exports = {
       {
         test: /\.(?:ico|gif|png|jpg|jpeg)$/i,
         type: 'asset/resource',
+        generator: {
+          filename: 'index/images/[hash][ext][query]',
+        },
         // asset/resource等同file-loader，asset/inline等同url-loader，asset/source等同raw-loader
         // asset等同automatically chooses between exporting a data URI and emitting a separate file. Previously achievable by using url-loader with asset size limit
       },
