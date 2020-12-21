@@ -8,6 +8,4 @@ module.exports = {
   moment: 'moment',
   xlsx: 'XLSX',
   axios: 'axios',
-  // antd: 'antd',
-  // lodash: '_',
 }

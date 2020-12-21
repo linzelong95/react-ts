@@ -11,10 +11,6 @@ import * as ReactRedux from 'react-redux'
 import moment from 'moment'
 import XLSX from 'xlsx'
 import axios from 'axios'
-// import _ from 'lodash'
-// import * as antd from 'antd'
-// import zhCN from 'antd/lib/locale-provider/zh_CN'
-// import * as Sentry from '@sentry/browser'
 
 // 公共样式
 
@@ -28,7 +24,3 @@ import axios from 'axios'
 ;(window as any).moment = moment
 ;(window as any).XLSX = XLSX
 ;(window as any).axios = axios
-// ;(window as any)._ = _
-// ;(window as any).antd = antd
-// ;(window as any).antd_LOCALE_ZHCN = zhCN
-// ;(window as any).Sentry = Sentry
