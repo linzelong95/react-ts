@@ -173,6 +173,7 @@ module.exports = {
           }),
           new MyInjectCustomScriptsPlugin({
             paths: glob
+              // TODO: 不能使用类似 {src,page}/**/*.{ts,js} 的写法？
               // .sync(`${path.resolve(PROJECT_PATH, './dist')}/{${COMMON_MODULES.join(',')}}/js/*.js`, { nodir: true })
               .sync(`${path.resolve(PROJECT_PATH, './dist')}/base/js/*.js`, { nodir: true })
               .map((pathname) => path.relative(path.resolve(PROJECT_PATH, isDevelopment ? '' : './dist'), pathname)),
@@ -190,7 +191,7 @@ module.exports = {
       },
     }),
 
-    // 优化错误展示
+    // 优化错误展示，与webpack 5暂不兼容？
     new FriendlyErrorsWebpackPlugin(),
 
     // 进度条

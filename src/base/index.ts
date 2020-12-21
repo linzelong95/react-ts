@@ -8,10 +8,10 @@ import * as ReactRouter from 'react-router'
 import * as ReactRouterDOM from 'react-router-dom'
 import * as Redux from 'redux'
 import * as ReactRedux from 'react-redux'
-import _ from 'lodash'
 import moment from 'moment'
 import XLSX from 'xlsx'
 import axios from 'axios'
+// import _ from 'lodash'
 // import * as antd from 'antd'
 // import zhCN from 'antd/lib/locale-provider/zh_CN'
 // import * as Sentry from '@sentry/browser'
@@ -28,10 +28,10 @@ moment.locale('zh-cn')
 ;(window as any).ReactRouterDOM = ReactRouterDOM
 ;(window as any).Redux = Redux
 ;(window as any).ReactRedux = ReactRedux
-;(window as any)._ = _
 ;(window as any).moment = moment
 ;(window as any).XLSX = XLSX
 ;(window as any).axios = axios
+// ;(window as any)._ = _
 // ;(window as any).antd = antd
 // ;(window as any).antd_LOCALE_ZHCN = zhCN
 // ;(window as any).Sentry = Sentry
