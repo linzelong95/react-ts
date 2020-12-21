@@ -34,18 +34,24 @@ class MyInjectCustomScriptsPlugin {
     this.options = options
   }
 
-  // TODO:如何通过直接向webpack打包的文件注入自己的js来达到目的?
+  // TODO:如何通过直接向webpack打包的文件区注入额外的js/css来达到目的?
   apply(compiler) {
     const { paths } = this.options
     compiler.hooks.compilation.tap('MyInjectCustomScriptsPlugin', (compilation) => {
       HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync('MyInjectCustomScriptsPlugin', (data, callback) => {
-        const scripts = paths.reduce((jsString, path) => {
-          jsString += `<script src=${path}></script>`
-          return jsString
-        }, '')
+        const scripts = paths.reduce(
+          (scripts, path) => {
+            if (path.endsWith('.js')) scripts.jsString += `<script src=${path}></script>`
+            if (path.endsWith('.css')) scripts.cssString += `<link href=${path} rel=stylesheet />`
+            return scripts
+          },
+          { jsString: '', cssString: '' },
+        )
         const { html } = data
+        const firstCssIndex = html.indexOf('<link')
         const firstScriptIndex = html.indexOf('<script')
-        data.html = html.slice(0, firstScriptIndex) + scripts + html.slice(firstScriptIndex)
+        data.html = html.slice(0, firstScriptIndex) + scripts.jsString + html.slice(firstScriptIndex)
+        data.html = data.html.slice(0, firstCssIndex) + scripts.cssString + data.html.slice(firstCssIndex)
         callback(undefined, data)
       })
     })
