@@ -1,11 +1,11 @@
 import React, { CSSProperties } from 'react'
 import { IconProps } from './type'
-import ICONS_MAP from './icon-map'
+import MAP from './map'
 import styles from './style.less'
 
 function createIconStyle(params: Omit<IconProps, 'className'>): CSSProperties {
   const { name, width, height, color } = params
-  let icon: string = ICONS_MAP[name]
+  let icon: string = MAP[name]
   if (color) {
     icon = icon.replace('{{COLOR}}', encodeURIComponent(color))
   }
