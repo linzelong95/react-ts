@@ -1,4 +1,4 @@
-import React, { Dispatch, useCallback } from 'react'
+import React, { useEffect, Dispatch, useCallback } from 'react'
 import { connect } from 'react-redux'
 import { Icon } from '@common/components'
 import { StoreState, UserAction, UserActionType } from '@src/store/types'
@@ -6,6 +6,7 @@ import './app.less'
 import testImgUrl from '@public/images/haha.jpeg'
 import testSvgUrl from '@public/images/mail.svg'
 import Test from './containers/test'
+import { login } from '@services/user'
 
 interface AppProps {
   user: StoreState['user']
@@ -20,6 +21,14 @@ function App(props: AppProps): JSX.Element {
 
   const logout = useCallback(() => {
     onClearUser()
+  }, [])
+
+  useEffect(() => {
+    ;(async () => {
+      const [res, err] = await login({ email: '984621758@qq.com', password: 'Qq123456' })
+      if (err) return
+      console.log(res)
+    })()
   }, [])
 
   return (
@@ -44,7 +53,7 @@ function App(props: AppProps): JSX.Element {
   )
 }
 
-export default connect(
+export default connect<Pick<AppProps, 'user'>, Pick<AppProps, 'onClearUser'>, Omit<AppProps, 'user' | 'onClearUser'>, StoreState>(
   (state: StoreState) => ({
     user: state.user,
   }),

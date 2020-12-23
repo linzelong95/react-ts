@@ -1,6 +1,7 @@
 const { merge } = require('webpack-merge')
-const glob = require('glob')
+// const glob = require('glob')
 const path = require('path')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 // const PurgeCSSPlugin = require('purgecss-webpack-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
@@ -25,7 +26,7 @@ const productionConfig = {
 
   output: {
     filename: `[name]/js/[hash:8].js`,
-    path: path.resolve(__dirname, '../dist'),
+    path: path.resolve(PROJECT_PATH, 'dist'),
   },
 
   devtool: 'source-map',
@@ -46,6 +47,7 @@ const productionConfig = {
   },
 
   plugins: [
+    // 抽离出css
     new MiniCssExtractPlugin({
       filename: '[name]/css/[hash:8].css',
     }),
@@ -56,6 +58,18 @@ const productionConfig = {
       dangerouslyAllowCleanPatternsOutsideProject: true,
       cleanOnceBeforeBuildPatterns: BUILD_MODULES.length ? BUILD_MODULES.map((moduleName) => `${moduleName}/**/*`) : ['index.html', 'index/**/*'],
     }),
+
+    ...(BUILD_MODULES.length
+      ? []
+      : [
+          // 复制一些东西
+          new CopyWebpackPlugin({
+            patterns: [
+              // TEST
+              // { from: path.resolve(PROJECT_PATH, 'src/public'), to: path.resolve(PROJECT_PATH, 'dist/public') }
+            ],
+          }),
+        ]),
 
     // 去除无用样式,webpack 5暂时不兼容
     // new PurgeCSSPlugin({

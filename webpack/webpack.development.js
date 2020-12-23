@@ -35,11 +35,11 @@ module.exports = merge(commonConfig, {
       poll: true,
     },
     proxy: {
-      '/api/': {
-        target: 'http://111.222.333.333:3001',
+      '/api': {
+        target: 'http://local.lceda.cn/',
         changeOrigin: true,
         pathRewrite: {
-          '^/api': '',
+          '^/': '',
         },
       },
     },

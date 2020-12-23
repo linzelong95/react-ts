@@ -19,24 +19,26 @@
     "react-typescript"
   ],
   "author": {
-    "name": "vortesnail",
-    "url": "https://github.com/vortesnail",
-    "email": "1091331061@qq.com"
+    "name": "xxx",
+    "url": "xxx",
+    "email": "xxx@qq.com"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/vortesnail/react-ts-quick-starter/issues"
+    "url": "https://xxx"
   },
-  "homepage": "https://github.com/vortesnail/react-ts-quick-starter#readme",
+  "homepage": "https://xxx#readme",
   "dependencies": {
     "axios": "^0.21.0",
     "moment": "^2.29.1",
+    "qs": "^6.9.4",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-redux": "^7.2.2",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "redux": "^4.0.5",
+    "uuid": "^8.3.2",
     "xlsx": "^0.16.9"
   },
   "devDependencies": {
@@ -63,6 +65,7 @@
     "autoprefixer": "^10.1.0",
     "babel-loader": "^8.2.2",
     "clean-webpack-plugin": "^3.0.0",
+    "copy-webpack-plugin": "^7.0.0",
     "core-js": "^3.8.1",
     "css-loader": "^5.0.1",
     "eslint": "^7.16.0",
