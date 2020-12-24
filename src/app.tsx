@@ -32,11 +32,11 @@ function App(props: AppProps): JSX.Element {
   }, [])
 
   return (
-    <div className="app">
+    <div>
       <Test />
       <h1>我的名字{user.username}</h1>
       <Icon className="map-icon" name="model" width="40px" height="40px" color="#333" />
-      <header className="app-header">
+      <header>
         <p>
           Ed8886 <code>src/App.js</code> and save to reload.{b.join(',')}
         </p>

@@ -9,13 +9,13 @@ interface TestProps {
 }
 
 const Test = (props: TestProps) => {
-  const [dataSource, setDataSource] = useState<string[]>([])
+  const [dataSource, setDataSource] = useState<GetSomethingListRes['list']>([])
 
   useEffect(() => {
     ;(async () => {
-      const [res, err] = await getSomethingList<GetSomethingListRes>('haha')
-      console.log(err)
+      const [res, err] = await getSomethingList('haha')
       if (err) {
+        console.log(err)
         alert('请求异常')
         return
       }

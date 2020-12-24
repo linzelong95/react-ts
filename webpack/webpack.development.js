@@ -36,11 +36,12 @@ module.exports = merge(commonConfig, {
     },
     proxy: {
       '/api': {
-        target: 'http://local.lceda.cn/',
+        target: 'http://local.lceda.cn/', // 需要在内网环境
         changeOrigin: true,
         pathRewrite: {
           '^/': '',
         },
+        secure: false,
       },
     },
     headers: {
