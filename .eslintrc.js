@@ -56,7 +56,8 @@ module.exports = {
       },
     ],
     'handle-callback-err': 'off',
-    camelcase: 'off',
+    indent: 'off',
+    camelcase: 'warn',
     'standard/no-callback-literal': 'off',
     'react/jsx-handler-names': 'off',
     'unicorn/no-reduce': 'off',
@@ -64,22 +65,17 @@ module.exports = {
     'unicorn/prevent-abbreviations': 'off',
     'unicorn/explicit-length-check': 'off', // 允许length不跟某个值比较， 如'xxx'.length?1:0
     'react/react-in-jsx-scope': 'error',
-    // 允许使用new RegExp
-    'prefer-regex-literals': 'off',
-    // 允许使用require导入变量
-    '@typescript-eslint/no-var-requires': 'off',
+    'prefer-regex-literals': 'off', // 允许使用new RegExp
+    'no-use-before-define': 'off', // 解决'React' was used before it was defined的报错以及在上方调用下方声明的函数时的报错
+    'no-unused-vars': 'warn',
+    '@typescript-eslint/no-var-requires': 'off', // 允许使用require导入变量
     '@typescript-eslint/no-extra-semi': 'off', // 跟prettier规则冲突
     '@typescript-eslint/no-explicit-any': 'off', // 允许使用ts的any类型
-    // 下面两行配置解决'React' was used before it was defined的报错
-    'no-use-before-define': 'off',
-    '@typescript-eslint/no-use-before-define': ['error'],
   },
   overrides: [
     {
       files: ['*.ts', '*.tsx'],
       rules: {
-        indent: 'off',
-        '@typescript-eslint/indent': ['error', 2],
         '@typescript-eslint/explicit-module-boundary-types': 'warn',
         '@typescript-eslint/no-var-requires': 'warn',
         // "@typescript-eslint/class-name-casing": ["error"],// 兼容性有问题，先取消
@@ -87,15 +83,15 @@ module.exports = {
         '@typescript-eslint/type-annotation-spacing': ['error'],
         'no-unused-vars': 'off',
         '@typescript-eslint/no-unused-vars': [
-          'error',
+          'warn',
           {
             vars: 'all',
             args: 'after-used',
             ignoreRestSiblings: false,
           },
         ],
-        'func-call-spacing': 'off',
-        '@typescript-eslint/func-call-spacing': ['error'],
+        // 'func-call-spacing': 'off',
+        // '@typescript-eslint/func-call-spacing': ['error'],
         'import/export': 'off',
       },
     },

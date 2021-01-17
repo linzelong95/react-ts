@@ -5,17 +5,17 @@ import { StoreState, UserAction, UserActionType } from '@src/store/types'
 import './app.less'
 import testImgUrl from '@public/images/haha.jpeg'
 import testSvgUrl from '@public/images/mail.svg'
-import Test from './containers/test'
 import { login } from '@services/user'
-
+import routes from '@configs/routes'
+import { renderRoutes } from '@utils/routes'
+import { useHistory } from 'react-router-dom'
 interface AppProps {
   user: StoreState['user']
   onClearUser: (flag?: boolean) => void
 }
 
 function App(props: AppProps): JSX.Element {
-  const a = [1, 3, 5]
-  const b = [...a]
+  const history = useHistory()
   const { user, onClearUser } = props
   console.log(user)
 
@@ -33,22 +33,22 @@ function App(props: AppProps): JSX.Element {
 
   return (
     <div>
-      <Test />
       <h1>我的名字{user.username}</h1>
       <Icon className="map-icon" name="model" width="40px" height="40px" color="#333" />
-      <header>
-        <p>
-          Ed8886 <code>src/App.js</code> and save to reload.{b.join(',')}
-        </p>
-        <a className="app-link" href="https://reactjs.org" target="_blank" rel="noopener noreferrer">
-          Learn React
-        </a>
-        <img src={testImgUrl} />
-        <div style={{ background: 'black' }}>
-          <span style={{ background: `url(${testSvgUrl})`, backgroundSize: '50px 50px' }} />
-        </div>
-      </header>
+      <img src={testImgUrl} />
+      <div style={{ background: 'black' }}>
+        <span style={{ background: `url(${testSvgUrl})`, backgroundSize: '50px 50px' }} />
+      </div>
       <button onClick={logout}>删除username</button>
+      <button onClick={() => history.push('/')}>push /</button>
+      <button onClick={() => history.push('/test-a')}>push /test-a</button>
+      <button onClick={() => history.push('/test-a/test-b')}>push /test-a/test-b</button>
+      <button onClick={() => history.push('/test-a/f')}>push /test-a/f</button>
+      <button onClick={() => history.push('/test-a/test-c')}>push /test-a/test-c</button>
+      <button onClick={() => history.push('/c')}>push /c</button>
+      <button onClick={() => history.push('/d')}>push /d</button>
+      <button onClick={() => history.push('/not-found')}>push /not-found</button>
+      {renderRoutes(routes)}
     </div>
   )
 }

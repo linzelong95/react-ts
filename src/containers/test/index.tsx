@@ -3,12 +3,13 @@ import { connect } from 'react-redux'
 import { StoreState } from '@src/store/types'
 import { getSomethingList } from '@services/test'
 import { GetSomethingListRes } from '@type/test'
+import type { FC, PropsWithChildren } from 'react'
 
 interface TestProps {
   user: StoreState['user']
 }
 
-const Test = (props: TestProps) => {
+const Test: FC<PropsWithChildren<TestProps>> = (props) => {
   const [dataSource, setDataSource] = useState<GetSomethingListRes['list']>([])
 
   useEffect(() => {
@@ -26,11 +27,14 @@ const Test = (props: TestProps) => {
     })()
   }, [])
 
+  console.log('children', props.children)
+
   return (
     <>
       <div>我测试一下{props.user?.username}</div>
       <div>{dataSource.join(',')}</div>
       <button>点我发起请求</button>
+      {props.children}
     </>
   )
 }

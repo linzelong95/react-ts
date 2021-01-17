@@ -62,11 +62,11 @@ const productionConfig = {
     ...(BUILD_MODULES.length
       ? []
       : [
-          // 复制一些东西
+          // 复制一些东西，如果有需要的话
           new CopyWebpackPlugin({
             patterns: [
               // TEST
-              // { from: path.resolve(PROJECT_PATH, 'src/public'), to: path.resolve(PROJECT_PATH, 'dist/public') }
+              { from: path.resolve(PROJECT_PATH, 'src/public'), to: path.resolve(PROJECT_PATH, 'dist/public') },
             ],
           }),
         ]),
