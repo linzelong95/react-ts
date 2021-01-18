@@ -6,4 +6,12 @@ export interface RouteConfig extends Omit<RouteProps, 'path' | 'children' | 'ren
   redirect?: string
   routes?: RouteConfig[]
   wrappers?: ReactNode[]
+  authPoints?: string[]
+  authOperator?: 'or' | 'and'
 }
+
+// blog.tab-all // all rights
+// blog.tab-r // read
+// blog.tab-a // add
+// blog.tab-u // update
+// blog.tab-d // delete

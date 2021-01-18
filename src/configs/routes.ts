@@ -1,5 +1,5 @@
-import { hot } from 'react-hot-loader/root'
 import { RouteConfig } from '@common/types'
+// import { hot } from 'react-hot-loader/root'
 import Test from '@containers/test'
 import TestA from '@containers/test-a'
 import TestB from '@containers/test-b'
@@ -18,29 +18,29 @@ const routes: RouteConfig[] = [
   {
     path: '/test-c',
     exact: true,
-    component: hot(TestC),
+    component: TestC,
   },
   {
-    path: '/',
-    component: hot(Test),
+    path: '/root',
+    component: Test,
     // exact: true,
-    redirect: '/test-a',
+    redirect: '/root/test-a',
     routes: [
       {
-        path: '/test-a',
+        path: '/root/test-a',
         // exact: true,
-        component: hot(TestA),
-        redirect: '/test-a/test-b',
+        component: TestA,
+        redirect: '/root/test-a/test-b',
         routes: [
           {
-            path: '/test-a/test-b',
+            path: '/root/test-a/test-b',
             exact: true,
-            component: hot(TestB),
+            component: TestB,
           },
           {
-            path: '/test-a/test-c',
+            path: '/root/test-a/test-c',
             exact: true,
-            component: hot(TestC),
+            component: TestC,
           },
         ],
       },

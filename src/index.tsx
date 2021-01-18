@@ -6,6 +6,7 @@ import { Provider } from 'react-redux'
 import App from '@src/app'
 import { ErrorBoundary } from '@common/components'
 import '@src/index.global.less'
+import '@src/locales'
 
 if (module && module.hot) {
   module.hot.accept()

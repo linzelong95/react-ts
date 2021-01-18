@@ -117,7 +117,7 @@ module.exports = {
           isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader,
           { loader: 'css-loader', options: { importLoaders: 1, modules: true } },
           { loader: 'postcss-loader', options: { postcssOptions: { plugins: [autoprefixer] } } },
-          { loader: 'less-loader' },
+          { loader: 'less-loader', options: { lessOptions: { javascriptEnabled: true } } },
         ],
       },
       {
@@ -127,7 +127,7 @@ module.exports = {
           isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader,
           { loader: 'css-loader', options: { importLoaders: 1 } },
           { loader: 'postcss-loader', options: { postcssOptions: { plugins: [autoprefixer] } } },
-          { loader: 'less-loader' },
+          { loader: 'less-loader', options: { lessOptions: { javascriptEnabled: true } } },
         ],
       },
       {

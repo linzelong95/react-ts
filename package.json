@@ -29,11 +29,14 @@
   },
   "homepage": "https://xxx#readme",
   "dependencies": {
+    "antd": "^4.10.3",
     "axios": "^0.21.0",
+    "i18next": "^19.8.4",
     "moment": "^2.29.1",
     "qs": "^6.9.4",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "react-i18next": "^11.8.5",
     "react-redux": "^7.2.2",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
@@ -112,9 +115,9 @@
     "webpack-merge": "^5.7.2"
   },
   "browserslist": [
-    ">1%",
+    ">5%",
     "not dead",
-    "ie >= 9",
+    "ie >= 11",
     "not op_mini all"
   ],
   "husky": {

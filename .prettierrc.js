@@ -1,8 +1,8 @@
 module.exports = {
   // 开启eslint支持
   eslintIntegration: true,
-  // 一行最多 160 字符
-  printWidth: 160,
+  // 一行最多 140 字符
+  printWidth: 140,
   // 行尾不要有分号
   semi: false,
   // 使用单引号
