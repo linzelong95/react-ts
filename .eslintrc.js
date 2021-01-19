@@ -47,7 +47,6 @@ module.exports = {
     'react/jsx-no-bind': 'off',
     'react/no-did-update-set-state': 'off',
     'react/jsx-fragments': ['error', 'syntax'],
-    'padding-line-between-statements': ['error', { blankLine: 'always', prev: 'block-like', next: 'block-like' }],
     'lines-between-class-members': ['error', 'always'],
     'react/jsx-wrap-multilines': [
       'error',

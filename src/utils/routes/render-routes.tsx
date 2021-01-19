@@ -7,16 +7,16 @@ import type { RouteConfig } from '@common/types'
 function renderRoutes(routes: RouteConfig[] = [], redirectComponent?: JSX.Element): React.CElement<SwitchProps, Switch> {
   return (
     <Switch>
-      {routes.map((route, index) => (
-        <Route
-          key={route.path || index}
-          path={route.path}
-          exact={route.exact}
-          strict={route.strict}
-          sensitive={route.sensitive}
-          render={(props: RouteComponentProps<any>) => render({ route, props })}
-        />
-      ))}
+      {routes.map((route, index) => {
+        const { path, exact, strict, sensitive } = route
+        return (
+          <Route
+            key={path || index}
+            {...{ path, exact, strict, sensitive }}
+            render={(props: RouteComponentProps<any>) => render({ route, props })}
+          />
+        )
+      })}
       {redirectComponent}
       <Route component={NotFound} />
     </Switch>

@@ -70,10 +70,10 @@ module.exports = {
 
   // 路径及 alias 配置
   resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.jsx', '.less'],
+    extensions: ['.ts', '.tsx', '.js', '.jsx'],
     plugins: [
       new TsConfigPathsPlugin({
-        extensions: ['.ts', '.tsx', '.js', '.jsx', '.less'],
+        extensions: ['.ts', '.tsx', '.js', '.jsx'],
       }),
     ],
     alias: isDevelopment

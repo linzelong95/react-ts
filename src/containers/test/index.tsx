@@ -39,4 +39,6 @@ const Test: FC<PropsWithChildren<TestProps>> = (props) => {
   )
 }
 
-export default connect<Pick<TestProps, 'user'>, null, Omit<TestProps, 'user'>, StoreState>((state: StoreState) => ({ user: state.user }))(memo(Test))
+export default connect<Pick<TestProps, 'user'>, null, Omit<TestProps, 'user'>, StoreState>((state: StoreState) => ({ user: state.user }))(
+  memo(Test),
+)

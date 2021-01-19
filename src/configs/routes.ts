@@ -10,15 +10,19 @@ const routes: RouteConfig[] = [
     path: '/c',
     exact: true,
     redirect: '/test-a',
+    authPoints: ['blog.super_admin-is'],
   },
   {
     path: '/d',
     exact: true,
+    authPoints: ['blog.personal_admin-is'],
   },
   {
     path: '/test-c',
     exact: true,
     component: TestC,
+    authPoints: ['blog.super_admin-is', 'blog.personal_admin-is'],
+    authOperator: 'and',
   },
   {
     path: '/root',
@@ -39,12 +43,18 @@ const routes: RouteConfig[] = [
           },
           {
             path: '/root/test-a/test-c',
+            authPoints: ['blog.super_admin-is', 'blog.personal_admin-is'],
+            authOperator: 'and',
             exact: true,
             component: TestC,
           },
         ],
       },
     ],
+  },
+  {
+    path: '/',
+    redirect: '/root/test-a',
   },
 ]
 

@@ -10,6 +10,10 @@ export interface RouteConfig extends Omit<RouteProps, 'path' | 'children' | 'ren
   authOperator?: 'or' | 'and'
 }
 
+// blog.super_admin-is
+// blog.personal_admin-is
+
+// 标签管理模块
 // blog.tab-all // all rights
 // blog.tab-r // read
 // blog.tab-a // add
