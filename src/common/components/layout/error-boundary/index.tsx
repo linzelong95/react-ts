@@ -1,7 +1,6 @@
-/**
- * 全局渲染错误 catch
- */
 import React from 'react'
+import { Result, Button } from 'antd'
+import styles from './index.less'
 // import { captureException } from '@sentry/browser'
 
 interface ErrorBoundaryState {
@@ -30,6 +29,10 @@ export class ErrorBoundary extends React.Component<unknown, ErrorBoundaryState> 
     const { hasError } = this.state
     const { children } = this.props
     if (!hasError) return children
-    return <div>错误界面</div>
+    return (
+      <div className={styles['error-boundary']}>
+        <Result status="500" title="500" subTitle="Sorry, something went wrong." extra={<Button type="primary">Back Home</Button>} />
+      </div>
+    )
   }
 }

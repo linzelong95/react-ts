@@ -1,9 +1,9 @@
-import React, { memo, useState, useCallback, useEffect } from 'react'
+import React, { memo, useState, useCallback, useEffect, useMemo } from 'react'
 import { useLocation, useHistory } from 'react-router-dom'
 import { Menu, Layout, PageHeader, Button, message } from 'antd'
 import { SettingOutlined, TranslationOutlined, SearchOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
-import { WrappedContainer } from '@common/components'
+import { WrappedContainer, Forbidden } from '@common/components'
 import routes from '@configs/routes'
 import logoImg from '@public/images/logo.png'
 import type { FC } from 'react'
@@ -14,34 +14,34 @@ import type { SiderProps } from 'antd/es/layout'
 import styles from './index.less'
 
 // 假如当前用户是blog.personal_admin-is
-const userAuthPoints: string[] = ['blog.super_admin-is', 'blog.personal_admin-is']
+const userAuthPoints: string[] = ['blog.personal_admin-is']
 
-const validFlattedMenus: string[] = []
-
-function getMenu(routes: RouteConfig[], t: TFunction<string>): JSX.Element[] {
+function getMenuItems(routes: RouteConfig[], flattedPathsWithPermission: string[], t: TFunction<string>): JSX.Element[] {
   return routes.map((route) => {
-    const { path, authPoints, authOperator = 'or' } = route
-    if (path === '/') {
-      validFlattedMenus.push(path)
-      return null
-    }
-    if (Array.isArray(authPoints)) {
-      const isPass: boolean =
-        authPoints.length > 0 &&
-        ((authOperator === 'or' && userAuthPoints.some((userAuthPoint) => authPoints.includes(userAuthPoint))) ||
-          (authOperator === 'and' && authPoints.every((authPoint) => userAuthPoints.includes(authPoint))))
-      if (!isPass) return null
-    }
-    if (route.routes?.length) {
-      return (
-        <Menu.SubMenu key={path} icon={<SettingOutlined />} title={t(`menu.${path}`)}>
-          {getMenu(route.routes, t)}
-        </Menu.SubMenu>
-      )
-    }
-    validFlattedMenus.push(path)
-    return <Menu.Item key={path}>{t(`menu.${path}`)}</Menu.Item>
+    const { path } = route
+    if (path === '/' || !flattedPathsWithPermission.includes(path)) return null
+    return route.routes?.length ? (
+      <Menu.SubMenu key={path} icon={<SettingOutlined />} title={t(`menu.${path}`)}>
+        {getMenuItems(route.routes, flattedPathsWithPermission, t)}
+      </Menu.SubMenu>
+    ) : (
+      <Menu.Item key={path}>{t(`menu.${path}`)}</Menu.Item>
+    )
   })
+}
+
+function getFlattedPaths(routes: RouteConfig[] = [], userAuthPoints?: string[]): string[] {
+  return routes.reduce((flattedPaths, route) => {
+    const { path, authPoints, authOperator = 'or' } = route
+    if (Array.isArray(authPoints) && Array.isArray(userAuthPoints)) {
+      const isPass: boolean =
+        (authOperator === 'or' && userAuthPoints.some((userAuthPoint) => authPoints.includes(userAuthPoint))) ||
+        (authOperator === 'and' && authPoints.length > 0 && authPoints.every((authPoint) => userAuthPoints.includes(authPoint)))
+      if (!isPass) return flattedPaths
+    }
+    flattedPaths = [...flattedPaths, path, ...getFlattedPaths(route.routes, userAuthPoints)]
+    return flattedPaths
+  }, [])
 }
 
 const BasicLayout: FC = memo((props) => {
@@ -54,6 +54,18 @@ const BasicLayout: FC = memo((props) => {
 
   const [selectedMenuKeys, setSelectedMenuKeys] = useState<MenuProps['selectedKeys']>([])
   const [menuOpenKeys, setMenuOpenKeys] = useState<MenuProps['openKeys']>([])
+
+  const { isNotFound, isForbidden, flattedPathsWithPermission } = useMemo<{
+    isForbidden: boolean
+    isNotFound: boolean
+    flattedPathsWithPermission: string[]
+  }>(() => {
+    const allFlattedPaths = getFlattedPaths(routes)
+    const flattedPathsWithPermission = getFlattedPaths(routes, userAuthPoints)
+    const isNotFound = !allFlattedPaths.includes(pathname)
+    const isForbidden = !isNotFound && !flattedPathsWithPermission.includes(pathname)
+    return { isNotFound, isForbidden, flattedPathsWithPermission }
+  }, [routes, userAuthPoints, pathname, getFlattedPaths])
 
   useEffect(() => {
     setSelectedMenuKeys([pathname])
@@ -112,25 +124,27 @@ const BasicLayout: FC = memo((props) => {
             openKeys={menuOpenKeys}
             mode="inline"
           >
-            {getMenu(routes, t)}
+            {getMenuItems(routes, flattedPathsWithPermission, t)}
           </Menu>
         </Layout.Sider>
         <Layout className={styles['body-right']}>
           <Layout.Content className={styles['main-content']}>
-            <PageHeader
-              title={t(`menu.${selectedMenuKeys[0]}`)}
-              subTitle="This is a subtitle"
-              ghost={false}
-              breadcrumb={{
-                routes: [...menuOpenKeys, ...selectedMenuKeys].map((path, index) => ({
-                  path: pathname.split('/')[index + 1],
-                  breadcrumbName: t(`menu.${path}`),
-                })),
-              }}
-            >
-              自定义内容
-            </PageHeader>
-            <WrappedContainer>{children}</WrappedContainer>
+            {!isNotFound && !isForbidden && (
+              <PageHeader
+                title={t(`menu.${selectedMenuKeys[0]}`)}
+                subTitle="This is a subtitle"
+                ghost={false}
+                breadcrumb={{
+                  routes: [...menuOpenKeys, ...selectedMenuKeys].map((path, index) => ({
+                    path: pathname.split('/')[index + 1],
+                    breadcrumbName: t(`menu.${path}`),
+                  })),
+                }}
+              >
+                自定义内容
+              </PageHeader>
+            )}
+            <WrappedContainer style={{ marginBottom: 0 }}>{isForbidden ? <Forbidden /> : children}</WrappedContainer>
           </Layout.Content>
           <Layout.Footer className={styles.footer}>Layout.Footer</Layout.Footer>
         </Layout>

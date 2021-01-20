@@ -1,11 +1,15 @@
 import React, { memo } from 'react'
 import styles from './index.less'
-import type { FC } from 'react'
+import type { FC, CSSProperties } from 'react'
 
-const WrappedContainer: FC = memo((props) => {
-  const { children } = props
+const WrappedContainer: FC<{ style?: CSSProperties }> = memo((props) => {
+  const { children, ...restProps } = props
 
-  return <div className={styles['wrapped-container']}>{children}</div>
+  return (
+    <div className={styles['wrapped-container']} {...restProps}>
+      {children}
+    </div>
+  )
 })
 
 export { WrappedContainer }
