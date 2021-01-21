@@ -32,6 +32,10 @@ const productionConfig = {
   devtool: 'source-map',
 
   optimization: {
+    // 本项目并没有真正意义上的多入口，并且常用的公共依赖模块已抽离到base中
+    // splitChunks: {
+    //   chunks: 'all',
+    // },
     splitChunks: false,
     minimizer: [
       new TerserPlugin({
@@ -56,7 +60,9 @@ const productionConfig = {
     new CleanWebpackPlugin({
       dry: false,
       dangerouslyAllowCleanPatternsOutsideProject: true,
-      cleanOnceBeforeBuildPatterns: BUILD_MODULES.length ? BUILD_MODULES.map((moduleName) => `${moduleName}/**/*`) : ['index.html', 'index/**/*'],
+      cleanOnceBeforeBuildPatterns: BUILD_MODULES.length
+        ? BUILD_MODULES.map((moduleName) => `${moduleName}/**/*`)
+        : ['index.html', 'index/**/*'],
     }),
 
     ...(BUILD_MODULES.length

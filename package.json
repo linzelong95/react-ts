@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "node ./webpack/build.js dev",
+    "dev-all-libs": "node ./webpack/build.js dev-all-libs",
     "build": "node ./webpack/build.js build",
     "analyzer": "node ./webpack/build.js analyzer",
     "lint": "eslint -c ./.eslintrc.js --ext .ts,.tsx,.js,.jsx ./src"

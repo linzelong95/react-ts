@@ -3,13 +3,13 @@ import { connect } from 'react-redux'
 import { StoreState } from '@src/store/types'
 import { getSomethingList } from '@services/test'
 import { GetSomethingListRes } from '@type/test'
-import type { FC, PropsWithChildren } from 'react'
+import type { FC } from 'react'
 
 interface TestProps {
   user: StoreState['user']
 }
 
-const Test: FC<PropsWithChildren<TestProps>> = (props) => {
+const Test: FC<TestProps> = (props) => {
   const [dataSource, setDataSource] = useState<GetSomethingListRes['list']>([])
 
   useEffect(() => {
@@ -27,7 +27,7 @@ const Test: FC<PropsWithChildren<TestProps>> = (props) => {
     })()
   }, [])
 
-  console.log('children', props.children)
+  console.log('children', props)
 
   return (
     <>

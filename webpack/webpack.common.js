@@ -18,8 +18,11 @@ const externals = require('./externals')
 const CONSTANTS = require('./constants')
 const { PROJECT_PATH, BUILD_MODULES, COMMON_MODULES } = CONSTANTS
 
-// 环境
+// 是否是开发环境
 const isDevelopment = process.env.NODE_ENV !== 'production'
+
+// 是否重新处理所有依赖包
+const ifHandleAllLibs = process.env.IF_HANDLE_ALL_LIBS === 'all'
 
 // 生成要编译的模块
 const operatedModules = BUILD_MODULES.length
@@ -66,7 +69,7 @@ module.exports = {
   context: path.resolve(__dirname, '../'),
 
   // 如果打包的是 base，externals 不被忽略
-  externals: BUILD_MODULES.includes('base') ? {} : externals,
+  externals: BUILD_MODULES.includes('base') || ifHandleAllLibs ? {} : externals,
 
   // 路径及 alias 配置
   resolve: {
@@ -180,14 +183,15 @@ module.exports = {
                   useShortDoctype: true,
                 },
           }),
-          new MyInjectCustomScriptsPlugin({
-            paths: glob
-              // TODO: 不能使用类似 {src,page}/**/*.{ts,js} 的写法？
-              // .sync(`${path.resolve(PROJECT_PATH, './dist')}/{${COMMON_MODULES.join(',')}}/js/*.js`, { nodir: true })
-              .sync(`${path.resolve(PROJECT_PATH, './dist')}/base/js/*.js`, { nodir: true })
-              .map((pathname) => path.relative(path.resolve(PROJECT_PATH, isDevelopment ? '' : './dist'), pathname)),
-          }),
-        ]
+          !ifHandleAllLibs &&
+            new MyInjectCustomScriptsPlugin({
+              paths: glob
+                // TODO: 不能使用类似 {src,page}/**/*.{ts,js} 的写法？
+                // .sync(`${path.resolve(PROJECT_PATH, './dist')}/{${COMMON_MODULES.join(',')}}/js/*.js`, { nodir: true })
+                .sync(`${path.resolve(PROJECT_PATH, './dist')}/base/js/*.js`, { nodir: true })
+                .map((pathname) => path.relative(path.resolve(PROJECT_PATH, isDevelopment ? '' : './dist'), pathname)),
+            }),
+        ].filter((item) => item)
       : []),
 
     // 带名称导出模块,webpack 5 改为optimization.moduleIds: 'named'

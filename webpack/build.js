@@ -7,6 +7,7 @@ const mode = process.argv[2]
 const cwd = path.resolve(__dirname, '../')
 const environment = {
   NODE_ENV: mode,
+  IF_HANDLE_ALL_LIBS: 'light', // 'all'|'light',默认不处理base基础依赖
   BUILD_MODULES: modules.length === 0 ? '' : modules.join('&'),
   IS_ANALYZER: mode === 'analyzer',
   NODE_OPTIONS: '--max-old-space-size=8172',
@@ -15,6 +16,14 @@ const environment = {
 // 执行 webpack
 if (mode === 'dev') {
   environment.NODE_ENV = 'development'
+  // webpack 5用这个
+  execa('webpack', ['serve', '--config', 'webpack/webpack.development.js'], { cwd, env: environment, buffer: false, stdio: 'inherit' })
+  // execa('webpack-dev-server', ['--config', 'webpack/webpack.development.js'], { cwd, env: environment, buffer: false, stdio: 'inherit' })
+}
+
+if (mode === 'dev-all-libs') {
+  environment.NODE_ENV = 'development'
+  environment.IF_HANDLE_ALL_LIBS = 'all'
   // webpack 5用这个
   execa('webpack', ['serve', '--config', 'webpack/webpack.development.js'], { cwd, env: environment, buffer: false, stdio: 'inherit' })
   // execa('webpack-dev-server', ['--config', 'webpack/webpack.development.js'], { cwd, env: environment, buffer: false, stdio: 'inherit' })
