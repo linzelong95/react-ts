@@ -9,12 +9,17 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 const commonConfig = require('./webpack.common')
 
+// 常量
+const CONSTANTS = require('./constants')
+const { PROJECT_PATH } = CONSTANTS
+
 module.exports = merge(commonConfig, {
   mode: 'development',
 
   output: {
     filename: 'js/[name].js',
-    path: path.resolve(__dirname, '../dist'),
+    path: path.resolve(PROJECT_PATH, 'dist'),
+    publicPath: '/',
   },
 
   // DEV 配置
@@ -30,7 +35,8 @@ module.exports = merge(commonConfig, {
     clientLogLevel: 'silent', // 日志等级
     disableHostCheck: true,
     quiet: true,
-    historyApiFallback: { disableDotRule: true },
+    // 如果修改了output.publicPath:/additional-path/,需要修改为：{index:'/additional-path/'}
+    historyApiFallback: true,
     watchOptions: {
       poll: true,
     },

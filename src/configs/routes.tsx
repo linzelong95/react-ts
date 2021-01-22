@@ -1,3 +1,4 @@
+import React from 'react'
 import { RouteConfig } from '@common/types'
 import { asyncComponent } from '@utils/routes'
 import { AlipayOutlined, ZhihuOutlined } from '@ant-design/icons'
@@ -9,14 +10,14 @@ const routes: RouteConfig[] = [
     exact: true,
     redirect: '/test-a',
     authPoints: ['blog.super_admin-is'],
-    icon: AlipayOutlined,
+    icon: <AlipayOutlined />,
   },
   {
     path: '/d',
     exact: true,
     authPoints: ['blog.personal_admin-is'],
     component: asyncComponent(() => import(/* webpackPrefetch: true */ '@containers/test')),
-    icon: ZhihuOutlined,
+    icon: <ZhihuOutlined />,
   },
   {
     path: '/test-c',
@@ -24,27 +25,27 @@ const routes: RouteConfig[] = [
     component: asyncComponent(() => import(/* webpackPrefetch: true */ '@containers/test-a')),
     authPoints: ['blog.super_admin-is', 'blog.personal_admin-is'],
     authOperator: 'or',
-    icon: ZhihuOutlined,
+    icon: <ZhihuOutlined />,
   },
   {
     path: '/root',
     component: asyncComponent(() => import(/* webpackPrefetch: true */ '@containers/test')),
     // exact: true,
     redirect: '/root/test-a',
-    icon: ZhihuOutlined,
+    icon: <ZhihuOutlined />,
     routes: [
       {
         path: '/root/test-a',
         // exact: true,
         component: asyncComponent(() => import(/* webpackPrefetch: true */ '@containers/test-a')),
         redirect: '/root/test-a/test-b',
-        icon: ZhihuOutlined,
+        icon: <ZhihuOutlined />,
         routes: [
           {
             path: '/root/test-a/test-b',
             exact: true,
             component: asyncComponent(() => import(/* webpackPrefetch: true */ '@containers/test-b')),
-            icon: ZhihuOutlined,
+            icon: <ZhihuOutlined />,
           },
           {
             path: '/root/test-a/test-c',
@@ -52,7 +53,7 @@ const routes: RouteConfig[] = [
             authOperator: 'and',
             exact: true,
             component: asyncComponent(() => import(/* webpackPrefetch: true */ '@containers/test-c')),
-            icon: ZhihuOutlined,
+            icon: <ZhihuOutlined />,
           },
         ],
       },

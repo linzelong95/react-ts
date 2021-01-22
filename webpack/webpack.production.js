@@ -27,6 +27,7 @@ const productionConfig = {
   output: {
     filename: `[name]/js/[hash:8].js`,
     path: path.resolve(PROJECT_PATH, 'dist'),
+    publicPath: '/',
   },
 
   devtool: 'source-map',
