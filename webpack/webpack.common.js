@@ -1,6 +1,6 @@
 // const os = require('os')
 const path = require('path')
-// const webpack = require('webpack')
+const webpack = require('webpack')
 const glob = require('glob')
 
 const autoprefixer = require('autoprefixer')
@@ -183,6 +183,7 @@ module.exports = {
                   useShortDoctype: true,
                 },
           }),
+
           !ifHandleAllLibs &&
             new MyInjectCustomScriptsPlugin({
               paths: glob
@@ -191,31 +192,32 @@ module.exports = {
                 .sync(`${path.resolve(PROJECT_PATH, './dist')}/base/js/*.js`, { nodir: true })
                 .map((pathname) => path.relative(path.resolve(PROJECT_PATH, isDevelopment ? '' : './dist'), pathname)),
             }),
+
+          // 约定全局变量，页面上直接使用，不需要import，.eslintrc.js的globals属性需要做相应配置{_:'readonly'}
+          // new webpack.ProvidePlugin({
+          //   _:'lodash'
+          // }),
+
+          // TS 类型检查
+          new ForkTsCheckerWebpackPlugin({
+            eslint: {
+              files: './src/**/*.{ts,tsx,js,jsx}',
+            },
+          }),
+
+          // 优化错误展示，与webpack 5暂不兼容？
+          new FriendlyErrorsWebpackPlugin(),
         ].filter((item) => item)
       : []),
 
     // 带名称导出模块,webpack 5 改为optimization.moduleIds: 'named'
     // new webpack.NamedModulesPlugin(),
 
-    // 忽略哪些内容
-    // 忽略/moment/locale下的所有文件，在页面需要自行导入所需要的，如import 'moment/locale/zh-cn';
+    // 忽略模块中的某些内容，比如忽略/moment/locale下的所有文件，在页面需要自行导入所需要的，如import 'moment/locale/zh-cn';
     // new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
 
-    // 提取自己想要的部分，在页面就不需要特地导入所需要的，如不需要特地import 'moment/locale/zh-cn';
-    //   new webpack.ContextReplacementPlugin(
-    //     /moment[/\\]locale$/,
-    //     /zh-cn|es|zh-tw|ja/,
-    // ),
-
-    // TS 类型检查
-    new ForkTsCheckerWebpackPlugin({
-      eslint: {
-        files: './src/**/*.{ts,tsx,js,jsx}',
-      },
-    }),
-
-    // 优化错误展示，与webpack 5暂不兼容？
-    new FriendlyErrorsWebpackPlugin(),
+    // 提取模块其中的一部分，在页面就不需要特地导入所需要的，如不需要特地import 'moment/locale/zh-cn';
+    new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /zh-cn/),
 
     // 进度条
     new ProgressBarPlugin(),

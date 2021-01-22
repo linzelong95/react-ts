@@ -8,7 +8,6 @@ module.exports = {
   moment: 'moment',
   xlsx: 'XLSX',
   axios: 'axios',
-  antd: 'antd',
   i18next: 'i18next',
   'react-i18next': 'reactI18next',
   'antd/lib/locale/en_US': 'enUS',

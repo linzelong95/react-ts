@@ -3,7 +3,6 @@ import { initReactI18next } from 'react-i18next'
 import moment from 'moment'
 import en from './en'
 import zh from './zh-cn'
-import 'moment/locale/zh-cn'
 
 i18next
   .use(initReactI18next) // passes i18n down to react-i18next

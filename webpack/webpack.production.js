@@ -37,6 +37,8 @@ const productionConfig = {
     //   chunks: 'all',
     // },
     splitChunks: false,
+    minimize: true,
+    // webpack v5自带了TerserPlugin，这里可以不用配置
     minimizer: [
       new TerserPlugin({
         parallel: true,

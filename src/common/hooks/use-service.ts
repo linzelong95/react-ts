@@ -24,7 +24,7 @@ export function useService<T extends any, D extends any[]>(
       setRes(res)
       setLoading(false)
     })()
-  }, [...data, flag])
+  }, [data, service, flag])
 
   // 某些时候，我们需要在数据不变更的情况下手动去触发请求,可以调用该方法
   const forceRequest = () => setFlag((prevFlag) => prevFlag + 1)

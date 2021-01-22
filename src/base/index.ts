@@ -11,7 +11,6 @@ import * as ReactRedux from 'react-redux'
 import moment from 'moment'
 import XLSX from 'xlsx'
 import axios from 'axios'
-import * as antd from 'antd'
 import i18next from 'i18next'
 import * as reactI18next from 'react-i18next'
 import enUS from 'antd/lib/locale/en_US'
@@ -30,7 +29,6 @@ import zhCN from 'antd/lib/locale/zh_CN'
 ;(window as any).moment = moment
 ;(window as any).XLSX = XLSX
 ;(window as any).axios = axios
-;(window as any).antd = antd
 ;(window as any).i18next = i18next
 ;(window as any).reactI18next = reactI18next
 ;(window as any).enUS = enUS

@@ -13,9 +13,6 @@ import type { MenuProps } from 'antd/es/menu'
 import type { SiderProps } from 'antd/es/layout'
 import styles from './index.less'
 
-// 假如当前用户是blog.personal_admin-is
-const userAuthPoints: string[] = ['blog.personal_admin-is']
-
 function getMenuItems(routes: RouteConfig[], flattedPathsWithPermission: string[], t: TFunction<string>): JSX.Element[] {
   return routes.map((route) => {
     const { path, icon } = route
@@ -52,6 +49,9 @@ const BasicLayout: FC = memo((props) => {
   const { pathname } = useLocation()
   const history = useHistory()
 
+  // 假如当前用户是blog.personal_admin-is,这一部分应该从userInfo获取
+  const userAuthPoints: string[] = useMemo(() => ['blog.personal_admin-is'], [])
+
   const [sideCollapsed, setSideCollapsed] = useState<SiderProps['collapsed']>(false)
 
   const [selectedMenuKeys, setSelectedMenuKeys] = useState<MenuProps['selectedKeys']>([])
@@ -67,7 +67,7 @@ const BasicLayout: FC = memo((props) => {
     const isNotFound = !allFlattedPaths.includes(pathname)
     const isForbidden = !isNotFound && !flattedPathsWithPermission.includes(pathname)
     return { isNotFound, isForbidden, flattedPathsWithPermission }
-  }, [routes, userAuthPoints, pathname, getFlattedPaths])
+  }, [userAuthPoints, pathname])
 
   useEffect(() => {
     setSelectedMenuKeys([pathname])
@@ -83,7 +83,7 @@ const BasicLayout: FC = memo((props) => {
     ({ key }) => {
       history.push(key as string)
     },
-    [history?.push],
+    [history],
   )
 
   const openChangeMenu = useCallback<MenuProps['onOpenChange']>((keys) => {
@@ -94,7 +94,7 @@ const BasicLayout: FC = memo((props) => {
     const nextLang: 'en' | 'zh-CN' = i18n.languages[0] === 'zh-CN' ? 'en' : 'zh-CN'
     i18n.changeLanguage(nextLang)
     message.info(`当前语言已设置为${nextLang === 'zh-CN' ? '中文' : '英文'}`)
-  }, [i18n?.changeLanguage, i18n?.languages?.[0]])
+  }, [i18n])
 
   return (
     <Layout className={styles['basic-layout']}>
