@@ -8,6 +8,7 @@ export interface RouteConfig extends Omit<RouteProps, 'path' | 'children' | 'ren
   wrappers?: ReactNode[]
   authPoints?: string[]
   authOperator?: 'or' | 'and'
+  icon?: ReactNode
 }
 
 // blog.super_admin-is

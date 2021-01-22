@@ -11,4 +11,7 @@ module.exports = {
   antd: 'antd',
   i18next: 'i18next',
   'react-i18next': 'reactI18next',
+  'antd/lib/locale/en_US': 'antd_enUS',
+  'antd/lib/locale/zh_CN': 'antd_zhCN',
+  // '@sentry/browser': 'Sentry',
 }

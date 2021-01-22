@@ -1,7 +1,7 @@
 import React, { memo, useState, useCallback, useEffect, useMemo } from 'react'
 import { useLocation, useHistory } from 'react-router-dom'
 import { Menu, Layout, PageHeader, Button, message } from 'antd'
-import { SettingOutlined, TranslationOutlined, SearchOutlined } from '@ant-design/icons'
+import { TranslationOutlined, SearchOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { WrappedContainer, Forbidden } from '@common/components'
 import routes from '@configs/routes'
@@ -18,14 +18,16 @@ const userAuthPoints: string[] = ['blog.personal_admin-is']
 
 function getMenuItems(routes: RouteConfig[], flattedPathsWithPermission: string[], t: TFunction<string>): JSX.Element[] {
   return routes.map((route) => {
-    const { path } = route
+    const { path, icon } = route
     if (path === '/' || !flattedPathsWithPermission.includes(path)) return null
     return route.routes?.length ? (
-      <Menu.SubMenu key={path} icon={<SettingOutlined />} title={t(`menu.${path}`)}>
+      <Menu.SubMenu key={path} icon={icon} title={t(`menu.${path}`)}>
         {getMenuItems(route.routes, flattedPathsWithPermission, t)}
       </Menu.SubMenu>
     ) : (
-      <Menu.Item key={path}>{t(`menu.${path}`)}</Menu.Item>
+      <Menu.Item key={path} icon={icon}>
+        {t(`menu.${path}`)}
+      </Menu.Item>
     )
   })
 }

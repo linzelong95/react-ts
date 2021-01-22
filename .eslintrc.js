@@ -13,7 +13,7 @@ module.exports = {
     },
     'import/resolver': {
       node: {
-        extensions: ['.tsx', '.ts', '.js', '.json', '.less'],
+        extensions: ['.tsx', '.ts', '.js', '.json'],
       },
       typescript: {},
     },
@@ -60,6 +60,8 @@ module.exports = {
     'standard/no-callback-literal': 'off',
     'react/jsx-handler-names': 'off',
     'react/display-name': 'off',
+    'react-hooks/rules-of-hooks': 'error', // 检查 Hook 的规则
+    'react-hooks/exhaustive-deps': 'warn', // 检查 effect 的依赖
     'unicorn/no-reduce': 'off',
     'unicorn/no-null': 'off',
     'unicorn/prevent-abbreviations': 'off',
