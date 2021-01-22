@@ -86,8 +86,9 @@
     ".git", // Ignore the .git directory
     "*.dll", // Ignore all .dll files.
     "**/*.dll", // Ignore all .dll files
-    ".eslintrc",
     ".vscode/**",
-    "**/package.json"
+    "**/package.json",
+    ".eslintrc.js",
+    ".commitlintrc.js"
   ]
 }
