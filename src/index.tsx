@@ -1,5 +1,5 @@
 import React from 'react'
-import { render } from 'react-dom'
+import ReactDOM from 'react-dom'
 import store from '@src/store'
 import { BrowserRouter, HashRouter } from 'react-router-dom'
 import { ErrorBoundary } from '@common/components'
@@ -12,7 +12,7 @@ if (module && module.hot) {
   module.hot.accept()
 }
 
-render(
+ReactDOM.render(
   <React.StrictMode>
     <ErrorBoundary>
       <Provider store={store}>

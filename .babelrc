@@ -1,5 +1,9 @@
 {
-  "presets": [["@babel/preset-env", { "modules": false, "useBuiltIns": "usage", "corejs": "3.1.2" }], "@babel/preset-typescript", "@babel/preset-react"],
+  "presets": [
+    ["@babel/preset-env", { "modules": false, "useBuiltIns": "usage", "corejs": "3.1.2" }],
+    "@babel/preset-typescript",
+    "@babel/preset-react"
+  ],
   "plugins": [
     ["@babel/plugin-proposal-decorators", { "legacy": true }],
     ["@babel/plugin-proposal-class-properties", { "loose": true }],
@@ -13,3 +17,10 @@
     }
   }
 }
+
+// npm install babel-plugin-import --save-dev
+// antd默认支持按需导入
+// "plugins": [
+//   ["import", { "libraryName": "antd", "libraryDirectory": "lib","style": true}, "antd"],
+//   ["import", { "libraryName": "antd-mobile", "libraryDirectory": "lib"}, "antd-mobile"]
+// ]

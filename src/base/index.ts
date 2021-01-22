@@ -14,8 +14,8 @@ import axios from 'axios'
 import * as antd from 'antd'
 import i18next from 'i18next'
 import * as reactI18next from 'react-i18next'
-import antd_enUS from 'antd/lib/locale/en_US'
-import antd_zhCN from 'antd/lib/locale/zh_CN'
+import enUS from 'antd/lib/locale/en_US'
+import zhCN from 'antd/lib/locale/zh_CN'
 // import * as Sentry from '@sentry/browser'
 
 // 公共样式
@@ -33,6 +33,6 @@ import antd_zhCN from 'antd/lib/locale/zh_CN'
 ;(window as any).antd = antd
 ;(window as any).i18next = i18next
 ;(window as any).reactI18next = reactI18next
-;(window as any).antd_enUS = antd_enUS
-;(window as any).antd_zhCN = antd_zhCN
+;(window as any).enUS = enUS
+;(window as any).zhCN = zhCN
 // ;(window as any).Sentry = Sentry

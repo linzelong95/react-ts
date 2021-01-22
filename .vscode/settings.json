@@ -89,6 +89,7 @@
     ".vscode/**",
     "**/package.json",
     ".eslintrc.js",
-    ".commitlintrc.js"
+    ".commitlintrc.js",
+    ".babelrc"
   ]
 }

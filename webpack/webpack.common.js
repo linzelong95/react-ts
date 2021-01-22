@@ -197,6 +197,16 @@ module.exports = {
     // 带名称导出模块,webpack 5 改为optimization.moduleIds: 'named'
     // new webpack.NamedModulesPlugin(),
 
+    // 忽略哪些内容
+    // 忽略/moment/locale下的所有文件，在页面需要自行导入所需要的，如import 'moment/locale/zh-cn';
+    // new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+
+    // 提取自己想要的部分，在页面就不需要特地导入所需要的，如不需要特地import 'moment/locale/zh-cn';
+    //   new webpack.ContextReplacementPlugin(
+    //     /moment[/\\]locale$/,
+    //     /zh-cn|es|zh-tw|ja/,
+    // ),
+
     // TS 类型检查
     new ForkTsCheckerWebpackPlugin({
       eslint: {
