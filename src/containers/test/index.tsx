@@ -1,8 +1,6 @@
-import React, { memo, useEffect, useState } from 'react'
+import React, { memo, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { StoreState } from '@src/store/types'
-import { getSomethingList } from '@services/test'
-import { GetSomethingListRes } from '@type/test'
 import type { FC } from 'react'
 
 interface TestProps {
@@ -10,30 +8,13 @@ interface TestProps {
 }
 
 const Test: FC<TestProps> = (props) => {
-  const [dataSource, setDataSource] = useState<GetSomethingListRes['list']>([])
-
   useEffect(() => {
-    ;(async () => {
-      const [res, err] = await getSomethingList('haha')
-      if (err) {
-        console.log(err)
-        alert('请求异常')
-        return
-      }
-      const {
-        data: { list },
-      } = res
-      setDataSource(list)
-    })()
-  }, [])
-
-  console.log('children', props)
+    console.log('children', props)
+  }, [props])
 
   return (
     <>
       <div>我测试一下{props.user?.username}</div>
-      <div>{dataSource.join(',')}</div>
-      <button>点我发起请求</button>
       {props.children}
     </>
   )

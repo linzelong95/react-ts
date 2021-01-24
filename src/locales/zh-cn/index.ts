@@ -1,4 +1,4 @@
-import test from './test'
+import common from './common'
 import menu from './menu'
 
-export default { test, menu }
+export default { common, menu }

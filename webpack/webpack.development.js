@@ -41,11 +41,11 @@ module.exports = merge(commonConfig, {
       poll: true,
     },
     proxy: {
-      '/api': {
-        target: 'http://local.lceda.cn/', // 需要在内网环境
+      '/api/': {
+        target: 'http://127.0.0.1:7001/',
         changeOrigin: true,
         pathRewrite: {
-          '^/': '',
+          '^/api': '',
         },
         secure: false,
       },

@@ -1,1 +1,3 @@
-export * from './login'
+import * as loginServices from './login'
+
+export { loginServices }

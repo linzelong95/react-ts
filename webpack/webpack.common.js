@@ -11,6 +11,7 @@ const ProgressBarPlugin = require('progress-bar-webpack-plugin')
 const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin')
+// const HardSourceWebpackPlugin = require('hard-source-webpack-plugin')
 
 const externals = require('./externals')
 
@@ -79,6 +80,12 @@ module.exports = {
         extensions: ['.ts', '.tsx', '.js', '.jsx'],
       }),
     ],
+    // 解决：BREAKING CHANGE: webpack < 5 used to include polyfills for node.js core modules by default.
+    fallback: {
+      crypto: require.resolve('crypto-browserify'),
+      buffer: require.resolve('buffer/'),
+      stream: require.resolve('stream-browserify'),
+    },
     alias: isDevelopment
       ? {
           'react-dom': '@hot-loader/react-dom',
@@ -162,6 +169,10 @@ module.exports = {
   plugins: [
     ...(!BUILD_MODULES.length
       ? [
+          // DeprecationWarning: Compilation.assets will be frozen in future, all modifications are deprecated. BREAKING CHANGE: No more changes should happen to Compilation.assets after sealing the Compilation.
+          // Do changes to assets earlier, e. g. in Compilation.hooks.processAssets.
+          // Mak`e sure to select an appropriate stage from Compilation.PROCESS_ASSETS_STAGE_*.
+          // webpack v5需要使用 html-webpack-plugin@next，而不是html-webpack-plugin包
           new HtmlWebpackPlugin({
             template: path.resolve(PROJECT_PATH, './src/public/index.html'),
             filename: 'index.html',
@@ -222,6 +233,9 @@ module.exports = {
     // 进度条
     new ProgressBarPlugin(),
     // new webpack.ProgressPlugin(), // webpack自带
+
+    // 提供打包速度，webpack v5 报错
+    // new HardSourceWebpackPlugin(),
 
     // ...CONSTANTS.BUILD_MODULES.map((mdl) => {
     //   // 生成 Manifest 文件

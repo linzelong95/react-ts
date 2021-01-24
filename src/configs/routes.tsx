@@ -48,9 +48,9 @@ const routes: RouteConfig[] = [
             icon: <ZhihuOutlined />,
           },
           {
-            path: '/root/test-a/test-c',
+            path: '/root/test-a/:id',
             authPoints: ['blog.super_admin-is', 'blog.personal_admin-is'],
-            authOperator: 'and',
+            authOperator: 'or',
             exact: true,
             component: asyncComponent(() => import(/* webpackPrefetch: true */ '@containers/test-c')),
             icon: <ZhihuOutlined />,

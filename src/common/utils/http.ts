@@ -30,7 +30,7 @@ export const http = axios.create({
 // 请求前做一些操作
 http.interceptors.request.use((req: AxiosRequestConfig) => {
   // 统一带上请求 ID，便于追溯，假设有这样的需求
-  req.headers['X-Seq-Id'] = `eda-${uuid()}`
+  req.headers['X-Seq-Id'] = `blog-${uuid()}`
 
   // 假设有这样的需求
   // 如果当前 URL 上有 access_token，统一带上
@@ -48,21 +48,24 @@ http.interceptors.request.use((req: AxiosRequestConfig) => {
 http.interceptors.response.use(
   (res: AxiosResponse) => {
     const {
-      data: { code, message },
+      data: { code, message, status },
     } = res
+
+    console.log(888, res)
 
     // 统一处理接口无权限操作的情况
     if (code === 401) {
       console.log('这里做报错的相关处理')
     }
 
-    // 假设code=0表示成功，code！=0为失败
-    if (code !== 0) {
+    // 假设code=200表示成功，code！==200为失败
+    // TODO:后面格式化为code为0表示成功，code不等于0表示失败
+    if (code !== 200) {
       // eslint-disable-next-line prefer-promise-reject-errors
       return Promise.reject({
         code,
         message: typeof message === 'string' ? message.slice(0, 100) : message,
-        status: 200,
+        status,
         rawResponse: res,
         rawError: null,
       } as CommonError)

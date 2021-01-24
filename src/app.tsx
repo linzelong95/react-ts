@@ -5,7 +5,6 @@ import { ConfigProvider } from 'antd'
 import { Icon, BasicLayout } from '@common/components'
 import { StoreState, UserAction, UserActionType } from '@src/store/types'
 import testSvgUrl from '@public/images/mail.svg'
-import { login } from '@services/user'
 import routes from '@configs/routes'
 import { renderRoutes } from '@utils/routes'
 import { useHistory } from 'react-router-dom'
@@ -27,14 +26,6 @@ function App(props: AppProps): JSX.Element {
   // const logout = useCallback(() => {
   //   onClearUser()
   // }, [])
-
-  useEffect(() => {
-    ;(async () => {
-      const [res, err] = await login({ email: '984621758@qq.com', password: 'Qq123456' })
-      if (err) return
-      console.log(res)
-    })()
-  }, [])
 
   return (
     <ConfigProvider locale={i18n.languages[0] === 'zh-CN' ? zhCN : enUS}>

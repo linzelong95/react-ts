@@ -57,6 +57,7 @@ module.exports = {
     'handle-callback-err': 'off',
     indent: 'off',
     camelcase: 'warn',
+    'promise/always-return': 'off',
     'standard/no-callback-literal': 'off',
     'react/jsx-handler-names': 'off',
     'react/display-name': 'off',

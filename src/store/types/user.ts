@@ -1,13 +1,16 @@
 export enum UserActionType {
+  LOGIN = 'LOGIN',
   LOGOUT = 'LOGOUT',
 }
 
 export interface UserState {
   username?: string
-  [key: string]: any // TODO:待确定具体字段
+  account: string
+  nickName: string
+  roleName: string
 }
 
-export interface UserAction {
+export interface UserAction<P = Record<string, unknown>> {
   type: UserActionType
-  params?: Record<string, any> // TODO:待确定具体字段
+  params?: P
 }

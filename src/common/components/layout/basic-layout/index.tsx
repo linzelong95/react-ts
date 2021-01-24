@@ -1,11 +1,10 @@
 import React, { memo, useState, useCallback, useEffect, useMemo } from 'react'
 import { useLocation, useHistory } from 'react-router-dom'
-import { Menu, Layout, PageHeader, Button, message } from 'antd'
-import { TranslationOutlined, SearchOutlined } from '@ant-design/icons'
-import { useTranslation } from 'react-i18next'
+import { Menu, Layout, PageHeader } from 'antd'
 import { WrappedContainer, Forbidden } from '@common/components'
+import Header from './header'
 import routes from '@configs/routes'
-import logoImg from '@public/images/logo.png'
+import { useTranslation } from 'react-i18next'
 import type { FC } from 'react'
 import type { TFunction } from 'react-i18next'
 import type { RouteConfig } from '@src/common/types'
@@ -16,7 +15,7 @@ import styles from './index.less'
 function getMenuItems(routes: RouteConfig[], flattedPathsWithPermission: string[], t: TFunction<string>): JSX.Element[] {
   return routes.map((route) => {
     const { path, icon } = route
-    if (path === '/' || !flattedPathsWithPermission.includes(path)) return null
+    if (path === '/' || path.includes('/:') || !flattedPathsWithPermission.includes(path)) return null
     return route.routes?.length ? (
       <Menu.SubMenu key={path} icon={icon} title={t(`menu.${path}`)}>
         {getMenuItems(route.routes, flattedPathsWithPermission, t)}
@@ -45,7 +44,7 @@ function getFlattedPaths(routes: RouteConfig[] = [], userAuthPoints?: string[]):
 
 const BasicLayout: FC = memo((props) => {
   const { children } = props
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const { pathname } = useLocation()
   const history = useHistory()
 
@@ -64,6 +63,7 @@ const BasicLayout: FC = memo((props) => {
   }>(() => {
     const allFlattedPaths = getFlattedPaths(routes)
     const flattedPathsWithPermission = getFlattedPaths(routes, userAuthPoints)
+    // TODO:动态路由的处理
     const isNotFound = !allFlattedPaths.includes(pathname)
     const isForbidden = !isNotFound && !flattedPathsWithPermission.includes(pathname)
     return { isNotFound, isForbidden, flattedPathsWithPermission }
@@ -90,24 +90,9 @@ const BasicLayout: FC = memo((props) => {
     setMenuOpenKeys(keys as MenuProps['openKeys'])
   }, [])
 
-  const changeLang = useCallback<(event: React.MouseEvent<HTMLElement, MouseEvent>) => void>(() => {
-    const nextLang: 'en' | 'zh-CN' = i18n.languages[0] === 'zh-CN' ? 'en' : 'zh-CN'
-    i18n.changeLanguage(nextLang)
-    message.info(`当前语言已设置为${nextLang === 'zh-CN' ? '中文' : '英文'}`)
-  }, [i18n])
-
   return (
     <Layout className={styles['basic-layout']}>
-      <Layout.Header className={styles['header-area']}>
-        <div className={styles['header-left']}>
-          <img src={logoImg} className={styles['site-logo']} />
-          <span className={styles['site-name']}>向上的博客</span>
-        </div>
-        <div className={styles['header-right']}>
-          <SearchOutlined className={styles['search-icon']} />
-          <Button size="small" shape="circle" icon={<TranslationOutlined />} onClick={changeLang} />
-        </div>
-      </Layout.Header>
+      <Header />
       <Layout className={styles['body-area']}>
         <Layout.Sider
           collapsible
@@ -137,6 +122,7 @@ const BasicLayout: FC = memo((props) => {
                 subTitle="This is a subtitle"
                 ghost={false}
                 breadcrumb={{
+                  // TODO:如果点击的是可扩展节点，面包屑不应该更新
                   routes: [...menuOpenKeys, ...selectedMenuKeys].map((path, index) => ({
                     path: pathname.split('/')[index + 1],
                     breadcrumbName: t(`menu.${path}`),
