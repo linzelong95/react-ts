@@ -7,10 +7,10 @@ export interface UserState {
   username?: string
   account: string
   nickName: string
-  roleName: string
+  roleName: 'admin' | 'user'
 }
 
-export interface UserAction<P = Record<string, unknown>> {
+export interface UserAction {
   type: UserActionType
-  params?: P
+  params?: UserState
 }

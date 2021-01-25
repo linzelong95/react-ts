@@ -1,8 +1,8 @@
-import { UserAction, UserActionType } from '../types'
+import { UserAction, UserActionType, UserState } from '../types'
 
 export const createLogoutAction: () => UserAction = () => ({ type: UserActionType.LOGOUT })
 
-export const createLoginAction: <P = Record<string, unknown>>(params: P) => UserAction<P> = (params) => ({
+export const createLoginAction: (params: UserState) => UserAction = (params) => ({
   type: UserActionType.LOGIN,
   params,
 })

@@ -1,7 +1,7 @@
-import React, { memo, useCallback, useState } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { Layout, Button, message, Avatar, Image, Dropdown, Menu, Divider } from 'antd'
-import { TranslationOutlined, SearchOutlined, BellOutlined } from '@ant-design/icons'
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { Layout, message, Avatar, Dropdown, Menu, Divider, Input } from 'antd'
+import { TranslationOutlined, SearchOutlined, BellOutlined, MenuUnfoldOutlined } from '@ant-design/icons'
 import logoImg from '@public/images/logo.png'
 import { useTranslation } from 'react-i18next'
 import { loginServices } from '@services/user'
@@ -9,15 +9,24 @@ import { createLogoutAction, createLoginAction } from '@store/actions'
 import LoginForm from './login-form'
 import { rsa, serialize } from '@common/utils'
 import type { StoreState } from '@src/store/types'
-import type { FC } from 'react'
+import type { FC, Dispatch, SetStateAction } from 'react'
 import type { LoginParams } from '@services/user/login'
+import type { DrawerProps } from 'antd/es/drawer'
 import styles from '../index.less'
 
-const Header: FC = memo(() => {
+interface HeaderProps {
+  userInfo: StoreState['user']
+  isMobile: boolean
+  onToggleMenuDrawer: Dispatch<SetStateAction<DrawerProps['visible']>>
+}
+
+const Header: FC<HeaderProps> = memo((props) => {
+  const { userInfo, isMobile, onToggleMenuDrawer } = props
   const [loginFormVisible, setLoginFormVisible] = useState<boolean>(false)
   const [isForRegister, setIsForRegister] = useState<boolean>(false)
+  const [searchBoxVisible, setSearchBoxVisible] = useState<boolean>(false)
+  const searchBoxRef = useRef<Input>(null)
   const { t, i18n } = useTranslation()
-  const userInfo = useSelector<StoreState, StoreState['user']>((state) => state.user)
   const dispatch = useDispatch()
 
   const changeLang = useCallback<(event: React.MouseEvent<HTMLElement, MouseEvent>) => void>(() => {
@@ -39,12 +48,12 @@ const Header: FC = memo(() => {
     async (params) => {
       message.loading({ content: '正在登录...', key: 'login' })
       const [publicKeyRes, publicKeyErr] = await loginServices.getPublicKey()
-      console.log(111, publicKeyRes, publicKeyErr)
       if (publicKeyErr || !publicKeyRes?.data?.item) {
         message.error({ content: '登录失败', key: 'login' })
         return
       }
-      const encryptedPassword = rsa(serialize(params.password), publicKeyRes.data.item)
+      const { password, autoLogin } = params
+      const encryptedPassword = rsa(serialize(password), publicKeyRes.data.item)
       const [loginRes, loginErr] = await loginServices.login({ ...params, password: encryptedPassword })
       if (loginErr) {
         message.error({ content: loginErr.message || '登录失败', key: 'login' })
@@ -52,6 +61,7 @@ const Header: FC = memo(() => {
       }
       message.success({ content: '登录成功', key: 'login' })
       dispatch(createLoginAction(loginRes.data))
+      localStorage.setItem('BLOG_STORE_ACCOUNT', JSON.stringify({ autoLogin, autoLoginMark: autoLogin }))
     },
     [dispatch],
   )
@@ -69,44 +79,98 @@ const Header: FC = memo(() => {
       message.error('退出登录失败')
       return
     }
+    let blogStoreAccountInfo: { autoLoginMark: boolean; autoLogin: boolean }
+    try {
+      blogStoreAccountInfo = JSON.parse(localStorage.getItem('BLOG_STORE_ACCOUNT') || '{}')
+    } catch {}
+    localStorage.setItem('BLOG_STORE_ACCOUNT', JSON.stringify({ ...blogStoreAccountInfo, autoLoginMark: false }))
     dispatch(createLogoutAction())
+  }, [dispatch])
+
+  useEffect(() => {
+    ;(async () => {
+      let blogStoreAccountInfo: { autoLoginMark: boolean; autoLogin: boolean }
+      try {
+        blogStoreAccountInfo = JSON.parse(localStorage.getItem('BLOG_STORE_ACCOUNT') || '{}')
+      } catch {}
+      if (blogStoreAccountInfo?.autoLoginMark) {
+        const [loginRes] = await loginServices.login({ autoLogin: true })
+        if (loginRes?.data) dispatch(createLoginAction(loginRes.data))
+      }
+    })()
   }, [dispatch])
 
   return (
     <Layout.Header className={styles['header-area']}>
       <div className={styles['header-left']}>
         <img src={logoImg} className={styles['site-logo']} />
-        <span className={styles['site-name']}>向上的博客</span>
+        {isMobile ? (
+          <MenuUnfoldOutlined
+            style={{ fontSize: 20, marginLeft: 8 }}
+            onClick={() => {
+              onToggleMenuDrawer(true)
+            }}
+          />
+        ) : (
+          <span className={styles['site-name']}>briefNull</span>
+        )}
       </div>
-      <div className={styles['header-right']}>
-        <SearchOutlined className={styles['search-icon']} />
-        <BellOutlined />
-        <div className={styles['login-info']}>
-          {userInfo.account ? (
-            <Dropdown
-              overlay={
-                <Menu>
-                  <Menu.Item onClick={logout}>{t('common.logout')}</Menu.Item>
-                </Menu>
-              }
-            >
-              <Avatar src={<Image src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />} />
-              {userInfo.account}
-            </Dropdown>
+      <ul className={styles['header-right']}>
+        <li>
+          {searchBoxVisible ? (
+            <Input
+              ref={searchBoxRef}
+              placeholder="Enter something"
+              prefix={<SearchOutlined />}
+              onBlur={() => {
+                setSearchBoxVisible(false)
+              }}
+            />
           ) : (
-            <>
-              <a className={styles['log-in']} onClick={(e) => showLoginForm(e)}>
-                {t('common.login')}
-              </a>
-              <Divider type="vertical" className={styles['vertical-divider']} />
-              <a className={styles['log-out']} onClick={(e) => showLoginForm(e, true)}>
-                {t('common.register')}
-              </a>
-            </>
+            <SearchOutlined
+              onClick={() => {
+                setSearchBoxVisible(true)
+                setTimeout(() => {
+                  searchBoxRef.current?.focus?.()
+                }, 50)
+              }}
+            />
           )}
-        </div>
-        <Button size="small" shape="circle" icon={<TranslationOutlined />} onClick={changeLang} />
-      </div>
+        </li>
+        {(!searchBoxVisible || !isMobile) && (
+          <>
+            <li>
+              <BellOutlined />
+            </li>
+            <li className={styles['login-info']}>
+              {userInfo.account ? (
+                <Dropdown
+                  overlay={
+                    <Menu>
+                      <Menu.Item onClick={logout}>{t('common.logout')}</Menu.Item>
+                    </Menu>
+                  }
+                >
+                  <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
+                </Dropdown>
+              ) : (
+                <>
+                  <a className={styles['log-in']} onClick={(e) => showLoginForm(e)}>
+                    {t('common.login')}
+                  </a>
+                  <Divider type="vertical" className={styles['vertical-divider']} />
+                  <a className={styles['log-out']} onClick={(e) => showLoginForm(e, true)}>
+                    {t('common.register')}
+                  </a>
+                </>
+              )}
+            </li>
+          </>
+        )}
+        <li>
+          <TranslationOutlined onClick={changeLang} />
+        </li>
+      </ul>
       <LoginForm
         visible={loginFormVisible}
         isForRegister={isForRegister}

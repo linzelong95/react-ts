@@ -48,22 +48,42 @@ http.interceptors.request.use((req: AxiosRequestConfig) => {
 http.interceptors.response.use(
   (res: AxiosResponse) => {
     const {
-      data: { code, message, status },
+      status,
+      data,
+      data: { message },
     } = res
 
     console.log(888, res)
 
+    // // 统一处理接口无权限操作的情况
+    // if (code === 401) {
+    //   console.log('这里做报错的相关处理')
+    // }
+
+    // // 假设code=200表示成功，code！==200为失败
+    // // TODO:后面格式化为code为0表示成功，code不等于0表示失败
+    // if (code !== 200) {
+    //   // eslint-disable-next-line prefer-promise-reject-errors
+    //   return Promise.reject({
+    //     code,
+    //     message: typeof message === 'string' ? message.slice(0, 100) : message,
+    //     status:200,
+    //     rawResponse: res,
+    //     rawError: null,
+    //   } as CommonError)
+    // }
+    // return res
+
     // 统一处理接口无权限操作的情况
-    if (code === 401) {
+    if (status === 401) {
       console.log('这里做报错的相关处理')
     }
 
     // 假设code=200表示成功，code！==200为失败
     // TODO:后面格式化为code为0表示成功，code不等于0表示失败
-    if (code !== 200) {
+    if (status !== 200) {
       // eslint-disable-next-line prefer-promise-reject-errors
       return Promise.reject({
-        code,
         message: typeof message === 'string' ? message.slice(0, 100) : message,
         status,
         rawResponse: res,
@@ -71,7 +91,7 @@ http.interceptors.response.use(
       } as CommonError)
     }
 
-    return res
+    return { ...res, data: { data, code: status, message } }
   },
   (err: AxiosError) => {
     const {

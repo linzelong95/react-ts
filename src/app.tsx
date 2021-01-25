@@ -54,6 +54,6 @@ export default connect<Pick<AppProps, 'user'>, Pick<AppProps, 'onClearUser'>, Om
     user: state.user,
   }),
   (dispatch: Dispatch<UserAction>) => ({
-    onClearUser: (flag?: boolean) => dispatch({ type: UserActionType.LOGOUT, params: { flag } }),
+    onClearUser: (flag?: boolean) => dispatch({ type: UserActionType.LOGOUT }),
   }),
 )(App)

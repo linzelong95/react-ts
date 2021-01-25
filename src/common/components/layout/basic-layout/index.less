@@ -9,12 +9,15 @@
     padding: 0 24px;
     display: flex;
     justify-content: space-between;
+    @media screen and (max-width: 765px) {
+      padding: 0 10px;
+    }
     .header-left {
       display: flex;
       align-items: center;
       .site-logo {
-        width: 50px;
-        height: 50px;
+        width: 40px;
+        height: 40px;
       }
       .site-name {
         margin-left: 10px;
@@ -25,18 +28,21 @@
     .header-right {
       display: flex;
       align-items: center;
-      .search-icon {
-        font-size: 20px;
-        cursor: pointer;
-      }
-      .login-info {
-        color: white;
-        .log-in,
-        .log-out {
+      list-style: none;
+      height: 100%;
+      li {
+        &.login-info {
           color: white;
+          .log-in,
+          .log-out {
+            color: white;
+          }
+          .vertical-divider {
+            border-left-color: white;
+          }
         }
-        .vertical-divider {
-          border-left-color: white;
+        &:not(:last-child) {
+          margin-right: 10px;
         }
       }
     }
@@ -56,6 +62,9 @@
       }
       .footer {
         text-align: center;
+        .copyright {
+          margin: 0 5px;
+        }
       }
     }
   }

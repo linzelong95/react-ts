@@ -15,6 +15,9 @@ export async function tryCatch<R, E = Error>(promise: Promise<R> | R): Promise<[
   }
 }
 
+// 判断是否是客户端
+export const isClient = typeof window === 'object'
+
 // md5序列化
 export function serialize(value: string): string {
   return md5(value.toString()).toString(hex).replace('-', '')

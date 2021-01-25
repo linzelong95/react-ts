@@ -9,7 +9,7 @@ import { CommonError } from '@common/types'
  * @param {Service}  service 请求方法
  * @param {...any[]} data    该 service 方法所需要的参数
  */
-export function useService<T extends any, D extends any[]>(
+function useService<T extends any, D extends any[]>(
   service: (...data: D) => Promise<[T, CommonError]>,
   ...data: D
 ): [boolean, T, CommonError, () => void] {
@@ -31,3 +31,5 @@ export function useService<T extends any, D extends any[]>(
 
   return [loading, res[0], res[1], forceRequest]
 }
+
+export default useService

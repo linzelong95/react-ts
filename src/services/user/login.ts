@@ -4,13 +4,13 @@ import type { CommonError, CommonResponse } from '@common/types'
 import type { UserState } from '@store/types'
 
 export interface LoginParams {
-  account: string
-  password: string
+  account?: string
+  password?: string
   autoLogin: boolean
 }
 
 export function login(params: LoginParams): Promise<[CommonResponse<UserState>, null] | [null, CommonError]> {
-  return post<CommonResponse<UserState>>(userApis.LOGIN, { ...params, t: Date.now() })
+  return post<CommonResponse<UserState>, LoginParams & { t: number }>(userApis.LOGIN, { ...params, t: Date.now() })
 }
 
 export function logout<Res = unknown>(): Promise<[CommonResponse<Res>, null] | [null, CommonError]> {

@@ -66,6 +66,7 @@ module.exports = {
     'unicorn/no-reduce': 'off',
     'unicorn/no-null': 'off',
     'unicorn/prevent-abbreviations': 'off',
+    'unicorn/no-useless-undefined': 'off', // 允许设置undefined
     'unicorn/explicit-length-check': 'off', // 允许length不跟某个值比较， 如'xxx'.length?1:0
     'react/react-in-jsx-scope': 'error',
     'prefer-regex-literals': 'off', // 允许使用new RegExp
