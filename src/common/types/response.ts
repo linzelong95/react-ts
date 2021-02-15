@@ -5,9 +5,9 @@ import { AxiosError, AxiosResponse } from 'axios'
 
 /**
  * 统一的响应类型
- * @param {any} T 数据类型
+ * @param {unknown} T 数据类型
  */
-export interface CommonResponse<T = any> {
+export interface CommonResponse<T = unknown> {
   // 业务返回码
   code: number
 

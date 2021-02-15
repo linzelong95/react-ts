@@ -1,7 +1,8 @@
-import React, { useCallback, memo } from 'react'
-import { Form, Input, Checkbox, Modal } from 'antd'
+import React, { useCallback, memo, useState, useEffect } from 'react'
+import { Form, Input, Checkbox, Modal, message, Row, Col } from 'antd'
 import { UserOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
+import { loginServices } from '@services/user'
 import type { FC } from 'react'
 import type { ModalProps } from 'antd/es/modal'
 import type { LoginParams } from '@services/user/login'
@@ -28,6 +29,7 @@ interface LoginFormProps extends Omit<ModalProps, 'title' | 'okText' | 'onCancel
 
 const LoginForm: FC<LoginFormProps> = memo((props) => {
   const { isForRegister, visible, onLogin, onRegister, onClose, ...restProps } = props
+  const [captcha, setCaptcha] = useState<string>('')
   const [form] = Form.useForm<LoginParams>()
   const { t } = useTranslation()
 
@@ -52,6 +54,19 @@ const LoginForm: FC<LoginFormProps> = memo((props) => {
       })
   }, [form, isForRegister, onLogin, onRegister, handleCancel])
 
+  const getRefreshedCaptcha = useCallback<(event?: React.MouseEvent<HTMLElement, MouseEvent>) => void>(async () => {
+    const [captchaRes, captchaErr] = await loginServices.getWebpageCaptcha()
+    if (captchaErr || !captchaRes?.data?.item) {
+      message.error('获取验证码失败')
+      return
+    }
+    setCaptcha(captchaRes.data.item)
+  }, [])
+
+  useEffect(() => {
+    getRefreshedCaptcha()
+  }, [getRefreshedCaptcha])
+
   return (
     <Modal
       visible={visible}
@@ -73,9 +88,34 @@ const LoginForm: FC<LoginFormProps> = memo((props) => {
         <Form.Item label="Password" name="password" rules={[{ required: true, message: 'Please input your password!' }]}>
           <Input.Password />
         </Form.Item>
-        <Form.Item {...tailLayout} name="autoLogin" valuePropName="checked">
-          <Checkbox>Remember me</Checkbox>
-        </Form.Item>
+        {isForRegister ? (
+          <Form.Item label="RePassword" name="repeatedPassword" rules={[{ required: true, message: 'Please input your password!' }]}>
+            <Input.Password />
+          </Form.Item>
+        ) : (
+          <>
+            <Form.Item label="Captcha">
+              <Row gutter={8}>
+                <Col span={18}>
+                  <Form.Item noStyle name="captcha" rules={[{ required: true, message: 'Please input captcha!' }]}>
+                    <Input placeholder="captcha" />
+                  </Form.Item>
+                </Col>
+                <Col span={6}>
+                  <img
+                    alt="验证码"
+                    src={`data:image/png;base64,${captcha}`}
+                    style={{ height: 31, width: '100%', border: '1px solid gray', padding: 3, cursor: 'pointer' }}
+                    onClick={getRefreshedCaptcha}
+                  />
+                </Col>
+              </Row>
+            </Form.Item>
+            <Form.Item {...tailLayout} name="autoLogin" valuePropName="checked" style={{ marginBottom: 0 }}>
+              <Checkbox>Remember me</Checkbox>
+            </Form.Item>
+          </>
+        )}
       </Form>
     </Modal>
   )

@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { loginServices } from '@services/user'
 import { createLogoutAction, createLoginAction } from '@store/actions'
 import LoginForm from './login-form'
+import { useLocalStorage } from '@common/hooks'
 import { rsa, serialize } from '@common/utils'
 import type { StoreState } from '@src/store/types'
 import type { FC, Dispatch, SetStateAction } from 'react'
@@ -28,6 +29,9 @@ const Header: FC<HeaderProps> = memo((props) => {
   const searchBoxRef = useRef<Input>(null)
   const { t, i18n } = useTranslation()
   const dispatch = useDispatch()
+  const [accountLocalStorage, setAccountLocalStorage] = useLocalStorage<{ autoLoginMark: boolean; autoLogin: boolean }>(
+    'BLOG_STORE_ACCOUNT',
+  )
 
   const changeLang = useCallback<(event: React.MouseEvent<HTMLElement, MouseEvent>) => void>(() => {
     const nextLang = i18n.languages[0] === 'zh-CN' ? 'en' : 'zh-CN'
@@ -46,13 +50,18 @@ const Header: FC<HeaderProps> = memo((props) => {
 
   const login = useCallback<(params: LoginParams) => void>(
     async (params) => {
-      message.loading({ content: '正在登录...', key: 'login' })
+      message.loading({ content: '正在登录...', key: 'login', duration: 0 })
+      const { password, autoLogin, captcha } = params
+      const [, verifyCaptchaErr] = await loginServices.verifyCaptcha(captcha)
+      if (verifyCaptchaErr) {
+        message.error({ content: '验证码错误', key: 'login' })
+        return
+      }
       const [publicKeyRes, publicKeyErr] = await loginServices.getPublicKey()
       if (publicKeyErr || !publicKeyRes?.data?.item) {
         message.error({ content: '登录失败', key: 'login' })
         return
       }
-      const { password, autoLogin } = params
       const encryptedPassword = rsa(serialize(password), publicKeyRes.data.item)
       const [loginRes, loginErr] = await loginServices.login({ ...params, password: encryptedPassword })
       if (loginErr) {
@@ -60,14 +69,21 @@ const Header: FC<HeaderProps> = memo((props) => {
         return
       }
       message.success({ content: '登录成功', key: 'login' })
+      setAccountLocalStorage({ autoLogin, autoLoginMark: autoLogin })
       dispatch(createLoginAction(loginRes.data))
-      localStorage.setItem('BLOG_STORE_ACCOUNT', JSON.stringify({ autoLogin, autoLoginMark: autoLogin }))
     },
-    [dispatch],
+    [setAccountLocalStorage, dispatch],
   )
 
   const register = useCallback<(params: any) => void>(
-    (params) => {
+    async (params) => {
+      message.loading({ content: '正在注册...', key: 'register', duration: 0 })
+      const [, registerErr] = await loginServices.register(params)
+      if (registerErr) {
+        message.error({ content: registerErr.message || '注册失败', key: 'register' })
+        return
+      }
+      message.success({ content: '注册成功', key: 'register' })
       login(params)
     },
     [login],
@@ -79,26 +95,18 @@ const Header: FC<HeaderProps> = memo((props) => {
       message.error('退出登录失败')
       return
     }
-    let blogStoreAccountInfo: { autoLoginMark: boolean; autoLogin: boolean }
-    try {
-      blogStoreAccountInfo = JSON.parse(localStorage.getItem('BLOG_STORE_ACCOUNT') || '{}')
-    } catch {}
-    localStorage.setItem('BLOG_STORE_ACCOUNT', JSON.stringify({ ...blogStoreAccountInfo, autoLoginMark: false }))
+    setAccountLocalStorage({ ...accountLocalStorage, autoLoginMark: false })
     dispatch(createLogoutAction())
-  }, [dispatch])
+  }, [accountLocalStorage, setAccountLocalStorage, dispatch])
 
   useEffect(() => {
     ;(async () => {
-      let blogStoreAccountInfo: { autoLoginMark: boolean; autoLogin: boolean }
-      try {
-        blogStoreAccountInfo = JSON.parse(localStorage.getItem('BLOG_STORE_ACCOUNT') || '{}')
-      } catch {}
-      if (blogStoreAccountInfo?.autoLoginMark) {
+      if (accountLocalStorage?.autoLoginMark) {
         const [loginRes] = await loginServices.login({ autoLogin: true })
         if (loginRes?.data) dispatch(createLoginAction(loginRes.data))
       }
     })()
-  }, [dispatch])
+  }, [accountLocalStorage, dispatch])
 
   return (
     <Layout.Header className={styles['header-area']}>
@@ -171,15 +179,17 @@ const Header: FC<HeaderProps> = memo((props) => {
           <TranslationOutlined onClick={changeLang} />
         </li>
       </ul>
-      <LoginForm
-        visible={loginFormVisible}
-        isForRegister={isForRegister}
-        onLogin={login}
-        onRegister={register}
-        onClose={() => {
-          setLoginFormVisible(false)
-        }}
-      />
+      {loginFormVisible && (
+        <LoginForm
+          visible={loginFormVisible}
+          isForRegister={isForRegister}
+          onLogin={login}
+          onRegister={register}
+          onClose={() => {
+            setLoginFormVisible(false)
+          }}
+        />
+      )}
     </Layout.Header>
   )
 })
