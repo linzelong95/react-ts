@@ -24,6 +24,15 @@ const plugin: EggPlugin = {
     enable: true,
     package: 'egg-cors',
   },
+
+  /**
+   * 路由增强
+   * @see https://github.com/eggjs/egg-router-plus
+   */
+  routerPlus: {
+    enable: true,
+    package: 'egg-router-plus',
+  },
 }
 
 export default plugin

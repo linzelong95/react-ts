@@ -120,6 +120,5 @@ export default (appInfo: EggAppInfo) => {
     maxDays: 7,
   }
 
-  // the return config will combines to EggAppConfig
   return config
 }

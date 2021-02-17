@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2" />
+    <title><%= title %></title>
+    <link rel="icon" href="<%= favicon %>" type="image/png" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue',
+          Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+      }
+      body {
+        background: #f6f6f6;
+      }
+      header {
+        display: flex;
+        flex-direction: row;
+      }
+      .error-code-display {
+        padding: 0 150px;
+        background: #fff;
+        height: 300px;
+        display: flex;
+        align-items: flex-end;
+      }
+      .error-code-display h1 {
+        font-size: 200px;
+        color: #ccc;
+        line-height: 1;
+        font-weight: 100;
+      }
+      .error-message {
+        padding: 50px 150px;
+      }
+      .error-message h2 {
+        font-size: 50px;
+        color: #666;
+        font-weight: 800;
+      }
+      .error-message p {
+        font-size: 24px;
+        color: #666;
+        margin-top: 30px;
+      }
+      footer {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        padding: 30px 150px;
+        width: 100%;
+      }
+      footer p {
+        font-size: 16px;
+        color: #777;
+        line-height: 2;
+      }
+      @media screen and (max-width: 768px) {
+        .error-code-display {
+          padding: 0 30px;
+          height: 150px;
+        }
+        .error-code-display h1 {
+          font-size: 120px;
+        }
+        .error-message {
+          padding: 30px;
+        }
+        .error-message h2 {
+          font-size: 30px;
+        }
+        .error-message p {
+          font-size: 18px;
+          margin-top: 15px;
+        }
+        footer {
+          padding: 0 30px;
+          bottom: 20px;
+        }
+        footer p {
+          font-size: 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="error-code-display">
+      <h1><%= code %></h1>
+    </div>
+    <div class="error-message">
+      <h2>请求发生错误</h2>
+      <p><%= message %></p>
+    </div>
+    <footer>
+      <p>如有其它疑问，或不了解错误原因，请企业微信联系：CSIG_OMP助手</p>
+      <p>Copyright &copy; 2020-2021 briefNull 博客. All Rights Reserved.</p>
+    </footer>
+  </body>
+</html>

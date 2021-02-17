@@ -88,12 +88,12 @@ export default class AccountController extends Controller {
     ctx.body = { message: '退出成功', flag: true }
   }
 
-  async getpublickey() {
+  async getPublicKey() {
     const { ctx, config } = this
     ctx.body = { item: config.rsaPublicKey }
   }
 
-  async getcaptcha() {
+  async getCaptcha() {
     const { ctx } = this
     const cap: number = Math.floor(Math.random() * 9000 + 1000)
     const p = new captchapng(80, 30, cap)
@@ -110,7 +110,7 @@ export default class AccountController extends Controller {
     }
   }
 
-  async verifycaptcha() {
+  async verifyCaptcha() {
     const { ctx } = this
     const { captcha } = ctx.request.body
     const { cap } = ctx.session

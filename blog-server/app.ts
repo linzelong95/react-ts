@@ -5,7 +5,7 @@ import type { Application } from 'egg'
 export default (app: Application) => {
   app.beforeStart(async () => {
     const { env } = app.config
-    const dir = env === 'prod' ? 'dist' : 'src'
+    // const dir = env === 'prod' ? 'dist' : 'src'
     await createConnection({
       type: 'mysql',
       host: env === 'prod' ? '127.0.0.1' : '120.78.139.146',
@@ -15,9 +15,9 @@ export default (app: Application) => {
       database: 'myblog',
       synchronize: true,
       logging: false,
-      entities: [`${dir}/entity/**/*{.ts,.js}`],
-      migrations: [`${dir}/migration/**/*{.ts,.js}`],
-      subscribers: [`${dir}/subscriber/**/*{.ts,.js}`],
+      entities: [`${__dirname}/entity/**/*{.ts,.js}`],
+      migrations: [`${__dirname}/migration/**/*{.ts,.js}`],
+      subscribers: [`${__dirname}/subscriber/**/*{.ts,.js}`],
     })
   })
 }

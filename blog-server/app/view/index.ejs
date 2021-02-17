@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover"/>
+    <title><%= title %></title>
+    <meta name="keywords" content="<%= keywords %>"/>
+    <meta name="description" content="<%= description %>"/>
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="icon" href="<%= favicon %>" type="image/png"/>
+    <% if(Array.isArray(cssList)) { %>
+      <% for (const css of cssList) { %>
+        <link rel="stylesheet" href="<%= css %>"></link>
+      <% } %>
+    <% } %>
+
+    <script>
+      window.initialTime = Date.now()
+    </script>
+
+    <% if(typeof initialState === 'object' && initialState) { %>
+      <script>
+        window.__INITIAL_STATE__ = <%- JSON.stringify(initialState) %>
+      </script>
+    <% } %>
+  </head>
+  <body>
+    <div id="root"></div>
+    <% if(Array.isArray(jsList)) { %>
+      <% for (const js of jsList) { %>
+        <script src="<%= js %>"></script>
+      <% } %>
+    <% } %>
+    <script>
+      window.scriptLoadedTime = Date.now()
+    </script>
+  </body>
+</html>

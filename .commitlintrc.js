@@ -19,3 +19,6 @@ module.exports = {
  * test : 增加测试
  * anno: 增加注释
  */
+
+// 绕开条件前的校验
+// git commit -m 'xxx' --no-verify
