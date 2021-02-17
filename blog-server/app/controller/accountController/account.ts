@@ -1,10 +1,9 @@
 import { Controller } from 'egg'
 import { getRepository } from 'typeorm'
-import { User } from '../../../entity/User'
+import { User } from '@entity/User'
 import * as crypto from 'crypto'
 import * as constants from 'constants'
-
-const captchapng = require('captchapng')
+import * as CaptchaPng from 'captchapng'
 
 export default class AccountController extends Controller {
   async info(): Promise<void> {
@@ -96,7 +95,7 @@ export default class AccountController extends Controller {
   async getCaptcha() {
     const { ctx } = this
     const cap: number = Math.floor(Math.random() * 9000 + 1000)
-    const p = new captchapng(80, 30, cap)
+    const p = new CaptchaPng(80, 30, cap)
     p.color(0, 0, 0, 0)
     p.color(80, 80, 80, 255)
     const base64 = p.getBase64()

@@ -1,72 +1,71 @@
-// import { provide } from 'midway';
-// import { getRepository } from "typeorm";
-// import { Category } from "../../entity/Category";
-// import { OrderByCondition } from "../../interface";
+import { Service } from 'egg'
+import { getRepository } from 'typeorm'
+import { Category } from '@entity/Category'
 
-// @provide()
-// export class AdminCategoryService {
+export default class AdminCategoryService extends Service {
+  repository = getRepository(Category)
 
-//   repository = getRepository(Category);
+  async list(options) {
+    const { index, size, name, isEnable, orderBy, sortIdsArr, id } = options
+    const orderByMap: Record<string, 'ASC' | 'DESC'> = {}
+    if (orderBy.name && ['name', 'isEnable', 'sort', 'createDate', 'updateDate'].includes(orderBy.name))
+      orderByMap[`category.${orderBy.name}`] = orderBy.by
+    if (!orderBy.name || !['createDate', 'updateDate'].includes(orderBy.name)) orderByMap['category.createDate'] = 'ASC'
+    return await this.repository
+      .createQueryBuilder('category')
+      .innerJoinAndSelect('category.sort', 'sort', sortIdsArr.length ? `sort.id in (${sortIdsArr.join(',')})` : '1=1')
+      .where('category.name like :name', { name: `%${name}%` })
+      .andWhere(id ? `category.id=${id}` : '1=1')
+      .andWhere(isEnable !== undefined ? `category.isEnable=${isEnable}` : '1=1')
+      .orderBy(orderByMap)
+      .skip((index - 1) * size)
+      .take(size)
+      .getManyAndCount()
+  }
 
-//   async list(options) {
-//     const { index, size, name, isEnable, orderBy, sortIdsArr, id } = options;
-//     const orderByMap: OrderByCondition = {};
-//     if (orderBy.name && ["name", "isEnable", "sort", "createDate", "updateDate"].includes(orderBy.name)) orderByMap[`category.${orderBy.name}`] = orderBy.by;
-//     if (!orderBy.name || !["createDate", "updateDate"].includes(orderBy.name)) orderByMap["category.createDate"] = "ASC";
-//     return await this.repository
-//       .createQueryBuilder("category")
-//       .innerJoinAndSelect("category.sort", "sort", sortIdsArr.length ? `sort.id in (${sortIdsArr.join(",")})` : "1=1")
-//       .where("category.name like :name", { name: `%${name}%` })
-//       .andWhere(id ? `category.id=${id}` : "1=1")
-//       .andWhere(isEnable !== undefined ? `category.isEnable=${isEnable}` : "1=1")
-//       .orderBy(orderByMap)
-//       .skip((index - 1) * size)
-//       .take(size)
-//       .getManyAndCount();
-//   }
+  async save(options) {
+    let flag = true
+    const categoryEntity = this.repository.create({ ...options })
+    await this.repository.save(categoryEntity).catch(() => {
+      flag = false
+    })
+    return flag
+  }
 
-//   async save(options) {
-//     let flag = true;
-//     const categoryEntity = this.repository.create({ ...options });
-//     await this.repository.save(categoryEntity).catch(e => { flag = false });
-//     return flag;
-//   }
+  async delete(ids: number[]) {
+    let flag = true
+    const result = await this.repository.delete(ids)
+    if (!result.raw.affectedRows) {
+      flag = false
+    }
+    return flag
+  }
 
-//   async delete(ids: number[]) {
-//     let flag = true;
-//     const result = await this.repository.delete(ids);
-//     if (!result.raw.affectedRows) {
-//       flag = false;
-//     }
-//     return flag;
-//   }
+  async lock(ids: number[]) {
+    let flag = true
+    const result = await this.repository
+      .createQueryBuilder()
+      .update(Category)
+      .set({ isEnable: 0 })
+      .where('id in (:...ids)', { ids })
+      .execute()
+    if (!result.raw.affectedRows) {
+      flag = false
+    }
+    return flag
+  }
 
-//   async lock(ids: number[]) {
-//     let flag = true;
-//     const result = await this.repository
-//       .createQueryBuilder()
-//       .update(Category)
-//       .set({ isEnable: 0 })
-//       .where("id in (:...ids)", { ids })
-//       .execute();
-//     if (!result.raw.affectedRows) {
-//       flag = false;
-//     }
-//     return flag;
-//   }
-
-//   async unlock(ids: number[]) {
-//     let flag = true;
-//     const result = await this.repository
-//       .createQueryBuilder()
-//       .update(Category)
-//       .set({ isEnable: 1 })
-//       .where("id in (:...ids)", { ids })
-//       .execute();
-//     if (!result.raw.affectedRows) {
-//       flag = false;
-//     }
-//     return flag;
-//   }
-
-// }
+  async unlock(ids: number[]) {
+    let flag = true
+    const result = await this.repository
+      .createQueryBuilder()
+      .update(Category)
+      .set({ isEnable: 1 })
+      .where('id in (:...ids)', { ids })
+      .execute()
+    if (!result.raw.affectedRows) {
+      flag = false
+    }
+    return flag
+  }
+}

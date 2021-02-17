@@ -18,7 +18,6 @@
       "@common/*": ["src/common/*"],
       "@public/*": ["src/public/*"],
       "@store/*": ["src/store/*"],
-      "@type/*": ["src/types/*"], // 无法写为@types，疑似关键字冲突
       "@services/*": ["src/services/*"],
       "@utils/*": ["src/utils/*"],
       "@configs/*": ["src/configs/*"],

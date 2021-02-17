@@ -1,4 +1,5 @@
 import { EggPlugin } from 'egg'
+import 'tsconfig-paths/register' // 解决egg.js中ts映射路径不生效问题
 
 const plugin: EggPlugin = {
   /**

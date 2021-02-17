@@ -15,9 +15,9 @@ export default (app: Application) => {
       database: 'myblog',
       synchronize: true,
       logging: false,
-      entities: [`${__dirname}/entity/**/*{.ts,.js}`],
-      migrations: [`${__dirname}/migration/**/*{.ts,.js}`],
-      subscribers: [`${__dirname}/subscriber/**/*{.ts,.js}`],
+      entities: [`${__dirname}/app/entity/**/*{.ts,.js}`],
+      migrations: [`${__dirname}/app/migration/**/*{.ts,.js}`],
+      subscribers: [`${__dirname}/app/subscriber/**/*{.ts,.js}`],
     })
   })
 }

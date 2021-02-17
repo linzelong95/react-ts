@@ -3,7 +3,7 @@ import * as passportLocal from 'passport-local'
 import * as crypto from 'crypto'
 import * as constants from 'constants'
 import { getRepository } from 'typeorm'
-import { User } from '../../entity/User'
+import { User } from '@entity/User'
 
 const LocalStrategy = passportLocal.Strategy
 

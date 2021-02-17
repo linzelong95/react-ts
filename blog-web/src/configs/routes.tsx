@@ -6,10 +6,9 @@ import { AlipayOutlined, ZhihuOutlined } from '@ant-design/icons'
 
 const routes: RouteConfig[] = [
   {
-    path: '/c',
+    path: '/category',
     exact: true,
-    redirect: '/test-a',
-    authPoints: ['blog.super_admin-is'],
+    component: asyncComponent(() => import(/* webpackPrefetch: true */ '@containers/category')),
     icon: <AlipayOutlined />,
   },
   {

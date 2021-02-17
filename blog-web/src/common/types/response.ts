@@ -39,3 +39,5 @@ export interface CommonError {
   // 如果返回的 HTTP 状态码 < 400，则没有这个对象
   rawError?: AxiosError
 }
+
+export type ServiceResult<T> = Promise<[CommonResponse<T>, null] | [null, CommonError]>
