@@ -30,10 +30,10 @@ const renderRoutes: RenderRoutes = (routes = [], extraParams = {}) => {
   const { redirectComponent, useNotFoundComponent = true } = extraParams
   return (
     <Switch key={uuid()}>
-      {routes.map((route, index) => {
-        const { path, exact, strict, sensitive } = route
-        const key = `${uuid()}-${path || index}`
-        return <Route key={key} {...{ path, exact, strict, sensitive }} render={(props) => renderRoute(route, props)} />
+      {routes.map((route) => {
+        const { menuKey, path, exact, strict, sensitive } = route
+        if (path.startsWith('http')) return null
+        return <Route key={menuKey} {...{ path, exact, strict, sensitive }} render={(props) => renderRoute(route, props)} />
       })}
       {redirectComponent}
       {useNotFoundComponent && <Route key={`${uuid()}-not-found`} component={NotFound} />}

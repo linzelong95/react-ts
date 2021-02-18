@@ -7,19 +7,22 @@ import { AlipayOutlined, ZhihuOutlined } from '@ant-design/icons'
 const routes: RouteConfig[] = [
   {
     path: '/category',
+    menuKey: 'category',
     exact: true,
     component: asyncComponent(() => import(/* webpackPrefetch: true */ '@blog-admin/containers/category')),
     icon: <AlipayOutlined />,
   },
   {
-    path: '/d',
+    path: 'http://www.baidu.com',
+    menuKey: 'baidu',
     exact: true,
-    authPoints: ['blog.personal_admin-is'],
-    component: asyncComponent(() => import(/* webpackPrefetch: true */ '@blog-admin/containers/test')),
+    // authPoints: ['blog.personal_admin-is'],
+    // component: asyncComponent(() => import(/* webpackPrefetch: true */ '@blog-admin/containers/test')),
     icon: <ZhihuOutlined />,
   },
   {
     path: '/test-c',
+    menuKey: 'testC',
     exact: true,
     component: asyncComponent(() => import(/* webpackPrefetch: true */ '@blog-admin/containers/test-a')),
     authPoints: ['blog.super_admin-is', 'blog.personal_admin-is'],
@@ -28,6 +31,7 @@ const routes: RouteConfig[] = [
   },
   {
     path: '/root',
+    menuKey: 'root',
     component: asyncComponent(() => import(/* webpackPrefetch: true */ '@blog-admin/containers/test')),
     // exact: true,
     redirect: '/root/test-a',
@@ -35,19 +39,21 @@ const routes: RouteConfig[] = [
     routes: [
       {
         path: '/root/test-a',
-        // exact: true,
+        menuKey: 'root-testA',
         component: asyncComponent(() => import(/* webpackPrefetch: true */ '@blog-admin/containers/test-a')),
         redirect: '/root/test-a/test-b',
         icon: <ZhihuOutlined />,
         routes: [
           {
             path: '/root/test-a/test-b',
+            menuKey: 'root-testA-testB',
             exact: true,
             component: asyncComponent(() => import(/* webpackPrefetch: true */ '@blog-admin/containers/test-b')),
             icon: <ZhihuOutlined />,
           },
           {
             path: '/root/test-a/:id',
+            menuKey: 'root-testA-id',
             authPoints: ['blog.super_admin-is', 'blog.personal_admin-is'],
             authOperator: 'or',
             exact: true,
@@ -60,6 +66,7 @@ const routes: RouteConfig[] = [
   },
   {
     path: '/',
+    menuKey: 'index',
     redirect: '/root/test-a',
   },
 ]

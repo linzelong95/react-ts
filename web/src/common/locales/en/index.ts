@@ -1,4 +1,4 @@
 import common from './common'
-import menu from './menu'
+import blogAdmin from './blog-admin'
 
-export default { common, menu }
+export default { common, 'blog-admin': blogAdmin }

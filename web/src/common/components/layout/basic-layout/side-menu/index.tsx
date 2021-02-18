@@ -12,23 +12,25 @@ import type { MenuProps } from 'antd/es/menu'
 import type { DrawerProps } from 'antd/es/drawer'
 import styles from '../index.less'
 
-function getMenuItems(routes: RouteConfig[], enablePaths: string[], t: TFunction<string>): JSX.Element[] {
+function getMenuItems(basename: string, routes: RouteConfig[], enablePaths: string[], t: TFunction<string>): JSX.Element[] {
   return routes?.map((route) => {
-    const { path, icon } = route
+    const { path, icon, menuKey } = route
     if (path === '/' || path.includes('/:') || !enablePaths.includes(path)) return null
+    const menuName = t(`${basename.slice(1)}.menu.${menuKey}`)
     return route.routes?.length ? (
-      <Menu.SubMenu key={path} icon={icon} title={t(`menu.${path}`)}>
-        {getMenuItems(route.routes, enablePaths, t)}
+      <Menu.SubMenu key={path} icon={icon} title={menuName}>
+        {getMenuItems(basename, route.routes, enablePaths, t)}
       </Menu.SubMenu>
     ) : (
       <Menu.Item key={path} icon={icon}>
-        {t(`menu.${path}`)}
+        {menuName}
       </Menu.Item>
     )
   })
 }
 
 interface SideMenuProps {
+  basename: string
   routes: RouteConfig[]
   paths: string[]
   isSmallViewPort: boolean
@@ -38,7 +40,7 @@ interface SideMenuProps {
 }
 
 const SideMenu: FC<SideMenuProps> = memo((props) => {
-  const { routes, paths, isMobile, isSmallViewPort, menuDrawerVisible, onToggleMenuDrawer } = props
+  const { basename, routes, paths, isMobile, isSmallViewPort, menuDrawerVisible, onToggleMenuDrawer } = props
   const history = useHistory()
   const { pathname } = useLocation()
   const { t } = useTranslation()
@@ -49,6 +51,10 @@ const SideMenu: FC<SideMenuProps> = memo((props) => {
 
   const clickMenu = useCallback<MenuProps['onClick']>(
     ({ key }) => {
+      if ((key as string).startsWith('http')) {
+        window.open(key as string, '_blank')
+        return
+      }
       history.push(key as string)
     },
     [history],
@@ -79,10 +85,10 @@ const SideMenu: FC<SideMenuProps> = memo((props) => {
         theme={isMobile ? 'dark' : 'light'}
         mode="inline"
       >
-        {getMenuItems(routes, paths, t)}
+        {getMenuItems(basename, routes, paths, t)}
       </Menu>
     ),
-    [selectedMenuKeys, menuOpenKeys, routes, paths, isMobile, t, clickMenu, openChangeMenu],
+    [basename, selectedMenuKeys, menuOpenKeys, routes, paths, isMobile, t, clickMenu, openChangeMenu],
   )
 
   return isMobile ? (

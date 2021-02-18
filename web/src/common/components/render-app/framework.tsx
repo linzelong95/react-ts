@@ -35,7 +35,9 @@ const Framework: FC<FrameworkOptions> = (props) => {
         <Provider store={store}>
           <BrowserRouter basename={basename}>
             <ConfigProvider locale={i18n.languages[0] === 'zh-CN' ? zhCN : enUS}>
-              <BasicLayout routes={routes}>{renderRoutes(routes)}</BasicLayout>
+              <BasicLayout routes={routes} basename={basename}>
+                {renderRoutes(routes)}
+              </BasicLayout>
             </ConfigProvider>
           </BrowserRouter>
         </Provider>

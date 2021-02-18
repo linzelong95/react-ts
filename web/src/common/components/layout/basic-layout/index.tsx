@@ -27,8 +27,8 @@ function getFlattedPaths(routes: RouteConfig[] = [], userAuthPoints?: string[]):
   }, [])
 }
 
-const BasicLayout: FC<{ routes?: RouteConfig[] }> = memo((props) => {
-  const { routes, children } = props
+const BasicLayout: FC<{ routes?: RouteConfig[]; basename: string }> = memo((props) => {
+  const { routes, basename, children } = props
   const { pathname } = useLocation()
   const userInfo = useSelector<StoreState, StoreState['user']>((state) => state.user)
   const isSmallViewPort = useMobile({ includePad: true, includeTraditionalSmallViewPort: 767 })
@@ -62,6 +62,7 @@ const BasicLayout: FC<{ routes?: RouteConfig[] }> = memo((props) => {
       <Layout className={styles['body-area']}>
         <SideMenu
           routes={routes}
+          basename={basename}
           paths={flattedPathsWithPermission}
           isMobile={isMobile}
           isSmallViewPort={isSmallViewPort}
