@@ -2,10 +2,10 @@ import React, { useCallback, memo, useState, useEffect } from 'react'
 import { Form, Input, Checkbox, Modal, message, Row, Col } from 'antd'
 import { UserOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
-import { loginServices } from '@services/user'
+import { loginServices } from '@common/services/user'
 import type { FC } from 'react'
 import type { ModalProps } from 'antd/es/modal'
-import type { LoginParams } from '@services/user/login'
+import type { LoginParams } from '@common/services/user/login'
 
 let blogStoreAccountInfo: { autoLoginMark: boolean; autoLogin: boolean }
 try {

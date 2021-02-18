@@ -40,4 +40,4 @@ export interface CommonError {
   rawError?: AxiosError
 }
 
-export type ServiceResult<T> = Promise<[CommonResponse<T>, null] | [null, CommonError]>
+export type ServiceResult<T = unknown> = Promise<[CommonResponse<T>, null] | [null, CommonError]>

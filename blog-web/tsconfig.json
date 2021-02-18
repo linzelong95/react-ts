@@ -14,14 +14,8 @@
     "allowSyntheticDefaultImports": true,
     "paths": {
       "@src/*": ["src/*"],
-      "@components/*": ["src/components/*"],
       "@common/*": ["src/common/*"],
-      "@public/*": ["src/public/*"],
-      "@store/*": ["src/store/*"],
-      "@services/*": ["src/services/*"],
-      "@utils/*": ["src/utils/*"],
-      "@configs/*": ["src/configs/*"],
-      "@containers/*": ["src/containers/*"]
+      "@blog-admin/*": ["src/blog-admin/*"]
     }
   },
   "include": ["./src/**/*"],

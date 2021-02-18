@@ -15,6 +15,7 @@ module.exports = merge(commonConfig, {
     filename: '[name]/js/[name].js',
     publicPath: 'http://127.0.0.1:7002/dev-static/',
     chunkFilename: (pathData) => `${pathData.chunk.runtime}/js/router/[id].js`,
+    assetModuleFilename: (pathData) => `${pathData.runtime}/js/asset/[name][ext][query]`,
   },
 
   // DEV 配置

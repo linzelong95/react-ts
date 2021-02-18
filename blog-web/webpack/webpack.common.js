@@ -12,26 +12,20 @@ const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin')
 // const HardSourceWebpackPlugin = require('hard-source-webpack-plugin')
+const CONSTANTS = require('./constants')
+const { PROJECT_PATH, BUILD_MODULES, MANIFEST_ROOT, RELEASE_TAG } = CONSTANTS
+
+if (!BUILD_MODULES.length) {
+  throw new Error('必须要添加要编译的 app 名，例如 npm run dev index 或 npm run build index')
+}
 
 const externals = require('./externals')
-
-// 常量
-const CONSTANTS = require('./constants')
-const { PROJECT_PATH, BUILD_MODULES, COMMON_MODULES, MANIFEST_ROOT, RELEASE_TAG } = CONSTANTS
 
 // 是否是开发环境
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // 是否重新处理所有依赖包
 const ifHandleAllLibs = process.env.IF_HANDLE_ALL_LIBS === 'all'
-
-// 生成要编译的模块
-const operatedModules = BUILD_MODULES.length
-  ? BUILD_MODULES.reduce((entryObject, currentModule) => {
-      entryObject[currentModule] = `./src/${currentModule}`
-      return entryObject
-    }, {})
-  : { index: path.resolve(PROJECT_PATH, 'src/index.tsx') }
 
 // class MyInjectCustomScriptsPlugin {
 //   constructor(options) {
@@ -64,7 +58,10 @@ const operatedModules = BUILD_MODULES.length
 
 module.exports = {
   // 应用入口
-  entry: operatedModules,
+  entry: BUILD_MODULES.reduce((entryObject, currentModule) => {
+    entryObject[currentModule] = path.resolve(PROJECT_PATH, `src/${currentModule}/index.tsx`)
+    return entryObject
+  }, {}),
 
   // 主路径
   context: PROJECT_PATH,
@@ -152,9 +149,6 @@ module.exports = {
       {
         test: /\.(?:ico|gif|png|jpg|jpeg)$/i,
         type: 'asset/resource',
-        generator: {
-          filename: 'images/[name][hash][ext][query]',
-        },
         // asset/resource等同file-loader，asset/inline等同url-loader，asset/source等同raw-loader
         // asset等同automatically chooses between exporting a data URI and emitting a separate file. Previously achievable by using url-loader with asset size limit
       },

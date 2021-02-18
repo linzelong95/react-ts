@@ -25,10 +25,11 @@ const productionConfig = {
   mode: 'production',
 
   output: {
-    filename: '[name]/js/[name].[hash:8].js',
+    filename: '[name]/js/[name].[contenthash:8].js',
     path: PUBLIC_ROOT,
     publicPath: '/public/',
     chunkFilename: (pathData) => `${pathData.chunk.runtime}/js/router/[id].js`,
+    assetModuleFilename: (pathData) => `${pathData.runtime}/js/asset/[name]-[hash][ext][query]`,
   },
 
   devtool: 'source-map',
@@ -57,7 +58,7 @@ const productionConfig = {
   plugins: [
     // 抽离出css
     new MiniCssExtractPlugin({
-      filename: '[name]/css/[name].[hash:8].css',
+      filename: '[name]/css/[name].[contenthash:8].css',
     }),
 
     // 删除无用文件

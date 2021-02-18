@@ -3,7 +3,7 @@ import { Layout, Menu, Drawer } from 'antd'
 import { useHistory, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useTitle } from '@common/hooks'
-import logoImg from '@public/images/logo.png'
+import logoImg from '@blog-admin/public/images/logo.png'
 import type { FC, ReactNode, Dispatch, SetStateAction } from 'react'
 import type { RouteConfig } from '@src/common/types'
 import type { TFunction } from 'react-i18next'
@@ -13,7 +13,7 @@ import type { DrawerProps } from 'antd/es/drawer'
 import styles from '../index.less'
 
 function getMenuItems(routes: RouteConfig[], enablePaths: string[], t: TFunction<string>): JSX.Element[] {
-  return routes.map((route) => {
+  return routes?.map((route) => {
     const { path, icon } = route
     if (path === '/' || path.includes('/:') || !enablePaths.includes(path)) return null
     return route.routes?.length ? (
@@ -46,6 +46,8 @@ const SideMenu: FC<SideMenuProps> = memo((props) => {
   const [menuOpenKeys, setMenuOpenKeys] = useState<MenuProps['openKeys']>([])
   useTitle(t(`menu.${selectedMenuKeys[0]}`))
   const [sideCollapsed, setSideCollapsed] = useState<SiderProps['collapsed']>(() => isSmallViewPort)
+
+  console.log(111, pathname, history)
 
   const clickMenu = useCallback<MenuProps['onClick']>(
     ({ key }) => {
@@ -98,7 +100,7 @@ const SideMenu: FC<SideMenuProps> = memo((props) => {
       closable={false}
       visible={menuDrawerVisible}
       bodyStyle={{ background: '#001529', padding: 0 }}
-      headerStyle={{ background: '#001529', borderBottomColor: '#424144', padding: '12px 16px' }}
+      headerStyle={{ background: '#001529', borderBottomColor: '#424144', padding: '12px 16px 10px 16px' }}
       onClose={() => {
         onToggleMenuDrawer(false)
       }}

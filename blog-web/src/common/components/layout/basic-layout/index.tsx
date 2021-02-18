@@ -7,11 +7,10 @@ import { useMobile } from '@common/hooks'
 import Header from './header'
 import Footer from './footer'
 import SideMenu from './side-menu'
-import routes from '@configs/routes'
 import type { FC } from 'react'
 import type { DrawerProps } from 'antd/es/drawer'
-import type { StoreState } from '@src/store/types'
-import type { RouteConfig } from '@src/common/types'
+import type { StoreState } from '@common/store/types'
+import type { RouteConfig } from '@common/types'
 import styles from './index.less'
 
 function getFlattedPaths(routes: RouteConfig[] = [], userAuthPoints?: string[]): string[] {
@@ -28,8 +27,8 @@ function getFlattedPaths(routes: RouteConfig[] = [], userAuthPoints?: string[]):
   }, [])
 }
 
-const BasicLayout: FC = memo((props) => {
-  const { children } = props
+const BasicLayout: FC<{ routes?: RouteConfig[] }> = memo((props) => {
+  const { routes, children } = props
   const { pathname } = useLocation()
   const userInfo = useSelector<StoreState, StoreState['user']>((state) => state.user)
   const isSmallViewPort = useMobile({ includePad: true, includeTraditionalSmallViewPort: 767 })
@@ -49,7 +48,7 @@ const BasicLayout: FC = memo((props) => {
     const allFlattedPaths = getFlattedPaths(routes)
     const flattedPathsWithPermission = getFlattedPaths(routes, authPoints)
     return { allFlattedPaths, flattedPathsWithPermission }
-  }, [getUserAuthPoints])
+  }, [routes, getUserAuthPoints])
 
   const match = useRouteMatch(allFlattedPaths)
 
