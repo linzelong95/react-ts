@@ -1,2 +1,0 @@
-(self.webpackChunkyyy=self.webpackChunkyyy||[]).push([[921],{76921:function(n,e,r){"use strict";r.r(e);var u=r(63804),t=r.n(u),c=r(95325),s=r(76012),a=r(8351);e.default=(0,c.connect)((function(n){return{user:n.user}}),(function(n){return{onClearUser:function(e){return n({type:s.c.LOGOUT})}}}))((function(n){return n.user,n.onClearUser,(0,a.useTranslation)().i18n,t().createElement("div",null,"1111")}))}}]);
-//# sourceMappingURL=921.js.map

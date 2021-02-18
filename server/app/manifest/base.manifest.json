@@ -1,7 +1,12 @@
 {
-  "base.js": {
-    "path": "/public/base/js/base.589d7040.js",
+  "base.css": {
+    "path": "/public/base/css/base.c6f7bcd0.css",
     "editor": "briefNull",
-    "release": "briefNull-1613453285324"
+    "release": "briefNull-1613664567498"
+  },
+  "base.js": {
+    "path": "/public/base/js/base.7bc65906.js",
+    "editor": "briefNull",
+    "release": "briefNull-1613664567498"
   }
 }

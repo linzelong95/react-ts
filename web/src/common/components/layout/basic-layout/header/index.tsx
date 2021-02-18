@@ -34,7 +34,7 @@ const Header: FC<HeaderProps> = memo((props) => {
   )
 
   const changeLang = useCallback<(event: React.MouseEvent<HTMLElement, MouseEvent>) => void>(() => {
-    const nextLang = i18n.languages[0] === 'zh-CN' ? 'en' : 'zh-CN'
+    const nextLang = i18n.language === 'zh-CN' ? 'en' : 'zh-CN'
     i18n.changeLanguage(nextLang)
     message.info(`当前语言已设置为${nextLang === 'zh-CN' ? '中文' : '英文'}`)
   }, [i18n])

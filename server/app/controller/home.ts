@@ -20,9 +20,8 @@ export default class HomeController extends Controller {
   public async index() {
     const { ctx } = this
     let currentUrl = ctx.path
-    console.log(222, 'home')
-    if (currentUrl.startsWith('/public') || currentUrl.startsWith('/api')) return
-    if (currentUrl === '/') currentUrl = '/index'
+    if (/^\/(public|api)/.test(currentUrl)) return
+    if (currentUrl === '/') currentUrl = '/blog-admin'
     const moduleName = currentUrl.split('/')[1]
     const moduleStatics = this.getModuleStatics(moduleName)
     if (!moduleStatics?.js?.path) return

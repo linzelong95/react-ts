@@ -59,7 +59,7 @@ const ifHandleAllLibs = process.env.IF_HANDLE_ALL_LIBS === 'all'
 module.exports = {
   // 应用入口
   entry: BUILD_MODULES.reduce((entryObject, currentModule) => {
-    entryObject[currentModule] = path.resolve(PROJECT_PATH, `src/${currentModule}/index.tsx`)
+    entryObject[currentModule] = path.resolve(PROJECT_PATH, `src/${currentModule}`)
     return entryObject
   }, {}),
 

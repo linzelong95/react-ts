@@ -182,7 +182,6 @@ const Category: FC<RouteComponentProps> = memo(() => {
         <Tabs.TabPane tab="Tab 1" key="cate" />
         <Tabs.TabPane tab="Tab 2" key="sort" />
       </Tabs>
-
       <Table
         columns={tabKey === 'cate' ? cateColumn : sortColumn}
         rowKey={(item) => item.id}

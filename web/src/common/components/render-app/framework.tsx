@@ -10,10 +10,6 @@ import zhCN from 'antd/lib/locale/zh_CN'
 import type { FC } from 'react'
 import type { ProviderProps } from 'react-redux'
 import type { RouteConfig } from '@common/types'
-import '@common/locales'
-import '@common/styles/index.global.less'
-
-if (module && module.hot) module.hot.accept()
 
 interface FrameworkOptions {
   // 应用名称
@@ -29,12 +25,13 @@ interface FrameworkOptions {
 const Framework: FC<FrameworkOptions> = (props) => {
   const { store, routes, basename } = props
   const { i18n } = useTranslation()
+  console.log(222, i18n.language)
   return (
     <React.StrictMode>
       <ErrorBoundary>
         <Provider store={store}>
           <BrowserRouter basename={basename}>
-            <ConfigProvider locale={i18n.languages[0] === 'zh-CN' ? zhCN : enUS}>
+            <ConfigProvider locale={i18n.language === 'zh-CN' ? zhCN : enUS}>
               <BasicLayout routes={routes} basename={basename}>
                 {renderRoutes(routes)}
               </BasicLayout>

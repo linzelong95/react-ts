@@ -2,7 +2,7 @@ const os = require('os')
 const path = require('path')
 
 // 服务端根目录
-const SERVER_ROOT = path.resolve(__dirname, '../../blog-server')
+const SERVER_ROOT = path.resolve(__dirname, '../../server')
 // 服务端静态文件路径
 const PUBLIC_ROOT = path.resolve(SERVER_ROOT, 'app/public')
 // manifest 路径
@@ -14,8 +14,8 @@ const RELEASE_TAG = `${os.userInfo().username}-${Date.now()}`
 const PROJECT_PATH = path.resolve(__dirname, '../')
 // 项目所在根目录的名称
 const PROJECT_NAME = path.parse(PROJECT_PATH).name
-// 项目依赖的模块，目前只有base
-const COMMON_MODULES = ['base']
+// 项目依赖的公共模块
+const COMMON_MODULES = ['common']
 // 动态生成要编译的模块
 const BUILD_MODULES = process.env.BUILD_MODULES.split('&').filter((moduleName) => !COMMON_MODULES.includes(moduleName))
 
