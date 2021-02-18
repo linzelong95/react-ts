@@ -47,8 +47,6 @@ const SideMenu: FC<SideMenuProps> = memo((props) => {
   useTitle(t(`menu.${selectedMenuKeys[0]}`))
   const [sideCollapsed, setSideCollapsed] = useState<SiderProps['collapsed']>(() => isSmallViewPort)
 
-  console.log(111, pathname, history)
-
   const clickMenu = useCallback<MenuProps['onClick']>(
     ({ key }) => {
       history.push(key as string)
