@@ -4,10 +4,11 @@ import * as crypto from 'crypto'
 import * as constants from 'constants'
 import { getRepository } from 'typeorm'
 import { User } from '@entity/User'
+import type { Context, Application } from 'egg'
 
 const LocalStrategy = passportLocal.Strategy
 
-module.exports = (options, app) => {
+module.exports = (options, app: Application) => {
   passport.serializeUser((user, done) => {
     // 序列化ctx.login()触发
     delete user.password
@@ -60,8 +61,8 @@ module.exports = (options, app) => {
   )
   app.use(passport.initialize())
   app.use(passport.session())
-  app.passport = passport
-  return async (ctx: any, next: any) => {
+  ;(app as any).passport = passport
+  return async (ctx: Context, next: any) => {
     const adminUrls = ['/admin/']
     const userUrls = ['/user/comment/delete', '/user/comment/insert']
     if (userUrls.some((i) => ctx.originalUrl.includes(i)) && !ctx.isAuthenticated()) {

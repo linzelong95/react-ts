@@ -1,0 +1,2 @@
+(self.webpackChunkyyy=self.webpackChunkyyy||[]).push([[460],{68460:function(e,n,t){"use strict";t.r(n);var u=t(67294);n.default=function(e){return(0,u.useEffect)((function(){}),[e]),u.createElement("div",null,"test-a ",null==e?void 0:e.children)}}}]);
+//# sourceMappingURL=460.js.map

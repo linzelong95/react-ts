@@ -6,7 +6,7 @@ export default class AdminCategoryController extends Controller {
     const { conditionQuery = {}, index = 1, size = 10 } = ctx.request.body
     const { isEnable, name = '', orderBy = {}, sortIdsArr = [], id } = conditionQuery
     const [list, total] = await this.service.adminService.category.list({ isEnable, name, orderBy, index, size, sortIdsArr, id })
-    ctx.body = { list, total }
+    ctx.body = { code: 0, data: { list, total } }
   }
 
   async save(): Promise<void> {

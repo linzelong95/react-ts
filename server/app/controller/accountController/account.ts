@@ -45,17 +45,13 @@ export default class AccountController extends Controller {
       ctx.response.redirect('/api/account/info')
       return
     }
-    return (ctx.app as any).passport.authenticate('local', (err, user, info) => {
-      if (!user || err) {
-        ctx.status = 400
-        ctx.body = info
-        return
-      }
+    return (ctx.app as any).passport.authenticate('local', (err, user, info: { message: string }) => {
+      if (!user || err) ctx.throw(400, info.message)
       if (autoLogin) {
-        ctx.cookies.set('userInfo', `${account}&&${password}`, { encrypt: true, signed: true, maxAge: 7 * 24 * 60 * 60 * 1000 })
+        const maxAge = 7 * 24 * 60 * 60 * 1000
+        ctx.cookies.set('userInfo', `${account}&&${password}`, { encrypt: true, signed: true, maxAge })
       }
-      ctx.status = 200
-      ctx.body = user
+      ctx.body = { code: 0, data: user }
       return ctx.login(user)
     })(ctx)
   }
@@ -94,26 +90,20 @@ export default class AccountController extends Controller {
 
   async getCaptcha() {
     const { ctx } = this
-    const cap: number = Math.floor(Math.random() * 9000 + 1000)
-    const p = new CaptchaPng(80, 30, cap)
-    p.color(0, 0, 0, 0)
-    p.color(80, 80, 80, 255)
-    const base64 = p.getBase64()
-    if (!base64) {
-      ctx.status = 400
-      ctx.body = { message: '获取验证码失败', flag: false }
-    } else {
-      ctx.session.cap = cap
-      ctx.status = 200
-      ctx.body = { item: base64 }
-    }
+    const captchaNum: number = Math.floor(Math.random() * 9000 + 1000)
+    const captchaPng = new CaptchaPng(80, 30, captchaNum)
+    captchaPng.color(0, 0, 0, 0)
+    captchaPng.color(80, 80, 80, 255)
+    const base64 = captchaPng.getBase64()
+    if (!base64) ctx.throw(400, '获取验证码失败')
+    ctx.body = { code: 0, data: { item: base64 } }
   }
 
   async verifyCaptcha() {
     const { ctx } = this
     const { captcha } = ctx.request.body
-    const { cap } = ctx.session
-    if (captcha === `${cap}`) {
+    const { captchaNum } = ctx.session
+    if (captcha === `${captchaNum}`) {
       ctx.status = 200
       ctx.body = { message: '验证成功', flag: true }
     } else {
