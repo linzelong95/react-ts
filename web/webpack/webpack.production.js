@@ -9,6 +9,8 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 // const SentryPlugin = require('@tencent/webpack-sentry-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 // const SpeedMeasurePlugin = require('speed-measure-webpack-plugin')
+// 找到没有用到的废弃文件
+// const { UnusedFilesWebpackPlugin } = require('unused-files-webpack-plugin')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 // 测速插件，webpack 5暂不支持
@@ -81,9 +83,13 @@ const productionConfig = {
         ]),
 
     // 去除无用样式
-    new PurgeCSSPlugin({
-      paths: glob.sync(`${path.resolve(PROJECT_PATH, './src')}/**/*`, { nodir: true }),
-    }),
+    ...(BUILD_MODULES.includes('base')
+      ? []
+      : [
+          new PurgeCSSPlugin({
+            paths: glob.sync(`${path.resolve(PROJECT_PATH, './src')}/**/*.{tsx,scss,less,css}`, { nodir: true }),
+          }),
+        ]),
 
     // sentry 上报
     // new SentryPlugin({
@@ -94,6 +100,17 @@ const productionConfig = {
     //   deleteAfterCompile: true,
     //   filenameTransform: (filename) => `~/public/${filename}`,
     //   exclude: /\.css\.map$/,
+    // }),
+
+    // TerserPlugin去除了所以注释，若需要添加注释，使用 @preserve 字样
+    // new webpack.BannerPlugin({
+    //   raw: true,
+    //   banner: '/** @preserve Powered by briefNull */',
+    // }),
+
+    // new UnusedFilesWebpackPlugin({
+    //   failOnUnused: true,
+    //   patterns: ['./src/**/*.*'],
     // }),
   ],
 

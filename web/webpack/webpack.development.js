@@ -1,10 +1,6 @@
 const webpack = require('webpack')
 const { merge } = require('webpack-merge')
 
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-// 找到没有用到的废弃文件
-// const { UnusedFilesWebpackPlugin } = require('unused-files-webpack-plugin')
-
 const commonConfig = require('./webpack.common')
 
 module.exports = merge(commonConfig, {
@@ -55,14 +51,5 @@ module.exports = merge(commonConfig, {
   },
 
   // 插件
-  plugins: [
-    new MiniCssExtractPlugin({
-      filename: '[name]/css/[name].css',
-    }),
-    // new UnusedFilesWebpackPlugin({
-    //   failOnUnused: true,
-    //   patterns: ['./src/**/*.*'],
-    // }),
-    new webpack.HotModuleReplacementPlugin(),
-  ],
+  plugins: [new webpack.HotModuleReplacementPlugin()],
 })

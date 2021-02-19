@@ -1,3 +1,4 @@
+// 在 .babelrc 中我们在 @babel/preset-env 下配置了 module: false ，目的在于不要将 import 和 export 关键字处理成 commonJS 的模块导出引入方式，比如 require ，这样的话才能支持 tree-shaking
 {
   "presets": [
     ["@babel/preset-env", { "modules": false, "useBuiltIns": "usage", "corejs": "3.1.2" }],

@@ -12,16 +12,17 @@ interface RenderData {
   description: string
   favicon: string
   initialState: {
+    sentry: { dns: string }
     release?: string
     showWaterMark: boolean
   }
 }
 export default class HomeController extends Controller {
   public async index() {
-    const { ctx } = this
+    const { ctx, config } = this
+    const { sentry } = config
     let currentUrl = ctx.path
     if (/^\/(public|api)/.test(currentUrl)) return
-    if (currentUrl === '/') currentUrl = '/blog-admin'
     const moduleName = currentUrl.split('/')[1]
     const moduleStatics = this.getModuleStatics(moduleName)
     if (!moduleStatics?.js?.path) return
@@ -29,7 +30,7 @@ export default class HomeController extends Controller {
     const renderData: RenderData = {
       jsList: [moduleStatics.js.path],
       cssList: [],
-      initialState: { release: moduleStatics.js.release, showWaterMark: false },
+      initialState: { sentry, release: moduleStatics.js.release, showWaterMark: false },
       title: 'blog',
       keywords: 'blog',
       description: 'This is a blog',

@@ -167,7 +167,7 @@ const Category: FC<RouteComponentProps> = memo(() => {
   useEffect(() => {
     ;(async () => {
       const [categoryRes] = await adminCategoryServices.getList({ index: 1, size: 999 })
-      setCategoryOptions(categoryRes?.data?.list)
+      setCategoryOptions(categoryRes?.data?.list || [])
     })()
   }, [])
 

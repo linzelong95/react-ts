@@ -3,9 +3,13 @@
 
 import 'egg';
 import ExportPassport from '../../../app/middleware/passport';
+import ExportRequest from '../../../app/middleware/request';
+import ExportResponse from '../../../app/middleware/response';
 
 declare module 'egg' {
   interface IMiddleware {
     passport: typeof ExportPassport;
+    request: typeof ExportRequest;
+    response: typeof ExportResponse;
   }
 }

@@ -23,7 +23,9 @@
     "importHelpers": true,
     "baseUrl": "./",
     "paths": {
-      "@entity/*": ["app/entity/*"]
+      "@entity/*": ["app/entity/*"],
+      "@constant/*": ["app/constant/*"],
+      "@lib/*": ["app/lib/*"]
     }
   },
   "exclude": ["app/public", "app/views", "node_modules*"]

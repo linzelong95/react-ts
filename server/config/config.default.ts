@@ -59,11 +59,32 @@ export default (appInfo: EggAppInfo) => {
     },
   }
 
-  // add your egg config in here
-  config.middleware = ['passport']
+  /**
+   * 一些 view 用到的变量
+   * @see https://eggjs.org/zh-cn/core/view.html#locals
+   */
+  config.locals = {
+    title: 'blog',
+    keywords: '',
+    description: '',
+    favicon: '',
+  }
 
+  // 中间件
+  config.middleware = ['passport', 'request', 'response']
+
+  // 中间件passport的默认参数
   config.passport = {
     rsaPrivateKey,
+  }
+
+  config.request = {
+    ignoredUrls: [/^\/watermark/, /^\/public\/(.+)\.map$/],
+  }
+
+  // 中间件response的默认配置
+  config.response = {
+    isApi: /^\/api\//,
   }
 
   config.security = {
@@ -115,9 +136,28 @@ export default (appInfo: EggAppInfo) => {
     watchDirs: ['app', 'config'],
   }
 
-  // 日志滚动
-  config.logrotator = {
-    maxDays: 7,
+  /**
+   * 日志配置
+   * @see https://eggjs.org/zh-cn/core/logger.html
+   */
+  config.logger = {
+    appLogName: `${appInfo.name}-log.log`,
+    coreLogName: `${appInfo.name}-core.log`,
+    agentLogName: `${appInfo.name}-agent.log`,
+    errorLogName: `${appInfo.name}-error.log`,
+  }
+
+  // 告警配置
+  config.alarm = {
+    defaultTitle: '【blog Alarm】',
+    defaultSender: 'blog-alarm',
+    defaultEmailSender: 'blog',
+    receivers: ['briefNull'], // 默认收件人
+  }
+
+  // sentry 配置
+  config.sentry = {
+    dsn: 'https://120.78.139.146/sentry/888',
   }
 
   return config
