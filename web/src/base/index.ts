@@ -16,7 +16,7 @@ import * as reactI18next from 'react-i18next'
 import LanguageDetector from 'i18next-browser-languagedetector'
 import enUS from 'antd/lib/locale/en_US'
 import zhCN from 'antd/lib/locale/zh_CN'
-// import * as Sentry from '@sentry/browser'
+import * as Sentry from '@sentry/browser'
 
 // 语言
 import '@common/locales'
@@ -39,6 +39,6 @@ import '@common/styles/index.global.less'
 ;(window as any).LanguageDetector = LanguageDetector
 ;(window as any).enUS = enUS
 ;(window as any).zhCN = zhCN
-// ;(window as any).Sentry = Sentry
+;(window as any).Sentry = Sentry
 
 if (module && module.hot) module.hot.accept()

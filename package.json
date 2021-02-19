@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@sentry/browser": "^6.2.0"
+  },
+  "devDependencies": {
+    "webpack-sentry-plugin": "^2.0.3"
+  }
+}

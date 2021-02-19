@@ -2,6 +2,7 @@ import React, { memo, useCallback, useEffect, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Layout, message, Avatar, Dropdown, Menu, Divider, Input } from 'antd'
 import { TranslationOutlined, SearchOutlined, BellOutlined, MenuUnfoldOutlined } from '@ant-design/icons'
+import * as Sentry from '@sentry/browser'
 import logoImg from '@blog-admin/public/images/logo.png'
 import { useTranslation } from 'react-i18next'
 import { loginServices } from '@common/services/user'
@@ -50,8 +51,8 @@ const Header: FC<HeaderProps> = memo((props) => {
 
   const login = useCallback<(params: LoginParams) => void>(
     async (params) => {
-      message.loading({ content: '正在登录...', key: 'login', duration: 0 })
       const { password, autoLogin, captcha } = params
+      message.loading({ content: '正在登录...', key: 'login', duration: 0 })
       const [, verifyCaptchaErr] = await loginServices.verifyCaptcha(captcha)
       if (verifyCaptchaErr) {
         message.error({ content: '验证码错误', key: 'login' })
@@ -101,12 +102,18 @@ const Header: FC<HeaderProps> = memo((props) => {
 
   useEffect(() => {
     ;(async () => {
-      if (accountLocalStorage?.autoLoginMark) {
+      if (accountLocalStorage?.autoLoginMark && !userInfo?.account) {
         const [loginRes] = await loginServices.login({ autoLogin: true })
         if (loginRes?.data) dispatch(createLoginAction(loginRes.data))
       }
     })()
-  }, [accountLocalStorage, dispatch])
+  }, [accountLocalStorage, userInfo, dispatch])
+
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'production') {
+      Sentry.setUser({ username: userInfo?.account })
+    }
+  }, [userInfo])
 
   return (
     <Layout.Header className={styles['header-area']}>

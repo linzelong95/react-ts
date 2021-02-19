@@ -13,5 +13,5 @@ module.exports = {
   'i18next-browser-languagedetector': 'LanguageDetector',
   'antd/lib/locale/en_US': 'enUS',
   'antd/lib/locale/zh_CN': 'zhCN',
-  // '@sentry/browser': 'Sentry',
+  '@sentry/browser': 'Sentry',
 }

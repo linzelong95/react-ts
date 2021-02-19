@@ -1,7 +1,7 @@
 import React from 'react'
 import { Result, Button } from 'antd'
 import styles from './index.less'
-// import { captureException } from '@sentry/browser'
+import { captureException } from '@sentry/browser'
 
 interface ErrorBoundaryState {
   hasError: boolean
@@ -22,7 +22,7 @@ export class ErrorBoundary extends React.Component<unknown, ErrorBoundaryState> 
       componentStack: info.componentStack,
       errorMessage: error.message,
     })
-    // captureException(error) // 错误上报，比如使用sentry
+    captureException(error)
   }
 
   render(): React.ReactNode {
