@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>briefNull‘s project</title>
+    <link rel="icon" href="<%= favicon %>" type="image/png"/>
+    <% if(scripts && Array.isArray(scripts.cssList)) { %>
+      <% for (const css of scripts.cssList) { %>
+        <link rel="stylesheet" href="<%= css %>"></link>
+      <% } %>
+    <% } %>
+    <% if(scripts && Array.isArray(scripts.jsList)) { %>
+      <% for (const js of scripts.jsList) { %>
+        <script src="<%= js %>"></script>
+      <% } %>
+    <% } %>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

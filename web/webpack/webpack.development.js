@@ -7,34 +7,34 @@ const commonConfig = require('./webpack.common')
 const CONSTANTS = require('./constants')
 const { WEB_ROOT, PUBLIC_ROOT, BUILD_MODULES } = CONSTANTS
 
-class MyInjectCustomScriptsPlugin {
-  constructor(options) {
-    this.options = options
-  }
+// class MyInjectCustomScriptsPlugin {
+//   constructor(options) {
+//     this.options = options
+//   }
 
-  // TODO:如何通过直接向webpack打包的文件区注入额外的js/css来达到目的?
-  apply(compiler) {
-    const { paths } = this.options
-    compiler.hooks.compilation.tap('MyInjectCustomScriptsPlugin', (compilation) => {
-      HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync('MyInjectCustomScriptsPlugin', (data, callback) => {
-        const scripts = paths.reduce(
-          (scripts, path) => {
-            if (path.endsWith('.js')) scripts.jsString += `<script src=${path}></script>`
-            if (path.endsWith('.css')) scripts.cssString += `<link href=${path} rel=stylesheet />`
-            return scripts
-          },
-          { jsString: '', cssString: '' },
-        )
-        const { html } = data
-        const firstCssIndex = html.indexOf('<link')
-        const firstScriptIndex = html.indexOf('<script')
-        data.html = html.slice(0, firstScriptIndex) + scripts.jsString + html.slice(firstScriptIndex)
-        data.html = data.html.slice(0, firstCssIndex) + scripts.cssString + data.html.slice(firstCssIndex)
-        callback(undefined, data)
-      })
-    })
-  }
-}
+//   // TODO:如何通过直接向webpack打包的文件区注入额外的js/css来达到目的?
+//   apply(compiler) {
+//     const { paths } = this.options
+//     compiler.hooks.compilation.tap('MyInjectCustomScriptsPlugin', (compilation) => {
+//       HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync('MyInjectCustomScriptsPlugin', (data, callback) => {
+//         const scripts = paths.reduce(
+//           (scripts, path) => {
+//             if (path.endsWith('.js')) scripts.jsString += `<script src=${path}></script>`
+//             if (path.endsWith('.css')) scripts.cssString += `<link href=${path} rel=stylesheet />`
+//             return scripts
+//           },
+//           { jsString: '', cssString: '' },
+//         )
+//         const { html } = data
+//         const firstCssIndex = html.indexOf('<link')
+//         const firstScriptIndex = html.indexOf('<script')
+//         data.html = html.slice(0, firstScriptIndex) + scripts.jsString + html.slice(firstScriptIndex)
+//         data.html = data.html.slice(0, firstCssIndex) + scripts.cssString + data.html.slice(firstCssIndex)
+//         callback(undefined, data)
+//       })
+//     })
+//   }
+// }
 
 // 是否是开发环境
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -91,15 +91,29 @@ module.exports = merge(commonConfig, {
   },
 
   plugins: [
-    // DeprecationWarning: Compilation.assets will be frozen in future, all modifications are deprecated. BREAKING CHANGE: No more changes should happen to Compilation.assets after sealing the Compilation.
-    // Do changes to assets earlier, e. g. in Compilation.hooks.processAssets.
-    // Mak`e sure to select an appropriate stage from Compilation.PROCESS_ASSETS_STAGE_*.
-    // webpack v5需要使用 html-webpack-plugin@next，而不是html-webpack-plugin包
     !BUILD_MODULES.includes('base') &&
       new HtmlWebpackPlugin({
-        template: path.resolve(WEB_ROOT, './src/index.dev.html'),
+        template: path.resolve(WEB_ROOT, './src/index.dev.ejs'),
         filename: 'index.html',
         cache: false, // 特别重要：防止之后使用v6版本 copy-webpack-plugin 时代码修改一刷新页面为空问题。
+        templateParameters: {
+          favicon: 'http://127.0.0.1:7001/public/assets/images/logo.png',
+          scripts:
+            !ifHandleAllLibs &&
+            glob.sync(`${path.resolve(PUBLIC_ROOT, './base')}/**/*{.css,.js}`, { nodir: true }).reduce(
+              (scripts, path) => {
+                const validPaths = path.split('/').slice(-2)
+                const file = `http://127.0.0.1:7001/public/base/${validPaths.join('/')}`
+                if (file.endsWith('.js')) {
+                  scripts.jsList.push(file)
+                } else {
+                  scripts.cssList.push(file)
+                }
+                return scripts
+              },
+              { cssList: [], jsList: [] },
+            ),
+        },
         minify: isDevelopment
           ? false
           : {
@@ -116,14 +130,6 @@ module.exports = merge(commonConfig, {
               minifyURLs: true,
               useShortDoctype: true,
             },
-      }),
-
-    !ifHandleAllLibs &&
-      new MyInjectCustomScriptsPlugin({
-        paths: glob.sync(`${path.resolve(PUBLIC_ROOT, './base')}/**/*{.css,.js}`, { nodir: true }).map((path) => {
-          const validPaths = path.split('/').slice(-2)
-          return `http://127.0.0.1:7001/public/base/${validPaths.join('/')}`
-        }),
       }),
 
     new webpack.HotModuleReplacementPlugin(),
