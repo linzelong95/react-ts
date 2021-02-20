@@ -14,3 +14,6 @@ logs/
 app/**/*.map
 test/**/*.map
 config/**/*.map
+
+#开发阶段暂不提交打包文件
+app/**/*.js

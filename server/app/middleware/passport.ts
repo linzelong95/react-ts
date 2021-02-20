@@ -4,6 +4,7 @@ import * as crypto from 'crypto'
 import * as constants from 'constants'
 import { getRepository } from 'typeorm'
 import { User } from '@entity/User'
+import { StatusCode } from '@constant/status'
 import type { Context, Application } from 'egg'
 
 const LocalStrategy = passportLocal.Strategy
@@ -66,19 +67,15 @@ module.exports = (options, app: Application) => {
     const adminUrls = ['/admin/']
     const userUrls = ['/user/comment/delete', '/user/comment/insert']
     if (userUrls.some((i) => ctx.originalUrl.includes(i)) && !ctx.isAuthenticated()) {
-      ctx.status = 401
-      ctx.body = { message: '用户未登录!', needRedirect: false }
-      return
+      ctx.throw(StatusCode.NOT_LOGGED, '用户未登录!')
     }
     if (adminUrls.some((i) => ctx.originalUrl.includes(i))) {
       if (!ctx.isAuthenticated()) {
-        ctx.status = 401
-        ctx.body = { message: '管理员未登录!', needRedirect: true }
-        return
+        // TODO
+        // ctx.body = { message: '管理员未登录!', needRedirect: true }
+        ctx.throw(StatusCode.NOT_LOGGED_FOR_ADMIN, '管理员未登录!')
       } else if (ctx.state.user.roleName !== 'admin') {
-        ctx.status = 401
-        ctx.body = { message: '无权限操作！', needRedirect: false }
-        return
+        ctx.throw(StatusCode.FORBIDDEN, '无权限操作！')
       }
     }
     await next()

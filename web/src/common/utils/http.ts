@@ -4,6 +4,14 @@ import axios, { AxiosError, AxiosResponse, AxiosRequestConfig } from 'axios'
 import { tryCatch } from './util'
 import { CommonError } from '@common/types'
 
+export enum StatusCode {
+  BAD_REQ = 400, // Bad Request 客户端请求的语法错误，服务器无法理解
+  NOT_LOGGED = 401, // Unauthorized 请求要求用户的身份认证
+  NOT_LOGGED_FOR_ADMIN = 4010, // 自定义：未登录（特指管理员）
+  FORBIDDEN = 403, // Forbidden 服务器理解请求客户端的请求，但是拒绝执行此请求
+  NOT_FOUND = 404, // Not Found 服务器无法根据客户端的请求找到资源（网页）
+}
+
 export const http = axios.create({
   baseURL: '/',
   timeout: 30000,
@@ -33,31 +41,35 @@ http.interceptors.request.use((req: AxiosRequestConfig) => {
 
 // 响应时做一些操作
 http.interceptors.response.use(
-  (res: AxiosResponse<{ code: number; message: string; data?: Record<string, any> }>) => {
+  (res: AxiosResponse<{ code: number; message?: string; data?: Record<string, any> }>) => {
     const {
+      status,
       data: { code, message },
     } = res
 
+    console.log(888, res)
+
+    // code为0表示成功，不为0表示异常
     if (code !== 0) {
-      if (code === 401) {
+      if (code === StatusCode.NOT_LOGGED_FOR_ADMIN) {
         console.log('这里做报错的相关处理')
       }
       const error = new Error(typeof message === 'string' ? message.slice(0, 100) : message)
       ;((error as unknown) as CommonError).code = code
-      ;((error as unknown) as CommonError).status = 200
+      ;((error as unknown) as CommonError).status = status
       ;((error as unknown) as CommonError).rawResponse = res
       return Promise.reject(error)
     }
     return res
   },
-  (err: AxiosError<{ code: number; message: string; data?: Record<string, any> }>) => {
+  (err: AxiosError<{ code: number; message?: string; data?: Record<string, any> }>) => {
     // 服务端代码错误，如访问ctx.a.b(ctx不存在a变量)时
     const {
       response: { status, statusText, data },
     } = err
     const { code = status, message = statusText || '请求错误，请联系相关人员' } = data
 
-    if (status === 401) {
+    if (code === 401) {
       window.location.reload()
       return
     }

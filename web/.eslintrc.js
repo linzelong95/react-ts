@@ -68,6 +68,7 @@ module.exports = {
     'unicorn/prevent-abbreviations': 'off',
     'unicorn/no-useless-undefined': 'off', // 允许设置undefined
     'unicorn/explicit-length-check': 'off', // 允许length不跟某个值比较， 如'xxx'.length?1:0
+    // 'unicorn/catch-error-name': 'off',
     'react/react-in-jsx-scope': 'error',
     'prefer-regex-literals': 'off', // 允许使用new RegExp
     'no-use-before-define': 'off', // 解决'React' was used before it was defined的报错以及在上方调用下方声明的函数时的报错

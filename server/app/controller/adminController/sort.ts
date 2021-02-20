@@ -1,24 +1,20 @@
 import { Controller } from 'egg'
+import { StatusCode } from '@constant/status'
 
 export default class AdminSortController extends Controller {
   async list(ctx): Promise<void> {
     const { conditionQuery = {}, index = 1, size = 10 } = ctx.request.body
     const { isEnable, isCateEnable, name = '', orderBy: orderBy = {} } = conditionQuery
-    const [list, total] = await this.service.adminService.category.list({ isEnable, isCateEnable, name, orderBy, index, size })
-    ctx.body = { list, total }
+    const [list, total] = await this.service.adminService.sort.list({ isEnable, isCateEnable, name, orderBy, index, size })
+    ctx.body = { code: 0, data: { list, total } }
   }
 
   async save(ctx): Promise<void> {
     const { id, name, isEnable } = ctx.request.body
     const flag = await this.service.adminService.category.save({ id, name, isEnable })
     const action = id ? '更新' : '添加'
-    if (!flag) {
-      ctx.status = 400
-      ctx.body = { message: `${action}失败`, flag }
-      return
-    }
-    ctx.status = 200
-    ctx.body = { message: `${action}成功`, flag }
+    if (!flag) ctx.throw(StatusCode.SERVER_ERROR, `${action}失败`)
+    ctx.body = { code: 0, message: `${action}成功` }
   }
 
   async delete(ctx): Promise<void> {

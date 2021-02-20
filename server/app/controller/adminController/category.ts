@@ -1,4 +1,5 @@
 import { Controller } from 'egg'
+import { StatusCode } from '@constant/status'
 
 export default class AdminCategoryController extends Controller {
   async list(): Promise<void> {
@@ -14,13 +15,8 @@ export default class AdminCategoryController extends Controller {
     const { id, name, isEnable, sortId } = ctx.request.body
     const flag = await this.service.adminService.category.save({ id, name, isEnable, sort: { id: sortId } })
     const action = id ? '更新' : '添加'
-    if (!flag) {
-      ctx.status = 400
-      ctx.body = { message: `${action}失败`, flag }
-      return
-    }
-    ctx.status = 200
-    ctx.body = { message: `${action}成功`, flag }
+    if (!flag) ctx.throw(StatusCode.SERVER_ERROR, `${action}失败`)
+    ctx.body = { code: 0, message: `${action}成功` }
   }
 
   async delete(): Promise<void> {
