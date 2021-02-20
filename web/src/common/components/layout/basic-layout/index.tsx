@@ -3,6 +3,7 @@ import { useLocation, useRouteMatch } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { Layout } from 'antd'
 import { Forbidden } from '@common/components'
+import { flatRoutes } from '@common/utils'
 import { useMobile } from '@common/hooks'
 import Header from './header'
 import Footer from './footer'
@@ -12,20 +13,6 @@ import type { DrawerProps } from 'antd/es/drawer'
 import type { StoreState } from '@common/store/types'
 import type { RouteConfig } from '@common/types'
 import styles from './index.less'
-
-function getFlattedPaths(routes: RouteConfig[] = [], userAuthPoints?: string[]): string[] {
-  return routes.reduce((flattedPaths, route) => {
-    const { path, authPoints, authOperator = 'or' } = route
-    if (Array.isArray(authPoints) && Array.isArray(userAuthPoints)) {
-      const isPass: boolean =
-        (authOperator === 'or' && userAuthPoints.some((userAuthPoint) => authPoints.includes(userAuthPoint))) ||
-        (authOperator === 'and' && authPoints.length > 0 && authPoints.every((authPoint) => userAuthPoints.includes(authPoint)))
-      if (!isPass) return flattedPaths
-    }
-    flattedPaths = [...flattedPaths, path, ...getFlattedPaths(route.routes, userAuthPoints)]
-    return flattedPaths
-  }, [])
-}
 
 const BasicLayout: FC<{ routes?: RouteConfig[]; basename: string }> = memo((props) => {
   const { routes, basename, children } = props
@@ -40,21 +27,18 @@ const BasicLayout: FC<{ routes?: RouteConfig[]; basename: string }> = memo((prop
     return userInfo.roleName === 'admin' ? ['blog.super_admin-is'] : ['blog.personal_admin-is']
   }, [userInfo])
 
-  const { allFlattedPaths, flattedPathsWithPermission } = useMemo<{
-    allFlattedPaths: string[]
-    flattedPathsWithPermission: string[]
-  }>(() => {
+  const { flattedRoutes, flattedAccessRoutes } = useMemo<
+    Record<'flattedRoutes' | 'flattedAccessRoutes', Omit<RouteConfig, 'routes'>[]>
+  >(() => {
     const authPoints = getUserAuthPoints()
-    const allFlattedPaths = getFlattedPaths(routes)
-    const flattedPathsWithPermission = getFlattedPaths(routes, authPoints)
-    return { allFlattedPaths, flattedPathsWithPermission }
+    return { flattedRoutes: flatRoutes(routes), flattedAccessRoutes: flatRoutes(routes, authPoints) }
   }, [routes, getUserAuthPoints])
 
-  const match = useRouteMatch(allFlattedPaths)
+  const match = useRouteMatch(flattedRoutes.map((route) => route.path))
 
   const isForbidden = useMemo<boolean>(() => {
-    return Boolean(match) && !flattedPathsWithPermission.includes(pathname)
-  }, [pathname, flattedPathsWithPermission, match])
+    return Boolean(match) && flattedAccessRoutes.every((route) => route.path !== pathname)
+  }, [pathname, flattedAccessRoutes, match])
 
   return (
     <Layout className={styles['basic-layout']}>
@@ -63,7 +47,7 @@ const BasicLayout: FC<{ routes?: RouteConfig[]; basename: string }> = memo((prop
         <SideMenu
           routes={routes}
           basename={basename}
-          paths={flattedPathsWithPermission}
+          flattedAccessRoutes={flattedAccessRoutes}
           isMobile={isMobile}
           isSmallViewPort={isSmallViewPort}
           menuDrawerVisible={menuDrawerVisible}
