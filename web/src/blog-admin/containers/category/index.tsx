@@ -60,7 +60,7 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
         width: '15%',
         filters: categoryOptions.map((categoryOption) => ({ text: categoryOption.name, value: categoryOption.id })),
         filteredValue: filters.sort ? [filters.sort] : [],
-        render: (val) => <span>{val.name}</span>,
+        render: (val) => val?.name,
       },
       {
         title: '创建时间',
@@ -217,7 +217,7 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
         ),
       },
     ],
-    [],
+    [filters],
   )
 
   const expandedRowRender = useCallback<TableProps<any>['expandedRowRender']>(

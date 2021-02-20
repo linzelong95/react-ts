@@ -21,7 +21,7 @@ const commonConfig = require('./webpack.common')
 
 // 常量
 const CONSTANTS = require('./constants')
-const { PROJECT_PATH, BUILD_MODULES, PUBLIC_ROOT } = CONSTANTS
+const { WEB_ROOT, BUILD_MODULES, PUBLIC_ROOT } = CONSTANTS
 
 const productionConfig = {
   mode: 'production',
@@ -77,7 +77,7 @@ const productionConfig = {
           // new CopyWebpackPlugin({
           //   patterns: [
           //     // TEST
-          //     { from: path.resolve(PROJECT_PATH, 'src/public'), to: path.resolve(PROJECT_PATH, 'dist/public') },
+          //     { from: path.resolve(WEB_ROOT, 'src/public'), to: path.resolve(WEB_ROOT, 'dist/public') },
           //   ],
           // }),
         ]),
@@ -87,7 +87,7 @@ const productionConfig = {
       ? []
       : [
           new PurgeCSSPlugin({
-            paths: glob.sync(`${path.resolve(PROJECT_PATH, './src')}/**/*.{tsx,scss,less,css}`, { nodir: true }),
+            paths: glob.sync(`${path.resolve(WEB_ROOT, './src')}/**/*.{tsx,scss,less,css}`, { nodir: true }),
           }),
         ]),
 

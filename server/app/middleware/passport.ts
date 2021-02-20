@@ -67,15 +67,15 @@ module.exports = (options, app: Application) => {
     const adminUrls = ['/admin/']
     const userUrls = ['/user/comment/delete', '/user/comment/insert']
     if (userUrls.some((i) => ctx.originalUrl.includes(i)) && !ctx.isAuthenticated()) {
-      ctx.throw(StatusCode.NOT_LOGGED, '用户未登录!')
+      ctx.body = { code: StatusCode.NOT_LOGGED, message: '用户未登录' }
     }
     if (adminUrls.some((i) => ctx.originalUrl.includes(i))) {
       if (!ctx.isAuthenticated()) {
         // TODO
         // ctx.body = { message: '管理员未登录!', needRedirect: true }
-        ctx.throw(StatusCode.NOT_LOGGED_FOR_ADMIN, '管理员未登录!')
+        ctx.body = { code: StatusCode.NOT_LOGGED_FOR_ADMIN, message: '管理员未登录' }
       } else if (ctx.state.user.roleName !== 'admin') {
-        ctx.throw(StatusCode.FORBIDDEN, '无权限操作！')
+        ctx.body = { code: StatusCode.FORBIDDEN, message: '无权限操作' }
       }
     }
     await next()

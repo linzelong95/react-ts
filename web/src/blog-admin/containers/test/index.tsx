@@ -19,7 +19,7 @@ function App(props: AppProps): JSX.Element {
   //   onClearUser()
   // }, [])
 
-  return <div>1111</div>
+  return <div>111133</div>
 }
 
 export default connect<Pick<AppProps, 'user'>, Pick<AppProps, 'onClearUser'>, Omit<AppProps, 'user' | 'onClearUser'>, StoreState>(

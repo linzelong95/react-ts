@@ -1,11 +1,8 @@
 const os = require('os')
 const path = require('path')
 const webpack = require('webpack')
-// const glob = require('glob')
-
 const autoprefixer = require('autoprefixer')
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin')
-// const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const ProgressBarPlugin = require('progress-bar-webpack-plugin')
 const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin')
@@ -13,7 +10,7 @@ const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin')
 // const HardSourceWebpackPlugin = require('hard-source-webpack-plugin')
 const CONSTANTS = require('./constants')
-const { PROJECT_PATH, BUILD_MODULES, MANIFEST_ROOT, RELEASE_TAG } = CONSTANTS
+const { WEB_ROOT, BUILD_MODULES, MANIFEST_ROOT, RELEASE_TAG } = CONSTANTS
 
 if (!BUILD_MODULES.length) {
   throw new Error('必须要添加要编译的 app 名，例如 npm run dev index 或 npm run build index')
@@ -27,44 +24,15 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 // 是否重新处理所有依赖包
 const ifHandleAllLibs = process.env.IF_HANDLE_ALL_LIBS === 'all'
 
-// class MyInjectCustomScriptsPlugin {
-//   constructor(options) {
-//     this.options = options
-//   }
-
-// TODO:如何通过直接向webpack打包的文件区注入额外的js/css来达到目的?
-// apply(compiler) {
-//   const { paths } = this.options
-//   compiler.hooks.compilation.tap('MyInjectCustomScriptsPlugin', (compilation) => {
-//     HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync('MyInjectCustomScriptsPlugin', (data, callback) => {
-//       const scripts = paths.reduce(
-//         (scripts, path) => {
-//           if (path.endsWith('.js')) scripts.jsString += `<script src=${path}></script>`
-//           if (path.endsWith('.css')) scripts.cssString += `<link href=${path} rel=stylesheet />`
-//           return scripts
-//         },
-//         { jsString: '', cssString: '' },
-//       )
-//       const { html } = data
-//       const firstCssIndex = html.indexOf('<link')
-//       const firstScriptIndex = html.indexOf('<script')
-//       data.html = html.slice(0, firstScriptIndex) + scripts.jsString + html.slice(firstScriptIndex)
-//       data.html = data.html.slice(0, firstCssIndex) + scripts.cssString + data.html.slice(firstCssIndex)
-//       callback(undefined, data)
-//     })
-//   })
-// }
-// }
-
 module.exports = {
   // 应用入口
   entry: BUILD_MODULES.reduce((entryObject, currentModule) => {
-    entryObject[currentModule] = path.resolve(PROJECT_PATH, `src/${currentModule}`)
+    entryObject[currentModule] = path.resolve(WEB_ROOT, `src/${currentModule}`)
     return entryObject
   }, {}),
 
   // 主路径
-  context: PROJECT_PATH,
+  context: WEB_ROOT,
 
   // 如果打包的是 base，externals 不被忽略
   externals: BUILD_MODULES.includes('base') || ifHandleAllLibs ? {} : externals,
@@ -161,59 +129,20 @@ module.exports = {
 
   // 插件
   plugins: [
-    ...(!BUILD_MODULES.length
-      ? [
-          // DeprecationWarning: Compilation.assets will be frozen in future, all modifications are deprecated. BREAKING CHANGE: No more changes should happen to Compilation.assets after sealing the Compilation.
-          // Do changes to assets earlier, e. g. in Compilation.hooks.processAssets.
-          // Mak`e sure to select an appropriate stage from Compilation.PROCESS_ASSETS_STAGE_*.
-          // webpack v5需要使用 html-webpack-plugin@next，而不是html-webpack-plugin包
-          // new HtmlWebpackPlugin({
-          //   template: path.resolve(PROJECT_PATH, './src/public/index.html'),
-          //   filename: 'index.html',
-          //   cache: false, // 特别重要：防止之后使用v6版本 copy-webpack-plugin 时代码修改一刷新页面为空问题。
-          //   minify: isDevelopment
-          //     ? false
-          //     : {
-          //         removeAttributeQuotes: true,
-          //         collapseWhitespace: true,
-          //         removeComments: true,
-          //         collapseBooleanAttributes: true,
-          //         collapseInlineTagWhitespace: true,
-          //         removeRedundantAttributes: true,
-          //         removeScriptTypeAttributes: true,
-          //         removeStyleLinkTypeAttributes: true,
-          //         minifyCSS: true,
-          //         minifyJS: true,
-          //         minifyURLs: true,
-          //         useShortDoctype: true,
-          //       },
-          // }),
+    // 约定全局变量，页面上直接使用，不需要import，.eslintrc.js的globals属性需要做相应配置{_:'readonly'}
+    // new webpack.ProvidePlugin({
+    //   _:'lodash'
+    // }),
 
-          // !ifHandleAllLibs &&
-          //   new MyInjectCustomScriptsPlugin({
-          //     paths: glob
-          //       // TODO: 不能使用类似 {src,page}/**/*.{ts,js} 的写法？
-          //       // .sync(`${path.resolve(PROJECT_PATH, './dist')}/{${COMMON_MODULES.join(',')}}/js/*.js`, { nodir: true })
-          //       .sync(`${path.resolve(PROJECT_PATH, './dist')}/base/js/*.js`, { nodir: true })
-          //       .map((pathname) => `/${path.relative(path.resolve(PROJECT_PATH, isDevelopment ? '' : './dist'), pathname)}`),
-          //   }),
+    // TS 类型检查
+    new ForkTsCheckerWebpackPlugin({
+      eslint: {
+        files: './src/**/*.{ts,tsx}',
+      },
+    }),
 
-          // 约定全局变量，页面上直接使用，不需要import，.eslintrc.js的globals属性需要做相应配置{_:'readonly'}
-          // new webpack.ProvidePlugin({
-          //   _:'lodash'
-          // }),
-
-          // TS 类型检查
-          new ForkTsCheckerWebpackPlugin({
-            eslint: {
-              files: './src/**/*.{ts,tsx,js,jsx}',
-            },
-          }),
-
-          // 优化错误展示，与webpack 5暂不兼容？
-          new FriendlyErrorsWebpackPlugin(),
-        ].filter((item) => item)
-      : []),
+    // 优化错误展示，与webpack 5暂不兼容？
+    new FriendlyErrorsWebpackPlugin(),
 
     // 带名称导出模块,webpack 5 改为optimization.moduleIds: 'named'
     // new webpack.NamedModulesPlugin(),

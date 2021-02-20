@@ -40,10 +40,13 @@ module.exports = (options, app: Application) => async (ctx: Context, next) => {
     // err.title = 'xxx';
     // throw err;
 
+    // http-errors deprecated non-error status code; use only 4xx or 5xx status codes node_modules/koa/lib/context.js:97:11
+    // ctx.throw只接受4xx和5xx，否则会触发异常（服务端内部错误500）
+
     // 代码错误，如访问ctx.a.b(ctx不存在a变量)时，status为undefined，需要赋默认值
     const { status = 500, message = '未知错误', title, stack } = err as { status: number; message?: string; stack: string; title?: string }
 
-    ctx.status = status < 600 ? status : Number(`${status}`.slice(0, 3))
+    ctx.status = status
 
     if (status === 500) {
       app.messenger.sendToAgent('send-alarm', { title: 'Node 运行时错误', seqId: ctx.seqId, error: { message, stack } })

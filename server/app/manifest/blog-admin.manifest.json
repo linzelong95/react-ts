@@ -1,6 +1,6 @@
 {
   "blog-admin.js": {
-    "path": "http://127.0.0.1:7002/dev-static/blog-admin/js/blog-admin.js",
+    "path": "http://127.0.0.1:7002/blog-admin/js/blog-admin.js",
     "editor": "briefNull"
   }
 }
