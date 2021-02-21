@@ -4,8 +4,7 @@ const glob = require('glob')
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const commonConfig = require('./webpack.common')
-const CONSTANTS = require('./constants')
-const { WEB_ROOT, PUBLIC_ROOT, BUILD_MODULES } = CONSTANTS
+const { WEB_ROOT, PUBLIC_ROOT, BUILD_MODULES } = require('./constants')
 
 // class MyInjectCustomScriptsPlugin {
 //   constructor(options) {
@@ -113,6 +112,9 @@ module.exports = merge(commonConfig, {
               },
               { cssList: [], jsList: [] },
             ),
+          // chunksSortMode:'manual',//不设置时，默认顺序以entry的顺序
+          // chunks:['entry_1_name','entry_2_name'] //默认当前entry多文件（如果有多个的话）全部注入
+          // excludeChunks:[],// 拒绝当前打包的入口文件的某些注入到html中，默认不排除
         },
         minify: isDevelopment
           ? false

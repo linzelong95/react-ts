@@ -4,7 +4,6 @@ export enum UserActionType {
 }
 
 export interface UserState {
-  username?: string
   account: string
   nickName: string
   roleName: 'admin' | 'user'

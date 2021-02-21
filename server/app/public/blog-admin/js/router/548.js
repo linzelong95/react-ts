@@ -1,2 +1,2 @@
-(self.webpackChunkyyy=self.webpackChunkyyy||[]).push([[548],{36548:function(e,t,n){"use strict";n.r(t);var u=n(67294);t.default=function(){return u.createElement(u.Fragment,null,u.createElement("div",null,"test-b"))}}}]);
+(self.webpackChunkyyy=self.webpackChunkyyy||[]).push([[548],{36548:function(e,n,t){"use strict";t.r(n);var u=t(63804),l=t.n(u);n.default=function(){return l().createElement(l().Fragment,null,l().createElement("div",null,"test-b"))}}}]);
 //# sourceMappingURL=548.js.map

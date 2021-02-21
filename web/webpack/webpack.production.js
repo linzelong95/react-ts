@@ -1,8 +1,8 @@
 const { merge } = require('webpack-merge')
-const glob = require('glob')
-const path = require('path')
+// const glob = require('glob')
+// const path = require('path')
+// const PurgeCSSPlugin = require('purgecss-webpack-plugin')
 // const CopyWebpackPlugin = require('copy-webpack-plugin')
-const PurgeCSSPlugin = require('purgecss-webpack-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
@@ -11,17 +11,14 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 // const SpeedMeasurePlugin = require('speed-measure-webpack-plugin')
 // 找到没有用到的废弃文件
 // const { UnusedFilesWebpackPlugin } = require('unused-files-webpack-plugin')
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 
 // 测速插件，webpack 5暂不支持
 // const smp = new SpeedMeasurePlugin()
 
-// configs
 const commonConfig = require('./webpack.common')
 
-// 常量
-const CONSTANTS = require('./constants')
-const { WEB_ROOT, BUILD_MODULES, PUBLIC_ROOT } = CONSTANTS
+const { BUILD_MODULES, PUBLIC_ROOT } = require('./constants')
 
 const productionConfig = {
   mode: 'production',
@@ -70,26 +67,19 @@ const productionConfig = {
       cleanOnceBeforeBuildPatterns: BUILD_MODULES.length ? BUILD_MODULES.map((moduleName) => `${moduleName}/**/*`) : ['index/**/*'],
     }),
 
-    ...(BUILD_MODULES.length
-      ? []
-      : [
-          // 复制一些东西，如果有需要的话
-          // new CopyWebpackPlugin({
-          //   patterns: [
-          //     // TEST
-          //     { from: path.resolve(WEB_ROOT, 'src/public'), to: path.resolve(WEB_ROOT, 'dist/public') },
-          //   ],
-          // }),
-        ]),
+    // 去除无用样式，使用其他有点问题，似乎无法跟webpack动态加载同时使用？
+    // !BUILD_MODULES.includes('base') &&
+    //   new PurgeCSSPlugin({
+    //     paths: glob.sync(`${path.resolve(WEB_ROOT, './src')}/**/*`, { nodir: true }),
+    //   }),
 
-    // 去除无用样式
-    ...(BUILD_MODULES.includes('base')
-      ? []
-      : [
-          new PurgeCSSPlugin({
-            paths: glob.sync(`${path.resolve(WEB_ROOT, './src')}/**/*.{tsx,scss,less,css}`, { nodir: true }),
-          }),
-        ]),
+    // 复制一些东西，如果有需要的话
+    // new CopyWebpackPlugin({
+    //   patterns: [
+    //     // TEST
+    //     { from: path.resolve(WEB_ROOT, 'src/public'), to: path.resolve(WEB_ROOT, 'dist/public') },
+    //   ],
+    // }),
 
     // sentry 上报
     // new SentryPlugin({
@@ -112,15 +102,13 @@ const productionConfig = {
     //   failOnUnused: true,
     //   patterns: ['./src/**/*.*'],
     // }),
-  ],
+
+    // bundler 分析
+    process.env.IS_ANALYZER === 'true' && new BundleAnalyzerPlugin(),
+  ].filter(Boolean),
 
   // 设置信息展示
   stats: 'minimal',
-}
-
-// 支持 bundler 分析
-if (process.env.IS_ANALYZER === 'true') {
-  productionConfig.plugins.push(new BundleAnalyzerPlugin())
 }
 
 // module.exports = smp.wrap(merge(commonConfig, productionConfig))

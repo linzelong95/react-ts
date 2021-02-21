@@ -9,8 +9,7 @@ const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin')
 // const HardSourceWebpackPlugin = require('hard-source-webpack-plugin')
-const CONSTANTS = require('./constants')
-const { WEB_ROOT, BUILD_MODULES, MANIFEST_ROOT, RELEASE_TAG } = CONSTANTS
+const { WEB_ROOT, BUILD_MODULES, MANIFEST_ROOT, RELEASE_TAG } = require('./constants')
 
 if (!BUILD_MODULES.length) {
   throw new Error('必须要添加要编译的 app 名，例如 npm run dev index 或 npm run build index')

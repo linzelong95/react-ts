@@ -134,10 +134,13 @@ export default (appInfo: EggAppInfo) => {
   config.development = {
     overrideDefault: true,
     watchDirs: ['app', 'config'],
-    ignoreDirs: ['app/public', 'app/manifest'],
+    // ignoreDirs: ['app/public', 'app/manifest'],
   }
 
-  // 国际化配置
+  /**
+   *  国际化配置
+   *@see https://eggjs.org/zh-cn/core/i18n.html
+   */
   config.i18n = {
     // 默认语言，默认 "zh-CN"
     defaultLocale: 'zh-CN',

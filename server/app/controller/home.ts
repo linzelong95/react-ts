@@ -15,6 +15,11 @@ interface RenderData {
     sentry: { dns: string }
     release?: string
     showWaterMark: boolean
+    user?: {
+      account: string
+      nickName: string
+      roleName: 'admin' | 'user'
+    }
   }
 }
 export default class HomeController extends Controller {
@@ -30,7 +35,7 @@ export default class HomeController extends Controller {
     const renderData: RenderData = {
       jsList: [moduleStatics.js.path],
       cssList: [],
-      initialState: { sentry, release: moduleStatics.js.release, showWaterMark: false },
+      initialState: { user: ctx.state.user || {}, sentry, release: moduleStatics.js.release, showWaterMark: false },
       title: 'blog',
       keywords: 'blog',
       description: 'This is a blog',

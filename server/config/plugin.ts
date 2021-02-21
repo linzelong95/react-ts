@@ -34,15 +34,6 @@ const plugin: EggPlugin = {
     enable: true,
     package: 'egg-router-plus',
   },
-
-  /**
-   * 多语言
-   * @see https://github.com/eggjs/egg-i18n
-   */
-  i18n: {
-    enable: true,
-    package: 'egg-i18n',
-  },
 }
 
 export default plugin
