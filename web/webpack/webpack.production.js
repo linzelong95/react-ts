@@ -34,11 +34,6 @@ const productionConfig = {
   devtool: 'source-map',
 
   optimization: {
-    // 本项目并没有真正意义上的多入口，并且常用的公共依赖模块已抽离到base中
-    // splitChunks: {
-    //   chunks: 'all',
-    // },
-    splitChunks: false,
     minimize: true,
     // webpack v5自带了TerserPlugin，这里可以不用配置
     minimizer: [

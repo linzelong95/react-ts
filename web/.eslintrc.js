@@ -4,7 +4,7 @@ module.exports = {
     jsx: true,
     useJSXTextNode: true,
     ecmaVersion: 11,
-    sourceType: 'module',
+    sourceType: 'module', // 当前项目是 ES Module 模块
     // allowImportExportEverywhere: true,
   },
   settings: {
@@ -25,13 +25,16 @@ module.exports = {
     'plugin:unicorn/recommended',
     'plugin:promise/recommended',
     'plugin:@typescript-eslint/recommended',
+    // 使得 @typescript-eslint 中的样式规范失效，遵循 prettier 中的样式规范
+    'prettier/@typescript-eslint',
+    // eslint 使用 prettier 中的样式规范，且如果使得 ESLint 检测到 prettier 的格式问题，将以 error 的形式抛出
     'plugin:prettier/recommended',
   ],
   plugins: ['react', 'react-hooks', 'unicorn', 'promise', '@typescript-eslint'],
   // 全局变量的校验规则
-  globals: {
-    _: 'readonly',
-  },
+  // globals: {
+  //   _: 'readonly',
+  // },
   env: {
     browser: true,
     node: true,

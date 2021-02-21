@@ -30,6 +30,7 @@
   },
   "homepage": "https://xxx#readme",
   "dependencies": {
+    "@sentry/browser": "^6.2.0",
     "antd": "^4.10.3",
     "axios": "^0.21.0",
     "buffer": "^6.0.3",
@@ -122,7 +123,8 @@
     "webpack-cli": "^4.2.0",
     "webpack-dev-server": "^3.11.0",
     "webpack-manifest-plugin": "^3.0.0",
-    "webpack-merge": "^5.7.2"
+    "webpack-merge": "^5.7.2",
+    "webpack-sentry-plugin": "^2.0.3"
   },
   "browserslist": [
     ">5%",
@@ -137,10 +139,10 @@
     }
   },
   "lint-staged": {
-    "*.{ts,tsx,js}": [
+    "*.{ts,tsx}": [
       "eslint --config .eslintrc.js"
     ],
-    "*.{ts,tsx,js,json,html,yml,css,less,scss,md}": [
+    "*.{ts,tsx,json,html,yml,css,less,scss,md}": [
       "prettier --write"
     ]
   }
