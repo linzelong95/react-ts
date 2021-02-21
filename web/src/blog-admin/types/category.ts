@@ -1,22 +1,24 @@
 import type { Sort } from '@blog-admin/types'
 
 export default interface Category {
-  listItem: {
+  listItemByAdminRole: {
     id: number
     createDate: string
     updateDate: string
     isEnable: 0 | 1
     isUsed: 0 | 1
     name: string
-    sort: Omit<Sort['listItem'], 'categories'>
+    sort: Omit<Sort['listItemByAdminRole'], 'categories'>
   }
-  getListRes: {
-    list: Sort['listItem'][]
+  getListResByAdminRole: {
+    list: Sort['listItemByAdminRole'][]
     total: number
   }
-  adminGetListParams: {
+  getListParamsByAdminRole: {
     index?: number
     size?: number
     conditionQuery?: { isEnable?: boolean; name?: string; orderBy?: Record<string, string>; sortIdsArr?: number[]; id?: number }
   }
+  // 添加函数的入参ts
+  insertParams: Pick<Sort['listItemByAdminRole'], 'isEnable' | 'name'> & { sortId: number }
 }

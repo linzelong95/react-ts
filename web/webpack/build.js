@@ -4,6 +4,19 @@ const execa = require('execa')
 
 const modules = process.argv.slice(3)
 const mode = process.argv[2]
+
+if (!['dev', 'dev-all-libs', 'build', 'build-all', 'analyzer'].includes(mode)) {
+  throw new Error('您输入的指令有误')
+}
+
+if (!modules.length) {
+  throw new Error(`必须添加要编译的 app 名，例如 npm run ${mode} appName`)
+}
+
+if (modules.length > 1 && modules.includes('base')) {
+  throw new Error('base模块请单独打包')
+}
+
 const env = {
   NODE_ENV: mode,
   IF_HANDLE_ALL_LIBS: 'light', // 'all'|'light',默认不处理base基础依赖

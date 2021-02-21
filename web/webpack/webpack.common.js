@@ -11,10 +11,6 @@ const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin')
 // const HardSourceWebpackPlugin = require('hard-source-webpack-plugin')
 const { WEB_ROOT, BUILD_MODULES, MANIFEST_ROOT, RELEASE_TAG } = require('./constants')
 
-if (!BUILD_MODULES.length) {
-  throw new Error('必须要添加要编译的 app 名，例如 npm run dev index 或 npm run build index')
-}
-
 const externals = require('./externals')
 
 // 是否是开发环境
@@ -38,10 +34,10 @@ module.exports = {
 
   // 路径及 alias 配置
   resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.jsx'],
+    extensions: ['.tsx', '.ts', '.js', '.jsx'],
     plugins: [
       new TsConfigPathsPlugin({
-        extensions: ['.ts', '.tsx', '.js', '.jsx'],
+        extensions: ['.tsx', '.ts', '.js', '.jsx'],
       }),
     ],
     // 解决：BREAKING CHANGE: webpack < 5 used to include polyfills for node.js core modules by default.
@@ -159,7 +155,7 @@ module.exports = {
     // 提高打包速度，webpack v5 报错
     // new HardSourceWebpackPlugin(),
 
-    ...(BUILD_MODULES.length ? BUILD_MODULES : ['index']).map((mdl) => {
+    ...BUILD_MODULES.map((mdl) => {
       return new WebpackManifestPlugin({
         fileName: path.resolve(MANIFEST_ROOT, `${mdl}.manifest.json`),
         writeToFileEmit: true,

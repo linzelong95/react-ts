@@ -3,14 +3,10 @@ import { Form, Input, Checkbox, Modal, message, Row, Col } from 'antd'
 import { UserOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { loginServices } from '@common/services/user'
+import { useLocalStorage } from '@common/hooks'
 import type { FC } from 'react'
 import type { ModalProps } from 'antd/es/modal'
 import type { LoginParams } from '@common/services/user/login'
-
-let blogStoreAccountInfo: { autoLoginMark: boolean; autoLogin: boolean }
-try {
-  blogStoreAccountInfo = JSON.parse(localStorage.getItem('BLOG_STORE_ACCOUNT') || '{}')
-} catch {}
 
 const layout = {
   labelCol: { span: 6 },
@@ -32,13 +28,14 @@ const LoginForm: FC<LoginFormProps> = memo((props) => {
   const [captcha, setCaptcha] = useState<string>('')
   const [form] = Form.useForm<LoginParams>()
   const { t } = useTranslation()
+  const [accountLocalStorage] = useLocalStorage<{ autoLoginMark: boolean; autoLogin: boolean }>('BLOG_STORE_ACCOUNT')
 
-  const handleCancel = useCallback<() => void>(() => {
+  const handleCancel = useCallback<ModalProps['onCancel']>(() => {
     form.resetFields()
     onClose()
   }, [form, onClose])
 
-  const handleOk = useCallback<() => void>(() => {
+  const handleOk = useCallback<ModalProps['onOk']>(() => {
     form
       .validateFields()
       .then((values) => {
@@ -47,12 +44,13 @@ const LoginForm: FC<LoginFormProps> = memo((props) => {
         } else {
           onLogin(values)
         }
-        handleCancel()
+        form.resetFields()
+        onClose()
       })
       .catch((error) => {
-        console.log('Validate Failed:', error)
+        message.error(error.message)
       })
-  }, [form, isForRegister, onLogin, onRegister, handleCancel])
+  }, [form, isForRegister, onLogin, onRegister, onClose])
 
   const getRefreshedCaptcha = useCallback<(event?: React.MouseEvent<HTMLElement, MouseEvent>) => void>(async () => {
     const [captchaRes, captchaErr] = await loginServices.getWebpageCaptcha()
@@ -81,7 +79,7 @@ const LoginForm: FC<LoginFormProps> = memo((props) => {
       onOk={handleOk}
       {...restProps}
     >
-      <Form {...layout} form={form} name="login" initialValues={{ autoLogin: Boolean(blogStoreAccountInfo?.autoLogin) }}>
+      <Form {...layout} form={form} name="login" initialValues={{ autoLogin: Boolean(accountLocalStorage?.autoLogin) }}>
         <Form.Item label="Account" name="account" rules={[{ required: true, message: 'Please input your account!' }]}>
           <Input />
         </Form.Item>
