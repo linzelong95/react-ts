@@ -7,7 +7,6 @@ module.exports = (options, app: Application) => async (ctx: Context, next) => {
   try {
     await next()
 
-    // 404 单独处理
     if (ctx.status === 404 && !ctx.body) {
       if (isApi?.test(path)) {
         ctx.body = { code: 404, message: 'Api not found!' }
@@ -24,9 +23,8 @@ module.exports = (options, app: Application) => async (ctx: Context, next) => {
 
     const isApplicationJson = /application\/json/.test((ctx.response?.header?.['content-type'] as string) || '')
 
-    // 返回统一化处理
+    // 若有需要，在这里统一处理code和message
     if (ctx.body && isApi?.test(path) && isApplicationJson) {
-      // 若有需要，在这里统一处理code和message
       const { code, message, data } = ctx.body
       // ctx.status = code === 0 ? 200 : code // 默认响应200，不需要重新设置
       ctx.body = { code, message, data }

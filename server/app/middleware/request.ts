@@ -1,8 +1,6 @@
-import LogEventName from '@constant/log'
+import { LogEvent } from '@constant/log'
 import { v4 as uuid } from 'uuid'
 import type { Context } from 'egg'
-
-const { CLIENT_RESPONSE, CLIENT_REQUEST } = LogEventName
 
 module.exports = (options) => async (ctx: Context, next) => {
   const { ignoredUrls } = options || {}
@@ -12,7 +10,7 @@ module.exports = (options) => async (ctx: Context, next) => {
 
   const { header, method, origin, href, path, query, params, ip, ips, request } = ctx
   ctx.logger.info({
-    event: CLIENT_REQUEST,
+    event: LogEvent.CLIENT_REQUEST,
     href,
     path,
     method,
@@ -38,7 +36,7 @@ module.exports = (options) => async (ctx: Context, next) => {
   if (ignoredUrls.some((url) => url.test(path)) || !isApplicationJson) return
 
   const responseLoggerParams = {
-    event: CLIENT_RESPONSE,
+    event: LogEvent.CLIENT_RESPONSE,
     status: ctx.status,
     message: ctx.message,
     type: ctx.type,

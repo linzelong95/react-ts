@@ -46,7 +46,7 @@ module.exports = merge(commonConfig, {
   output: {
     path: '/',
     filename: '[name]/js/[name].js',
-    // publicPath: 'http://127.0.0.1:7002/dev-static/',
+    // publicPath: 'http://127.0.0.1:7002/static/',
     publicPath: 'http://127.0.0.1:7002/',
     chunkFilename: (pathData) => `${pathData.chunk.runtime}/js/router/[id].js`,
     assetModuleFilename: (pathData) => `${pathData.runtime}/js/asset/[name][ext][query]`,
@@ -58,7 +58,7 @@ module.exports = merge(commonConfig, {
   target: 'web',
   devServer: {
     port: 7002,
-    // publicPath: '/dev-static/',
+    // publicPath: '/static/',
     publicPath: '/',
     hot: true, // 热更新
     open: true, // 打开默认浏览器

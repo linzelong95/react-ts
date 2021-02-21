@@ -4,49 +4,34 @@ const execa = require('execa')
 
 const modules = process.argv.slice(3)
 const mode = process.argv[2]
-const cwd = path.resolve(__dirname, '../')
-const environment = {
+const env = {
   NODE_ENV: mode,
   IF_HANDLE_ALL_LIBS: 'light', // 'all'|'light',默认不处理base基础依赖
-  BUILD_MODULES: modules.length === 0 ? '' : modules.join('&'),
+  BUILD_MODULES: modules.join('&'),
   IS_ANALYZER: mode === 'analyzer',
   NODE_OPTIONS: '--max-old-space-size=8172',
 }
 
-// 执行 webpack
-if (mode === 'dev') {
-  environment.NODE_ENV = 'development'
-  // webpack 5用这个
-  execa('webpack', ['serve', '--config', 'webpack/webpack.development.js'], { cwd, env: environment, buffer: false, stdio: 'inherit' })
-  // execa('webpack-dev-server', ['--config', 'webpack/webpack.development.js'], { cwd, env: environment, buffer: false, stdio: 'inherit' })
+const commonParams = { cwd: path.resolve(__dirname, '../'), buffer: false, stdio: 'inherit' }
+
+if (['dev', 'dev-all-libs'].includes(mode)) {
+  env.NODE_ENV = 'development'
+  if (mode === 'dev-all-libs') env.IF_HANDLE_ALL_LIBS = 'all'
+  execa('webpack', ['serve', '--config', 'webpack/webpack.development.js'], { ...commonParams, env })
+  // execa('webpack-dev-server', ['--config', 'webpack/webpack.development.js'], { ...commonParams, env }) // webpack 4
 }
 
-if (mode === 'dev-all-libs') {
-  environment.NODE_ENV = 'development'
-  environment.IF_HANDLE_ALL_LIBS = 'all'
-  // webpack 5用这个
-  execa('webpack', ['serve', '--config', 'webpack/webpack.development.js'], { cwd, env: environment, buffer: false, stdio: 'inherit' })
-  // execa('webpack-dev-server', ['--config', 'webpack/webpack.development.js'], { cwd, env: environment, buffer: false, stdio: 'inherit' })
-}
-
-if (mode === 'build') {
-  environment.NODE_ENV = 'production'
-  execa('webpack', ['--config', 'webpack/webpack.production.js'], { cwd, env: environment, buffer: false, stdio: 'inherit' })
-}
-
-if (mode === 'build-all') {
-  const files = fs.readdirSync(path.resolve(__dirname, '../src'), { withFileTypes: true })
-  const folders = files
-    .filter((file) => file.isDirectory())
-    .map((file) => file.name)
-    .filter((name) => name !== 'base' && name !== 'common')
-
-  environment.NODE_ENV = 'production'
-  environment.BUILD_MODULES = folders.join('&')
-  execa('webpack', ['--config', 'webpack/webpack.production.js'], { cwd, env: environment, buffer: false, stdio: 'inherit' })
-}
-
-if (mode === 'analyzer') {
-  environment.NODE_ENV = 'production'
-  execa('webpack', ['--profile', '--config', 'webpack/webpack.production.js'], { cwd, env: environment, buffer: false, stdio: 'inherit' })
+if (['build', 'build-all', 'analyzer'].includes(mode)) {
+  env.NODE_ENV = 'production'
+  if (mode === 'build-all') {
+    env.BUILD_MODULES = fs
+      .readdirSync(path.resolve(__dirname, '../src'), { withFileTypes: true })
+      .filter((file) => file.isDirectory() && !['base', 'common'].includes(file.name))
+      .map((file) => file.name)
+      .join('&')
+  }
+  execa('webpack', [mode === 'analyzer' && '--profile', '--config', 'webpack/webpack.production.js'].filter(Boolean), {
+    ...commonParams,
+    env,
+  })
 }

@@ -2,7 +2,14 @@ import { Controller } from 'egg'
 const path = require('path')
 const fs = require('fs')
 
-const MANIFEST_ROOT = path.resolve(__dirname, '../manifest')
+function getModuleStatics(moduleName): Record<'js' | 'css', { path: string; release: string; editor: string }> | null {
+  const appManifestPath = path.resolve(__dirname, `'../manifest/${moduleName}.manifest.json`)
+  if (!fs.existsSync(appManifestPath)) return null
+  return {
+    js: require(appManifestPath)[`${moduleName}.js`],
+    css: require(appManifestPath)[`${moduleName}.css`],
+  } as Record<'js' | 'css', { path: string; release: string; editor: string }>
+}
 
 interface RenderData {
   jsList: string[]
@@ -29,9 +36,9 @@ export default class HomeController extends Controller {
     let currentUrl = ctx.path
     if (/^\/(public|api)/.test(currentUrl)) return
     const moduleName = currentUrl.split('/')[1]
-    const moduleStatics = this.getModuleStatics(moduleName)
+    const moduleStatics = getModuleStatics(moduleName)
     if (!moduleStatics?.js?.path) return
-    const baseStatics = this.getModuleStatics('base')
+    const baseStatics = getModuleStatics('base')
     const renderData: RenderData = {
       jsList: [moduleStatics.js.path],
       cssList: [],
@@ -44,16 +51,6 @@ export default class HomeController extends Controller {
     if (baseStatics?.js?.path) renderData.jsList.unshift(baseStatics.js.path)
     if (baseStatics?.css?.path) renderData.cssList.push(baseStatics.css.path)
     if (moduleStatics?.css?.path) renderData.cssList.push(moduleStatics.css.path)
-    return ctx.render('index.ejs', renderData)
-  }
-
-  // 获取 App 的静态资源
-  getModuleStatics(moduleName): Record<'js' | 'css', { path: string; release: string; editor: string }> | null {
-    const appManifestPath = path.resolve(MANIFEST_ROOT, `${moduleName}.manifest.json`)
-    if (!fs.existsSync(appManifestPath)) return null
-    return {
-      js: require(appManifestPath)[`${moduleName}.js`],
-      css: require(appManifestPath)[`${moduleName}.css`],
-    } as Record<'js' | 'css', { path: string; release: string; editor: string }>
+    ctx.render('index.ejs', renderData)
   }
 }
