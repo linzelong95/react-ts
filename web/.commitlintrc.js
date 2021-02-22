@@ -20,5 +20,5 @@ module.exports = {
  * anno: 增加注释
  */
 
-// 绕开条件前的校验
+// 绕开git commit前的校验
 // git commit -m 'xxx' --no-verify

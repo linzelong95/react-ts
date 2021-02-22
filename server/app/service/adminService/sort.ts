@@ -32,29 +32,17 @@ export default class AdminSortService extends Service {
   }
 
   async delete(ids: number[]) {
-    let flag = true
     const result = await this.repository.delete(ids)
-    if (!result.raw.affectedRows) {
-      flag = false
-    }
-    return flag
+    return Boolean(result.raw.affectedRows)
   }
 
   async lock(ids: number[]) {
-    let flag = true
     const result = await this.repository.createQueryBuilder().update(Sort).set({ isEnable: 0 }).where('id in (:...ids)', { ids }).execute()
-    if (!result.raw.affectedRows) {
-      flag = false
-    }
-    return flag
+    return Boolean(result.raw.affectedRows)
   }
 
   async unlock(ids: number[]) {
-    let flag = true
     const result = await this.repository.createQueryBuilder().update(Sort).set({ isEnable: 1 }).where('id in (:...ids)', { ids }).execute()
-    if (!result.raw.affectedRows) {
-      flag = false
-    }
-    return flag
+    return Boolean(result.raw.affectedRows)
   }
 }

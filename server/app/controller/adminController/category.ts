@@ -24,13 +24,8 @@ export default class AdminCategoryController extends Controller {
     const { items } = ctx.request.body
     const ids = items.map((i) => i.id)
     const flag = await this.service.adminService.category.delete(ids)
-    if (!flag) {
-      ctx.status = 400
-      ctx.body = { message: `删除失败`, flag }
-      return
-    }
-    ctx.status = 200
-    ctx.body = { message: `删除成功`, flag }
+    if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '删除失败')
+    ctx.body = { code: 0, message: '删除成功' }
   }
 
   async lock(): Promise<void> {
@@ -38,13 +33,8 @@ export default class AdminCategoryController extends Controller {
     const { items } = ctx.request.body
     const ids = items.map((i) => i.id)
     const flag = await this.service.adminService.category.lock(ids)
-    if (!flag) {
-      ctx.status = 400
-      ctx.body = { message: `禁用失败`, flag }
-      return
-    }
-    ctx.status = 200
-    ctx.body = { message: `禁用成功`, flag }
+    if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '禁用失败')
+    ctx.body = { code: 0, message: '禁用成功' }
   }
 
   async unlock(): Promise<void> {
@@ -52,12 +42,7 @@ export default class AdminCategoryController extends Controller {
     const { items } = ctx.request.body
     const ids = items.map((i) => i.id)
     const flag = await this.service.adminService.category.unlock(ids)
-    if (!flag) {
-      ctx.status = 400
-      ctx.body = { message: `启用失败`, flag }
-      return
-    }
-    ctx.status = 200
-    ctx.body = { message: `启用成功`, flag }
+    if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '启用失败')
+    ctx.body = { code: 0, message: '启用成功' }
   }
 }

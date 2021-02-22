@@ -97,21 +97,20 @@ module.exports = merge(commonConfig, {
         cache: false, // 特别重要：防止之后使用v6版本 copy-webpack-plugin 时代码修改一刷新页面为空问题。
         templateParameters: {
           favicon: 'http://127.0.0.1:7001/public/assets/images/logo.png',
-          scripts:
-            !ifHandleAllLibs &&
-            glob.sync(`${path.resolve(PUBLIC_ROOT, './base')}/**/*{.css,.js}`, { nodir: true }).reduce(
-              (scripts, path) => {
-                const validPaths = path.split('/').slice(-2)
-                const file = `http://127.0.0.1:7001/public/base/${validPaths.join('/')}`
-                if (file.endsWith('.js')) {
-                  scripts.jsList.push(file)
-                } else {
-                  scripts.cssList.push(file)
-                }
-                return scripts
-              },
-              { cssList: [], jsList: [] },
-            ),
+          scripts: glob.sync(`${path.resolve(PUBLIC_ROOT, './base')}/**/*{.css,.js}`, { nodir: true }).reduce(
+            (scripts, path) => {
+              const validPaths = path.split('/').slice(-2)
+              const file = `http://127.0.0.1:7001/public/base/${validPaths.join('/')}`
+              if (file.endsWith('.js')) {
+                // 这样会导致locales没有包含进来，不过影响不大
+                if (!ifHandleAllLibs) scripts.jsList.push(file)
+              } else {
+                scripts.cssList.push(file)
+              }
+              return scripts
+            },
+            { cssList: [], jsList: [] },
+          ),
           // chunksSortMode:'manual',//不设置时，默认顺序以entry的顺序
           // chunks:['entry_1_name','entry_2_name'] //默认当前entry多文件（如果有多个的话）全部注入
           // excludeChunks:[],// 拒绝当前打包的入口文件的某些注入到html中，默认不排除

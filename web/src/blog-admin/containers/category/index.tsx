@@ -1,22 +1,24 @@
-import React, { memo, useCallback, useEffect, useState, useRef } from 'react'
+import React, { memo, useCallback, useEffect, useState, useRef, useMemo } from 'react'
 import { WrappedContainer } from '@common/components'
-import { message, Table, Tabs, Button, Tag, Input, Row, Col, Tooltip } from 'antd'
-import { FormOutlined, UnlockOutlined, LockOutlined, DeleteOutlined, HomeOutlined } from '@ant-design/icons'
+import { message, Table, Tabs, Button, Tag, Input, Row, Col, Tooltip, Badge } from 'antd'
+import { UnlockOutlined, LockOutlined, DeleteOutlined, HomeOutlined, ReloadOutlined } from '@ant-design/icons'
 import moment from 'moment'
 import { adminCategoryServices } from '@blog-admin/services/category'
 import { adminSortServices } from '@blog-admin/services/sort'
 import CategoryForm from './category-form'
-import type { FC, ReactText } from 'react'
+import type { FC, ReactNode } from 'react'
 import type { RouteComponentProps } from 'react-router'
 import type { Sort, Category } from '@blog-admin/types'
 import type { TableProps } from 'antd/lib/table'
+import type { SorterResult } from 'antd/lib/table/interface'
 import type { TabsProps } from 'antd/lib/tabs'
 
 export type ListItem = (Sort | Category)['listItemByAdminRole']
 export type ToggleEditorialPanel = (editCateInSortPanel?: boolean, record?: ListItem) => void
-export type SaveData = (params: (Sort | Category)['insertParams']) => void
+export type SaveData = (params: (Sort | Category)['editParams']) => void
 type TabKey = 'cate' | 'sort'
 type GetColumns = <T = unknown>(type: TabKey, excludes?: string[]) => TableProps<T>['columns']
+type HandleItems = (type: 'remove' | 'lock' | 'unlock', from?: TabKey, record?: ListItem) => void
 
 const CategoryManagement: FC<RouteComponentProps> = memo(() => {
   const inputSearchRef = useRef<Input>(null)
@@ -27,8 +29,8 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
   const [loading, setLoading] = useState<boolean>(false)
   const [dataSource, setDataSource] = useState<ListItem[]>([])
   const [allSortList, setAllSortList] = useState<Sort['getListResByAdminRole']['list']>([])
-  const [conditionQuery, setConditionQuery] = useState<Partial<(Sort | Category)['getListParamsByAdminRole']>>({})
-  const [filters, setFilters] = useState<Partial<{ sort: string; isEnable: boolean }>>({})
+  const [conditionQuery, setConditionQuery] = useState<Partial<(Sort | Category)['getListParamsByAdminRole']['conditionQuery']>>({})
+  const [filters, setFilters] = useState<Partial<{ sort: number[]; isEnable: number[] }>>({})
   const [editFormVisible, setEditFormVisible] = useState<boolean>(false)
   const [editFormType, setEditFormType] = useState<TabKey>('sort')
   const [editFormData, setEditFormData] = useState<ListItem>(null)
@@ -38,6 +40,11 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
     setFilters({})
     inputSearchRef.current?.setValue?.('')
     setPagination((prevValue) => ({ ...prevValue, current: 1 }))
+  }, [])
+
+  const getAllSortList = useCallback<() => void>(async () => {
+    const [sortRes] = await adminSortServices.getList({ index: 1, size: 999 })
+    setAllSortList(sortRes?.data?.list || [])
   }, [])
 
   const handleSelectRows = useCallback<TableProps<ListItem>['rowSelection']['onChange']>(
@@ -55,11 +62,18 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
     [selectedItems],
   )
 
-  const handleTableChange = useCallback<TableProps<ListItem>['onChange']>((pagination) => {
+  const handleTableChange = useCallback<TableProps<ListItem>['onChange']>((pagination, filters, sorter) => {
     setPagination({ current: pagination.current, pageSize: pagination.pageSize })
+    const { columnKey, order } = sorter as SorterResult<ListItem>
+    const orderBy = order ? { name: columnKey, by: order === 'descend' ? 'DESC' : 'ASC' } : {}
+    const isEnable = filters?.isEnable?.[0] as 0 | 1
+    const sortIdsArr = filters?.sort as number[]
+    setFilters(filters)
+    setConditionQuery((prevValue) => ({ ...prevValue, orderBy, isEnable, sortIdsArr } as typeof conditionQuery))
   }, [])
 
   const changeTab = useCallback<TabsProps['onChange']>((key) => {
+    setPagination((prevValue) => ({ ...prevValue, current: 1 }))
     setDataSource([])
     setSelectedItems([])
     setFilters({})
@@ -68,6 +82,37 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
     setEditFormType(key as TabKey)
     inputSearchRef.current?.setValue?.('')
   }, [])
+
+  const handleItems = useCallback<HandleItems>(
+    async (type, from = tabKey, record) => {
+      const handlingItems = (record ? [record] : selectedItems).map((item) => ({ id: item.id, name: item.name }))
+      const specificServices = from === 'sort' ? adminSortServices : adminCategoryServices
+      // const [, err] = await specificServices[type]({ items: handlingItems }) // 绕过ts检测，不推荐
+      let service: typeof adminSortServices.remove
+      switch (type) {
+        case 'remove':
+          service = specificServices.remove
+          break
+        case 'lock':
+          service = specificServices.lock
+          break
+        case 'unlock':
+          service = specificServices.unlock
+          break
+        default:
+          break
+      }
+      const [, err] = await service({ items: handlingItems })
+      if (err) {
+        message.error('操作失败')
+        return
+      }
+      message.success('操作成功')
+      setPagination((prevValue) => ({ ...prevValue, current: 1 }))
+      if (from === 'sort') getAllSortList()
+    },
+    [selectedItems, tabKey, getAllSortList],
+  )
 
   const toggleEditorialPanel = useCallback<ToggleEditorialPanel>(
     (editCateInSortPanel, record) => {
@@ -82,19 +127,21 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
     (params) => {
       message.loading({ content: '正在提交...', key: 'saveData', duration: 0 })
       Promise.race(
-        tabKey === 'sort'
-          ? [adminSortServices.insert(params as Sort['insertParams'])]
-          : [adminCategoryServices.insert(params as Category['insertParams'])],
+        editFormType === 'sort'
+          ? [adminSortServices.save(params as Sort['editParams'])]
+          : [adminCategoryServices.save(params as Category['editParams'])],
       )
         .then(([, err]) => {
           if (err) throw err
+          setPagination((prevValue) => ({ ...prevValue, current: 1 }))
           message.success({ content: '操作成功', key: 'saveData' })
+          if (editFormType === 'sort') getAllSortList()
         })
         .catch((error) => {
           message.error({ content: error.message || '提交失败', key: 'saveData' })
         })
     },
-    [tabKey],
+    [editFormType, getAllSortList],
   )
 
   const getColumns = useCallback<GetColumns>(
@@ -113,7 +160,7 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
             key: 'sort',
             sorter: true,
             filters: allSortList.map((sort) => ({ text: sort.name, value: sort.id })),
-            filteredValue: filters.sort ? [filters.sort] : [],
+            filteredValue: filters?.sort || [],
             render: (val) => val?.name,
           },
         {
@@ -140,7 +187,7 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
             { text: '可用', value: 1 },
           ],
           filterMultiple: false,
-          filteredValue: filters.isEnable !== undefined ? [(filters.isEnable as unknown) as ReactText] : [],
+          filteredValue: filters?.isEnable || [],
           render: (val) => <Tag color={val === 1 ? 'blue' : 'gray'}>{val === 1 ? '可用' : '不可用'}</Tag>,
         },
         {
@@ -149,67 +196,50 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
           render: (record) => (
             <>
               <Button
-                icon={<FormOutlined />}
                 size="small"
-                shape="circle"
-                onClick={() => toggleEditorialPanel(undefined, record)}
-                style={{ color: '#8B3A3A' }}
-              />
+                type="primary"
+                onClick={() => {
+                  toggleEditorialPanel(type !== tabKey, record)
+                }}
+              >
+                编辑
+              </Button>
               <Button
-                icon={<DeleteOutlined />}
                 size="small"
-                shape="circle"
-                // onClick={() => this.handleItems(AdminCateAPI.DELETE, item)}
-                style={{ color: 'red', marginLeft: '10px' }}
-              />
-              {record.isEnable === 1 && (
-                <Button
-                  icon={<LockOutlined />}
-                  size="small"
-                  shape="circle"
-                  // onClick={() => this.handleItems(AdminCateAPI.LOCK, item)}
-                  style={{ color: '#A020F0', marginLeft: '10px' }}
-                />
-              )}
-              {record.isEnable === 0 && (
-                <Button
-                  icon={<UnlockOutlined />}
-                  size="small"
-                  shape="circle"
-                  // onClick={() => this.handleItems(AdminCateAPI.UNLOCK, item)}
-                  style={{ color: 'green', marginLeft: '10px' }}
-                />
-              )}
+                danger
+                type="primary"
+                onClick={() => {
+                  handleItems('remove', type, record)
+                }}
+                style={{ marginLeft: 10 }}
+              >
+                删除
+              </Button>
+              <Button
+                size="small"
+                type="primary"
+                onClick={() => {
+                  handleItems(record.isEnable ? 'lock' : 'unlock', type, record)
+                }}
+                style={{ marginLeft: 10 }}
+              >
+                {record.isEnable ? '禁用' : '启用'}
+              </Button>
             </>
           ),
         },
       ].filter(Boolean)
     },
-    [allSortList, filters, toggleEditorialPanel],
-  )
-
-  const expandedRowRender = useCallback<TableProps<any>['expandedRowRender']>(
-    (record) => {
-      return (
-        <Table
-          columns={getColumns<Category['listItemByAdminRole']>('cate')}
-          rowKey="id"
-          loading={loading}
-          dataSource={record.categories}
-          pagination={false}
-          showHeader={false}
-        />
-      )
-    },
-    [getColumns, loading],
+    [tabKey, allSortList, filters, toggleEditorialPanel, handleItems],
   )
 
   useEffect(() => {
     setLoading(true)
+    const params = { index: pagination.current, size: pagination.pageSize, conditionQuery }
     Promise.race(
       tabKey === 'sort'
-        ? [adminSortServices.getList(conditionQuery as Partial<Sort['getListParamsByAdminRole']>)]
-        : [adminCategoryServices.getList(conditionQuery as Partial<Category['getListParamsByAdminRole']>)],
+        ? [adminSortServices.getList(params as Partial<Sort['getListParamsByAdminRole']>)]
+        : [adminCategoryServices.getList(params as Partial<Category['getListParamsByAdminRole']>)],
     )
       .then(([res, err]) => {
         if (err) throw err
@@ -221,21 +251,23 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
       .catch((error) => {
         message.error(error.message || '获取分类失败')
       })
-  }, [tabKey, conditionQuery])
+  }, [tabKey, conditionQuery, pagination])
 
   useEffect(() => {
-    ;(async () => {
-      const [sortRes] = await adminSortServices.getList({ index: 1, size: 999 })
-      setAllSortList(sortRes?.data?.list || [])
-    })()
-  }, [])
+    getAllSortList()
+  }, [getAllSortList])
 
-  return (
-    <WrappedContainer>
+  const tabComponent = useMemo<ReactNode>(() => {
+    return (
       <Tabs activeKey={tabKey} onChange={changeTab}>
         <Tabs.TabPane tab="一级分类" key="sort" />
         <Tabs.TabPane tab="二级分类" key="cate" />
       </Tabs>
+    )
+  }, [tabKey, changeTab])
+
+  const actionBarComponent = useMemo<ReactNode>(() => {
+    return (
       <Row align="middle" style={{ marginBottom: '15px' }}>
         <Col xs={12} sm={13} md={15} lg={16} xl={17}>
           <Button type="primary" size="small" onClick={() => toggleEditorialPanel()}>
@@ -245,6 +277,57 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
             <Button type="primary" size="small" style={{ marginLeft: 10 }} onClick={() => toggleEditorialPanel(true)}>
               新增子分类
             </Button>
+          )}
+          {selectedItems.length > 0 && (
+            <>
+              <Badge count={selectedItems.length} title="已选项数">
+                <Button
+                  icon={<ReloadOutlined />}
+                  type="primary"
+                  size="small"
+                  onClick={() => {
+                    setSelectedItems([])
+                  }}
+                  style={{ marginLeft: 10 }}
+                >
+                  清空
+                </Button>
+              </Badge>
+              <Button
+                icon={<DeleteOutlined />}
+                type="primary"
+                danger
+                size="small"
+                onClick={() => {
+                  handleItems('remove')
+                }}
+                style={{ marginLeft: 10 }}
+              >
+                删除
+              </Button>
+              <Button
+                icon={<UnlockOutlined />}
+                type="primary"
+                size="small"
+                onClick={() => {
+                  handleItems('unlock')
+                }}
+                style={{ marginLeft: 10 }}
+              >
+                启用
+              </Button>
+              <Button
+                icon={<LockOutlined />}
+                type="primary"
+                size="small"
+                onClick={() => {
+                  handleItems('lock')
+                }}
+                style={{ marginLeft: 10 }}
+              >
+                禁用
+              </Button>
+            </>
           )}
         </Col>
         <Col xs={2} sm={2} md={1} lg={1} xl={1}>
@@ -257,6 +340,7 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
             ref={inputSearchRef}
             placeholder="Enter something"
             onSearch={(value) => {
+              setPagination((prevValue) => ({ ...prevValue, current: 1 }))
               setConditionQuery((prevValue) => ({ ...prevValue, name: value.trim() }))
             }}
             enterButton
@@ -264,9 +348,14 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
           />
         </Col>
       </Row>
-      <Table
-        columns={getColumns<(Category | Sort)['listItemByAdminRole']>(tabKey)}
-        rowKey={(item) => item.id}
+    )
+  }, [tabKey, selectedItems, toggleEditorialPanel, handleItems, showDataByDefaultWay])
+
+  const contentTableComponent = useMemo<ReactNode>(() => {
+    return (
+      <Table<ListItem>
+        columns={getColumns<ListItem>(tabKey)}
+        rowKey="id"
         onChange={handleTableChange}
         rowSelection={{ selectedRowKeys: selectedItems.map((item) => item.id), onChange: handleSelectRows }}
         loading={loading}
@@ -277,8 +366,32 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
           total,
           ...pagination,
         }}
-        expandable={tabKey === 'sort' && { expandedRowRender }}
+        expandable={
+          tabKey === 'sort' && {
+            expandedRowRender: (record: Sort['listItemByAdminRole']) => {
+              const formativeDataSource = record?.categories?.map?.((category) => {
+                return { ...category, sort: { ...record, categories: undefined } }
+              })
+              return (
+                <Table<Category['listItemByAdminRole']>
+                  columns={getColumns<Category['listItemByAdminRole']>('cate', ['sort'])}
+                  rowKey="id"
+                  loading={loading}
+                  dataSource={formativeDataSource || []}
+                  pagination={false}
+                  showHeader={false}
+                />
+              )
+            },
+          }
+        }
       />
+    )
+  }, [tabKey, total, selectedItems, loading, dataSource, pagination, getColumns, handleTableChange, handleSelectRows])
+
+  const editFormComponent = useMemo<ReactNode>(() => {
+    if (!editFormVisible) return null
+    return (
       <CategoryForm
         type={editFormType}
         visible={editFormVisible}
@@ -287,6 +400,15 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
         onToggleEditorialPanel={toggleEditorialPanel}
         onSave={saveData}
       />
+    )
+  }, [editFormVisible, editFormType, editFormData, allSortList, toggleEditorialPanel, saveData])
+
+  return (
+    <WrappedContainer>
+      {tabComponent}
+      {actionBarComponent}
+      {contentTableComponent}
+      {editFormComponent}
     </WrappedContainer>
   )
 })

@@ -134,7 +134,7 @@ export default (appInfo: EggAppInfo) => {
   config.development = {
     overrideDefault: true,
     watchDirs: ['app', 'config'],
-    // ignoreDirs: ['app/public', 'app/manifest'],
+    ignoreDirs: ['app/public', 'app/manifest'],
   }
 
   /**

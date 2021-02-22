@@ -7,6 +7,18 @@ export function getList(params: Partial<Category['getListParamsByAdminRole']> = 
   return post<CommonResponse<Category['getListResByAdminRole']>, typeof params>(categoryApis.ADMIN_LIST, params)
 }
 
-export function insert(params: Category['insertParams']): ServiceResult {
-  return post<CommonResponse, typeof params>(categoryApis.ADMIN_INSERT, params)
+export function save(params: Category['editParams']): ServiceResult {
+  return post<CommonResponse, typeof params>(categoryApis.ADMIN_SAVE, params)
+}
+
+export function remove(params: Category['removeParams']): ServiceResult {
+  return post<CommonResponse, typeof params>(categoryApis.ADMIN_DELETE, params)
+}
+
+export function lock(params: Category['lockParams']): ServiceResult {
+  return post<CommonResponse, typeof params>(categoryApis.ADMIN_LOCK, params)
+}
+
+export function unlock(params: Category['unlockParams']): ServiceResult {
+  return post<CommonResponse, typeof params>(categoryApis.ADMIN_UNLOCK, params)
 }

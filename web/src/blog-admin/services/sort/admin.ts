@@ -7,6 +7,18 @@ export function getList(params: Partial<Sort['getListParamsByAdminRole']> = {}):
   return post<CommonResponse<Sort['getListResByAdminRole']>, typeof params>(sortApis.ADMIN_LIST, params)
 }
 
-export function insert(params: Sort['insertParams']): ServiceResult {
-  return post<CommonResponse, typeof params>(sortApis.ADMIN_INSERT, params)
+export function save(params: Sort['editParams']): ServiceResult {
+  return post<CommonResponse, typeof params>(sortApis.ADMIN_SAVE, params)
+}
+
+export function remove(params: Sort['removeParams']): ServiceResult {
+  return post<CommonResponse, typeof params>(sortApis.ADMIN_DELETE, params)
+}
+
+export function lock(params: Sort['lockParams']): ServiceResult {
+  return post<CommonResponse, typeof params>(sortApis.ADMIN_LOCK, params)
+}
+
+export function unlock(params: Sort['unlockParams']): ServiceResult {
+  return post<CommonResponse, typeof params>(sortApis.ADMIN_UNLOCK, params)
 }

@@ -11,7 +11,7 @@ export default class AdminSortController extends Controller {
 
   async save(ctx): Promise<void> {
     const { id, name, isEnable } = ctx.request.body
-    const flag = await this.service.adminService.category.save({ id, name, isEnable })
+    const flag = await this.service.adminService.sort.save({ id, name, isEnable })
     const action = id ? '更新' : '添加'
     if (!flag) ctx.throw(StatusCode.SERVER_ERROR, `${action}失败`)
     ctx.body = { code: 0, message: `${action}成功` }
@@ -20,39 +20,24 @@ export default class AdminSortController extends Controller {
   async delete(ctx): Promise<void> {
     const { items } = ctx.request.body
     const ids = items.map((i) => i.id)
-    const flag = await this.service.adminService.category.delete(ids)
-    if (!flag) {
-      ctx.status = 400
-      ctx.body = { message: `删除失败`, flag }
-      return
-    }
-    ctx.status = 200
-    ctx.body = { message: `删除成功`, flag }
+    const flag = await this.service.adminService.sort.delete(ids)
+    if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '删除失败')
+    ctx.body = { code: 0, message: '删除成功' }
   }
 
   async lock(ctx): Promise<void> {
     const { items } = ctx.request.body
     const ids = items.map((i) => i.id)
-    const flag = await this.service.adminService.category.lock(ids)
-    if (!flag) {
-      ctx.status = 400
-      ctx.body = { message: `禁用失败`, flag }
-      return
-    }
-    ctx.status = 200
-    ctx.body = { message: `禁用成功`, flag }
+    const flag = await this.service.adminService.sort.lock(ids)
+    if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '禁用失败')
+    ctx.body = { code: 0, message: '禁用成功' }
   }
 
   async unlock(ctx): Promise<void> {
     const { items } = ctx.request.body
     const ids = items.map((i) => i.id)
-    const flag = await this.service.adminService.category.unlock(ids)
-    if (!flag) {
-      ctx.status = 400
-      ctx.body = { message: `启用失败`, flag }
-      return
-    }
-    ctx.status = 200
-    ctx.body = { message: `启用成功`, flag }
+    const flag = await this.service.adminService.sort.unlock(ids)
+    if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '启用失败')
+    ctx.body = { code: 0, message: '启用成功' }
   }
 }
