@@ -15,18 +15,18 @@ export function remove(params: Message['removeParams']): ServiceResult {
   return post<CommonResponse, typeof params>(messageApis.ADMIN_DELETE, params)
 }
 
-export function top(params: Message['lockParams']): ServiceResult {
+export function top(params: Message['topParams']): ServiceResult {
   return post<CommonResponse, typeof params>(messageApis.ADMIN_TOP, params)
 }
 
-export function unTop(params: Message['unlockParams']): ServiceResult {
+export function unTop(params: Message['unTopParams']): ServiceResult {
   return post<CommonResponse, typeof params>(messageApis.ADMIN_UNTOP, params)
 }
 
-export function approve(params: Message['lockParams']): ServiceResult {
+export function approve(params: Message['approveParams']): ServiceResult {
   return post<CommonResponse, typeof params>(messageApis.ADMIN_APPROVE, params)
 }
 
-export function disapprove(params: Message['unlockParams']): ServiceResult {
+export function disapprove(params: Message['disapproveParams']): ServiceResult {
   return post<CommonResponse, typeof params>(messageApis.ADMIN_DISAPPROVE, params)
 }

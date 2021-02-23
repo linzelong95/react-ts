@@ -1,9 +1,9 @@
 import React, { memo, useCallback, useMemo } from 'react'
 import { Modal, Form, Input, Select, message } from 'antd'
-import type { Sort, Category } from '@blog-admin/types'
+import type { Message } from '@blog-admin/types'
 import type { FC } from 'react'
 import type { ModalProps } from 'antd/lib/modal'
-import type { ToggleEditorialPanel, SaveData, ListItem } from '../category'
+import type { ToggleEditorialPanel, SaveData, ListItem } from '../message'
 
 interface CateForm extends ModalProps {
   initialValues?: ListItem
@@ -11,7 +11,7 @@ interface CateForm extends ModalProps {
   onToggleEditorialPanel: ToggleEditorialPanel
 }
 
-type FormDataWhenEdited = (Sort | Category)['formDataWhenEdited']
+type FormDataWhenEdited = Message['formDataWhenEdited']
 
 const layout = {
   labelCol: { span: 5 },
@@ -31,21 +31,24 @@ const CategoryForm: FC<CateForm> = memo((props) => {
     form
       .validateFields()
       .then((values) => {
-        const { sort, ...commonValues } = values as Category['formDataWhenEdited']
-        if (sort) (commonValues as Category['editParams']).sortId = sort.key
-        onSave({ id: initialValues?.id, ...commonValues } as (Category | Sort)['editParams'])
+        const { id } = initialValues || {}
+        const { to, isTop, message } = values
+        const parentId = initialValues?.parentId === 0 ? id : initialValues?.parentId
+        const toId = to?.key
+        const toMail = to?.key !== undefined && typeof to.key !== 'number' && to.key !== '博主' ? to.key : '无'
+        onSave({ id, toMail, toId, parentId, isTop, message })
         form.resetFields()
         onToggleEditorialPanel()
       })
       .catch((error) => {
-        message.error(error.message)
+        message.error(error.message || '请检查表单填写是否正确')
       })
   }, [form, initialValues, onSave, onToggleEditorialPanel])
 
   const editingFormData = useMemo<FormDataWhenEdited>(() => {
-    const { name, isEnable = 1, sort } = (initialValues || {}) as Category['listItemByAdminRole']
-    const defaultValues = { isEnable, name } as FormDataWhenEdited
-    return { ...defaultValues, sort: sort ? { label: sort.name, key: sort.id } : undefined }
+    const { isTop = 1, from, fromMail } = initialValues || {}
+    const to = { key: from ? from.id : fromMail, label: from ? from.nickName : fromMail }
+    return { isTop, to } as FormDataWhenEdited
   }, [initialValues])
 
   return (
@@ -59,13 +62,23 @@ const CategoryForm: FC<CateForm> = memo((props) => {
       {...restProps}
     >
       <Form {...layout} form={form} initialValues={editingFormData}>
-        <Form.Item label="名称" name="name" rules={[{ required: true, message: '请输入名称!' }]}>
-          <Input />
+        {initialValues?.id && (
+          <>
+            <Form.Item label="回复对象" name="to">
+              <Select disabled labelInValue>
+                <Select.Option value={1}>是</Select.Option>
+              </Select>
+            </Form.Item>
+            <Form.Item>{initialValues.message}</Form.Item>
+          </>
+        )}
+        <Form.Item label="留言" name="message" rules={[{ required: true, message: '请输入留言内容!' }]}>
+          <Input.TextArea rows={2} />
         </Form.Item>
-        <Form.Item label="状态" name="isEnable" rules={[{ required: true, message: '请选择状态!' }]} style={{ marginBottom: 0 }}>
+        <Form.Item label="是否置顶" name="isTop" rules={[{ required: true, message: '请选择是否置顶!' }]} style={{ marginBottom: 0 }}>
           <Select>
-            <Select.Option value={1}>可用</Select.Option>
-            <Select.Option value={0}>不可用</Select.Option>
+            <Select.Option value={1}>是</Select.Option>
+            <Select.Option value={0}>否</Select.Option>
           </Select>
         </Form.Item>
       </Form>

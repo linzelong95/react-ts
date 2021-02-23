@@ -1,4 +1,4 @@
-import { post } from '@common/utils'
+import { post, get } from '@common/utils'
 import { userApis } from '@common/services/apis'
 import type { ServiceResult, CommonResponse } from '@common/types'
 import type { UserState } from '@common/store/types'
@@ -23,11 +23,11 @@ export function register(params: LoginParams): ServiceResult<UserState> {
 }
 
 export function getPublicKey(): ServiceResult<{ item: string }> {
-  return post<CommonResponse<{ item: string }>>(userApis.GET_PUBLIC_KEY)
+  return get<CommonResponse<{ item: string }>>(userApis.GET_PUBLIC_KEY)
 }
 
 export function getWebpageCaptcha(): ServiceResult<{ item: string }> {
-  return post<CommonResponse<{ item: string }>>(`${userApis.GET_WEBPAGE_CAPTCHA}?t=${Date.now()}`)
+  return get<CommonResponse<{ item: string }>>(`${userApis.GET_WEBPAGE_CAPTCHA}?t=${Date.now()}`)
 }
 
 export function verifyCaptcha(captcha: string): ServiceResult {

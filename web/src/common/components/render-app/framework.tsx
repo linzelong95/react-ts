@@ -25,7 +25,7 @@ interface FrameworkOptions {
 const Framework: FC<FrameworkOptions> = (props) => {
   const { store, routes, basename } = props
   const { i18n } = useTranslation()
-  console.log(222, i18n.language)
+
   return (
     <React.StrictMode>
       <ErrorBoundary>

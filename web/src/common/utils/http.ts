@@ -47,8 +47,6 @@ http.interceptors.response.use(
       data: { code, message },
     } = res
 
-    console.log(888, res)
-
     // code为0表示成功，不为0表示异常
     if (code !== 0) {
       if (code === StatusCode.NOT_LOGGED_FOR_ADMIN) {

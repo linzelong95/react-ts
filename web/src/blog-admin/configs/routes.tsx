@@ -16,7 +16,7 @@ const routes: RouteConfig[] = [
     path: '/message',
     menuKey: 'message',
     exact: true,
-    component: asyncComponent(() => import(/* webpackPrefetch: true */ '@blog-admin/containers/test-a')),
+    component: asyncComponent(() => import(/* webpackPrefetch: true */ '@blog-admin/containers/message')),
     // authPoints: ['blog.super_admin-is', 'blog.personal_admin-is'],
     // authOperator: 'or',
     icon: <ZhihuOutlined />,

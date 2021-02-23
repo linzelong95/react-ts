@@ -16,8 +16,6 @@ import type { RouteProps } from 'react-router-dom'
 //       ;(async () => {
 //         const componentRes = await importedComponent()
 //         setComponent(componentRes?.default)
-
-//         console.log((componentRes as any)?.default)
 //       })()
 //     }, [])
 

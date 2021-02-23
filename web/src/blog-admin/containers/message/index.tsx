@@ -1,6 +1,6 @@
 import React, { memo, useMemo, useState, useCallback, useRef, useEffect } from 'react'
 import { WrappedContainer } from '@common/components'
-import { message, Row, Col, Button, List, Checkbox, Avatar, Tag, Input, Tooltip, Badge } from 'antd'
+import { message, Row, Col, Button, List, Checkbox, Avatar, Tag, Input, Tooltip, Badge, Modal } from 'antd'
 import {
   UnlockOutlined,
   EyeOutlined,
@@ -14,6 +14,8 @@ import {
   EyeInvisibleOutlined,
   VerticalAlignTopOutlined,
   VerticalAlignMiddleOutlined,
+  FilterOutlined,
+  AlignCenterOutlined,
 } from '@ant-design/icons'
 import EditForm from './edit-form'
 import moment from 'moment'
@@ -27,8 +29,16 @@ import type { SearchProps } from 'antd/lib/input/Search'
 import type { TagProps } from 'antd/lib/tag'
 import styles from './index.less'
 
-export type SaveData = (params: any) => void
-type HandleItems = (type: 'remove' | 'reply' | 'approval' | 'disapproval' | 'top' | 'unTop', record?: any) => void
+export type ListItem = Message['listItemByAdminRole']
+export type ToggleEditorialPanel = (record?: ListItem) => void
+export type SaveData = (params: Message['editParams']) => void
+type HandleItems = (type: 'remove' | 'reply' | 'approve' | 'disapprove' | 'top' | 'unTop', record?: ListItem) => void
+type FilterRequest = (type: 'ok' | 'exit' | 'clear') => void
+type TemporaryCondition = {
+  commonFilterArr?: ['isTop'?, 'isApproved'?, 'isParent'?, 'isSon'?]
+  filterFlag?: boolean
+}
+type ConditionQuery = Message['getListParamsByAdminRole']['conditionQuery'] & Pick<TemporaryCondition, 'commonFilterArr'>
 
 const MessageManagement: FC<RouteComponentProps> = memo(() => {
   const inputSearchRef = useRef<Input>(null)
@@ -36,16 +46,14 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
   const [total, setTotal] = useState<number>(0)
   const [pagination, setPagination] = useState<{ current: number; pageSize: number }>({ current: 1, pageSize: 10 })
   const [editFormVisible, setEditFormVisible] = useState<boolean>(false)
-  const [editFormData, setEditFormData] = useState<any>(null)
-  const [dataSource, setDataSource] = useState<Message['listItemByAdminRole'][]>([])
-  const [selectedItems, setSelectedItems] = useState<Message['listItemByAdminRole'][]>([])
-  const [temporaryCondition, setTemporaryCondition] = useState<any>({})
+  const [editFormData, setEditFormData] = useState<ListItem>(null)
+  const [dataSource, setDataSource] = useState<ListItem[]>([])
+  const [selectedItems, setSelectedItems] = useState<ListItem[]>([])
+  const [temporaryCondition, setTemporaryCondition] = useState<TemporaryCondition>({})
   const [allSelectedFlag, setAllSelectedFlag] = useState<boolean>(false)
-  const [conditionQuery, setConditionQuery] = useState<Message['getListParamsByAdminRole']['conditionQuery']>({})
+  const [conditionQuery, setConditionQuery] = useState<ConditionQuery>({})
   const [filterModalVisible, setFilterModalVisible] = useState<boolean>(false)
   const [showSorterFlag, setShowSorterFlag] = useState<boolean>(false)
-
-  console.log(filterModalVisible)
 
   const showDataByDefaultWay = useCallback<(event: React.MouseEvent<HTMLElement, MouseEvent>) => void>(() => {
     setConditionQuery({})
@@ -59,14 +67,20 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
     setConditionQuery((prevValue) => ({ ...prevValue, message: value.trim() }))
   }, [])
 
-  const toggleEditorialPanel = useCallback<(record?: any) => void>((record) => {
+  const toggleEditorialPanel = useCallback<(record?: ListItem) => void>((record) => {
     setEditFormData(record)
     setEditFormVisible((prevValue) => !prevValue)
   }, [])
 
-  const saveData = useCallback<SaveData>((params) => {
-    console.log(params)
+  const saveData = useCallback<SaveData>(async (params) => {
     message.loading({ content: '正在提交...', key: 'saveData', duration: 0 })
+    const [, saveErr] = await adminMessageServices.save(params)
+    if (saveErr) {
+      message.error({ content: saveErr.message || '提交失败', key: 'saveData' })
+      return
+    }
+    setPagination((prevValue) => ({ ...prevValue, current: 1 }))
+    message.success({ content: '操作成功', key: 'saveData' })
   }, [])
 
   const toggleSelectAll = useCallback<ButtonProps['onClick']>(() => {
@@ -79,7 +93,7 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
     setAllSelectedFlag(!allSelectedFlag)
   }, [dataSource, selectedItems, allSelectedFlag])
 
-  const toggleSelectOne = useCallback(
+  const toggleSelectOne = useCallback<ToggleEditorialPanel>(
     (record) => {
       const newSelectedItems = selectedItems.some((selectedItem) => selectedItem.id === record.id)
         ? selectedItems.filter((selectedItem) => selectedItem.id !== record.id)
@@ -99,7 +113,7 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
     setShowSorterFlag((prevValue) => !prevValue)
   }, [dataSource])
 
-  const sort = useCallback<TagProps['onClick']>(
+  const handleSort = useCallback<TagProps['onClick']>(
     ({ currentTarget }) => {
       const { id } = currentTarget
       if (id === 'default') {
@@ -111,8 +125,8 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
         ...prevValue,
         orderBy: {
           name: id,
-          by: prevValue.orderBy.by === 'ASC' ? 'DESC' : 'ASC',
-        } as Message['getListParamsByAdminRole']['conditionQuery']['orderBy'],
+          by: prevValue?.orderBy?.by === 'ASC' ? 'DESC' : 'ASC',
+        } as ConditionQuery['orderBy'],
       }))
       setPagination((prevValue) => ({ ...prevValue, current: 1 }))
     },
@@ -125,7 +139,7 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
 
   const handleItems = useCallback<HandleItems>(
     async (type, record) => {
-      const handlingItems = (record ? [record] : selectedItems).map((item) => ({ id: item.id, name: item.name }))
+      const handlingItems = (record ? [record] : selectedItems).map((item) => ({ id: item.id }))
       const [, err] = await adminMessageServices[type]({ items: handlingItems })
       if (err) {
         message.error('操作失败')
@@ -137,9 +151,43 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
     [selectedItems],
   )
 
+  const filterRequest = useCallback<FilterRequest>(
+    (type) => {
+      if (type === 'clear') {
+        setTemporaryCondition({})
+        return
+      }
+      setFilterModalVisible((prevValue) => !prevValue)
+      if (type === 'exit') {
+        setTemporaryCondition((prevValue) => ({ ...prevValue, filterFlag: conditionQuery?.commonFilterArr?.length > 0 }))
+        return
+      }
+      setTemporaryCondition((prevValue = {}) => {
+        const { commonFilterArr = [] } = prevValue
+        const isApproved = commonFilterArr.includes?.('isApproved') ? 0 : undefined
+        const isTop = commonFilterArr.includes?.('isTop') ? 1 : undefined
+        const isRoot = (() => {
+          if (commonFilterArr.includes('isParent') && !commonFilterArr.includes('isSon')) return 1
+          if (!commonFilterArr.includes('isParent') && commonFilterArr.includes('isSon')) return 0
+          return undefined
+        })()
+        setConditionQuery((oldValue) => ({
+          ...oldValue,
+          isApproved,
+          isTop,
+          isRoot,
+          commonFilterArr,
+        }))
+        return { ...prevValue, filterFlag: prevValue.commonFilterArr.length > 0 }
+      })
+    },
+    [conditionQuery],
+  )
+
   useEffect(() => {
     setLoading(true)
-    const params = { index: pagination.current, size: pagination.pageSize, conditionQuery }
+    const neededConditionQuery = { ...conditionQuery, commonFilterArr: undefined }
+    const params = { index: pagination.current, size: pagination.pageSize, conditionQuery: neededConditionQuery }
     ;(async () => {
       const [messageRes, messageErr] = await adminMessageServices.getList(params)
       if (messageErr || !Array.isArray(messageRes?.data?.list)) {
@@ -147,11 +195,16 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
         return
       }
       setLoading(false)
-      setSelectedItems([])
       setTotal(messageRes.data.total)
       setDataSource(messageRes.data.list)
     })()
   }, [pagination, conditionQuery])
+
+  useEffect(() => {
+    setAllSelectedFlag(
+      !dataSource?.length ? false : dataSource.every((listItem) => selectedItems.some((selectedItem) => selectedItem.id === listItem.id)),
+    )
+  }, [selectedItems, dataSource])
 
   const actionBarComponent = useMemo<ReactNode>(() => {
     return (
@@ -168,9 +221,9 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
             新增
           </Button>
           <Button
-            icon="filter"
-            type={temporaryCondition.filterflag ? undefined : 'primary'}
-            danger={temporaryCondition.filterflag}
+            icon={<FilterOutlined />}
+            type="primary"
+            danger={temporaryCondition.filterFlag}
             size="small"
             onClick={() => {
               setFilterModalVisible(true)
@@ -181,7 +234,7 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
           </Button>
           <Button
             icon={<StarOutlined />}
-            type={allSelectedFlag ? undefined : 'primary'}
+            type="primary"
             danger={allSelectedFlag}
             size="small"
             onClick={toggleSelectAll}
@@ -191,20 +244,21 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
             &nbsp;
           </Button>
           <Button
-            icon={showSorterFlag ? 'right-circle-o' : 'left-circle-o'}
+            icon={<AlignCenterOutlined />}
             type="primary"
+            danger={showSorterFlag}
             size="small"
             onClick={toggleShowSorter}
-            style={{ marginLeft: 20 }}
+            style={{ marginLeft: 10 }}
           >
             排序
           </Button>
           {showSorterFlag && (
             <>
-              <Tag color="magenta" id="default" style={{ marginLeft: 10 }} onClick={sort}>
+              <Tag color="magenta" id="default" style={{ marginLeft: 10, cursor: 'pointer' }} onClick={handleSort}>
                 默认
               </Tag>
-              <Tag color="magenta" id="createDate" style={{ marginLeft: 5 }} onClick={sort}>
+              <Tag color="magenta" id="createDate" style={{ cursor: 'pointer' }} onClick={handleSort}>
                 时间
                 {conditionQuery?.orderBy?.name === 'createDate' && conditionQuery?.orderBy?.by === 'DESC' ? (
                   <CaretDownOutlined />
@@ -212,7 +266,7 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
                   <CaretUpOutlined />
                 )}
               </Tag>
-              <Tag color="magenta" id="isApproved" style={{ marginLeft: 5 }} onClick={sort}>
+              <Tag color="magenta" id="isApproved" style={{ cursor: 'pointer' }} onClick={handleSort}>
                 显示
                 {conditionQuery?.orderBy?.name === 'isApproved' && conditionQuery?.orderBy?.by === 'DESC' ? (
                   <CaretDownOutlined />
@@ -220,7 +274,7 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
                   <CaretUpOutlined />
                 )}
               </Tag>
-              <Tag color="magenta" id="isTop" style={{ marginLeft: 5 }} onClick={sort}>
+              <Tag color="magenta" id="isTop" style={{ cursor: 'pointer' }} onClick={handleSort}>
                 置顶
                 {conditionQuery?.orderBy?.name === 'isTop' && conditionQuery?.orderBy?.by === 'DESC' ? (
                   <CaretDownOutlined />
@@ -273,7 +327,7 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
                 type="primary"
                 size="small"
                 onClick={() => {
-                  handleItems('approval')
+                  handleItems('approve')
                 }}
                 style={{ marginLeft: 10 }}
               >
@@ -284,7 +338,7 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
                 type="primary"
                 size="small"
                 onClick={() => {
-                  handleItems('disapproval')
+                  handleItems('disapprove')
                 }}
                 style={{ marginLeft: 10 }}
               >
@@ -337,7 +391,7 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
     showDataByDefaultWay,
     handleSearch,
     toggleShowSorter,
-    sort,
+    handleSort,
   ])
 
   const contentListComponent = useMemo<ReactNode>(() => {
@@ -388,13 +442,13 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
                 size="small"
                 type="primary"
                 onClick={() => {
-                  handleItems(item.isApproved ? 'disapproval' : 'approval', item)
+                  handleItems(item.isApproved ? 'disapprove' : 'approve', item)
                 }}
               >
                 {item.isApproved ? '隐藏' : '过审'}
               </Button>,
               <Button
-                key="isTo["
+                key="isTop"
                 size="small"
                 type="primary"
                 onClick={() => {
@@ -413,22 +467,24 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
                     onChange={() => {
                       toggleSelectOne(item)
                     }}
-                    style={{ marginLeft: 20, marginTop: 10 }}
+                    style={{ marginLeft: 10, marginRight: 10, marginTop: 10 }}
                   />
                   <Avatar src="https://gw.alipayobjects.com/zos/rmsportal/ThXAXghbEsBCCSDihZxY.png" />
                 </>
               }
               title={
                 <span>
-                  <span style={{ color: 'green', fontWeight: 'bold' }}>
-                    <i>{item.from ? item.from.nickName : `${item.fromMail} [游客]`}&nbsp;</i>
+                  <span style={{ color: 'green', fontWeight: 'bold', marginRight: 10 }}>
+                    <i>{item.from ? item.from.nickName : `${item.fromMail} [游客]`}</i>
                   </span>
                   的留言
                   {item.parentId > 0 && (
                     <span>
-                      ( 回复&nbsp;
-                      <i style={{ color: '#A0522D', fontWeight: 'bold' }}>{item.to ? item.to.nickName : `${item.toMail} [游客]`}</i>
-                      &nbsp; )
+                      ( 回复
+                      <i style={{ color: '#A0522D', fontWeight: 'bold', marginLeft: 10, marginRight: 10 }}>
+                        {item.to ? item.to.nickName : `${item.toMail} [游客]`}
+                      </i>
+                      )
                     </span>
                   )}
                   &nbsp;:&nbsp;
@@ -445,6 +501,43 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
     )
   }, [loading, dataSource, total, pagination, allSelectedFlag, selectedItems, pageChange, toggleSelectOne, handleItems])
 
+  const filterModalComponent = useMemo(() => {
+    return (
+      <Modal
+        destroyOnClose
+        visible={filterModalVisible}
+        title="请选择筛选条件"
+        onCancel={() => filterRequest('exit')}
+        footer={[
+          <Button key="exit" onClick={() => filterRequest('exit')}>
+            不更改并退出
+          </Button>,
+          <Button key="clear" danger onClick={() => filterRequest('clear')}>
+            清空
+          </Button>,
+          <Button key="ok" type="primary" onClick={() => filterRequest('ok')}>
+            确定
+          </Button>,
+        ]}
+      >
+        <div style={{ textAlign: 'center' }}>
+          <Checkbox.Group
+            options={[
+              { label: '置顶', value: 'isTop' },
+              { label: '待审', value: 'isApproved' },
+              { label: '父留言', value: 'isParent' },
+              { label: '子留言', value: 'isSon' },
+            ]}
+            value={temporaryCondition.commonFilterArr}
+            onChange={(value) => {
+              setTemporaryCondition((prevValue) => ({ ...prevValue, commonFilterArr: value } as TemporaryCondition))
+            }}
+          />
+        </div>
+      </Modal>
+    )
+  }, [filterModalVisible, temporaryCondition, filterRequest])
+
   const editFormComponent = useMemo<ReactNode>(() => {
     if (!editFormVisible) return null
     return (
@@ -456,6 +549,7 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
       {actionBarComponent}
       {contentListComponent}
       {editFormComponent}
+      {filterModalComponent}
     </WrappedContainer>
   )
 })
