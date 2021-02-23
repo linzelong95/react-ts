@@ -37,62 +37,42 @@ export default class AdminMessageService extends Service {
 
   async delete(options) {
     const { idsArr, parentIdsArr } = options
-    let flag = true
     const result = await this.repository
       .createQueryBuilder()
       .delete()
       .from(Message)
       .where(`id in (${idsArr.join(',')}) ${parentIdsArr.length > 0 ? `or parentId in (${parentIdsArr.join(',')})` : ''}`)
       .execute()
-    if (!result.raw.affectedRows) {
-      flag = false
-    }
-    return flag
+    return Boolean(result.raw.affectedRows)
   }
 
   async approve(ids: number[]) {
-    let flag = true
     const result = await this.repository
       .createQueryBuilder()
       .update(Message)
       .set({ isApproved: 1 })
       .where('id in (:...ids)', { ids })
       .execute()
-    if (!result.raw.affectedRows) {
-      flag = false
-    }
-    return flag
+    return Boolean(result.raw.affectedRows)
   }
 
   async disapprove(ids: number[]) {
-    let flag = true
     const result = await this.repository
       .createQueryBuilder()
       .update(Message)
       .set({ isApproved: 0 })
       .where('id in (:...ids)', { ids })
       .execute()
-    if (!result.raw.affectedRows) {
-      flag = false
-    }
-    return flag
+    return Boolean(result.raw.affectedRows)
   }
 
   async top(ids: number[]) {
-    let flag = true
     const result = await this.repository.createQueryBuilder().update(Message).set({ isTop: 1 }).where('id in (:...ids)', { ids }).execute()
-    if (!result.raw.affectedRows) {
-      flag = false
-    }
-    return flag
+    return Boolean(result.raw.affectedRows)
   }
 
-  async untop(ids: number[]) {
-    let flag = true
+  async unTop(ids: number[]) {
     const result = await this.repository.createQueryBuilder().update(Message).set({ isTop: 0 }).where('id in (:...ids)', { ids }).execute()
-    if (!result.raw.affectedRows) {
-      flag = false
-    }
-    return flag
+    return Boolean(result.raw.affectedRows)
   }
 }

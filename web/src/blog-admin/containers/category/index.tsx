@@ -1,17 +1,18 @@
 import React, { memo, useCallback, useEffect, useState, useRef, useMemo } from 'react'
 import { WrappedContainer } from '@common/components'
 import { message, Table, Tabs, Button, Tag, Input, Row, Col, Tooltip, Badge } from 'antd'
-import { UnlockOutlined, LockOutlined, DeleteOutlined, HomeOutlined, ReloadOutlined } from '@ant-design/icons'
+import { UnlockOutlined, LockOutlined, DeleteOutlined, HomeOutlined, ReloadOutlined, PlusOutlined } from '@ant-design/icons'
 import moment from 'moment'
 import { adminCategoryServices } from '@blog-admin/services/category'
 import { adminSortServices } from '@blog-admin/services/sort'
-import CategoryForm from './category-form'
+import EditForm from './edit-form'
 import type { FC, ReactNode } from 'react'
 import type { RouteComponentProps } from 'react-router'
 import type { Sort, Category } from '@blog-admin/types'
 import type { TableProps } from 'antd/lib/table'
 import type { SorterResult } from 'antd/lib/table/interface'
 import type { TabsProps } from 'antd/lib/tabs'
+import type { SearchProps } from 'antd/lib/input/Search'
 
 export type ListItem = (Sort | Category)['listItemByAdminRole']
 export type ToggleEditorialPanel = (editCateInSortPanel?: boolean, record?: ListItem) => void
@@ -40,6 +41,11 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
     setFilters({})
     inputSearchRef.current?.setValue?.('')
     setPagination((prevValue) => ({ ...prevValue, current: 1 }))
+  }, [])
+
+  const handleSearch = useCallback<SearchProps['onSearch']>((value) => {
+    setPagination((prevValue) => ({ ...prevValue, current: 1 }))
+    setConditionQuery((prevValue) => ({ ...prevValue, name: value.trim() }))
   }, [])
 
   const getAllSortList = useCallback<() => void>(async () => {
@@ -244,7 +250,6 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
       .then(([res, err]) => {
         if (err) throw err
         setLoading(false)
-        setSelectedItems([])
         setTotal(res.data.total)
         setDataSource(res.data.list)
       })
@@ -270,11 +275,26 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
     return (
       <Row align="middle" style={{ marginBottom: '15px' }}>
         <Col xs={12} sm={13} md={15} lg={16} xl={17}>
-          <Button type="primary" size="small" onClick={() => toggleEditorialPanel()}>
+          <Button
+            icon={<PlusOutlined />}
+            type="primary"
+            size="small"
+            onClick={() => {
+              toggleEditorialPanel()
+            }}
+          >
             新增
           </Button>
           {tabKey === 'sort' && (
-            <Button type="primary" size="small" style={{ marginLeft: 10 }} onClick={() => toggleEditorialPanel(true)}>
+            <Button
+              icon={<PlusOutlined />}
+              type="primary"
+              size="small"
+              style={{ marginLeft: 10 }}
+              onClick={() => {
+                toggleEditorialPanel(true)
+              }}
+            >
               新增子分类
             </Button>
           )}
@@ -336,20 +356,11 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
           </Tooltip>
         </Col>
         <Col xs={10} sm={9} md={8} lg={7} xl={6}>
-          <Input.Search
-            ref={inputSearchRef}
-            placeholder="Enter something"
-            onSearch={(value) => {
-              setPagination((prevValue) => ({ ...prevValue, current: 1 }))
-              setConditionQuery((prevValue) => ({ ...prevValue, name: value.trim() }))
-            }}
-            enterButton
-            allowClear
-          />
+          <Input.Search ref={inputSearchRef} placeholder="Enter something" onSearch={handleSearch} enterButton allowClear />
         </Col>
       </Row>
     )
-  }, [tabKey, selectedItems, toggleEditorialPanel, handleItems, showDataByDefaultWay])
+  }, [tabKey, selectedItems, toggleEditorialPanel, handleItems, handleSearch, showDataByDefaultWay])
 
   const contentTableComponent = useMemo<ReactNode>(() => {
     return (
@@ -392,7 +403,7 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
   const editFormComponent = useMemo<ReactNode>(() => {
     if (!editFormVisible) return null
     return (
-      <CategoryForm
+      <EditForm
         type={editFormType}
         visible={editFormVisible}
         initialValues={editFormData}
