@@ -2,7 +2,6 @@ import React from 'react'
 import { RouteConfig } from '@common/types'
 import { asyncComponent } from '@common/utils'
 import { AlipayOutlined, ZhihuOutlined } from '@ant-design/icons'
-// import { hot } from 'react-hot-loader/root'
 
 const routes: RouteConfig[] = [
   {
@@ -20,6 +19,11 @@ const routes: RouteConfig[] = [
     // authPoints: ['blog.super_admin-is', 'blog.personal_admin-is'],
     // authOperator: 'or',
     icon: <ZhihuOutlined />,
+  },
+  {
+    path: '/',
+    menuKey: 'index',
+    redirect: '/category',
   },
 ]
 

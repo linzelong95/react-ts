@@ -3,7 +3,7 @@ const path = require('path')
 const fs = require('fs')
 
 function getModuleStatics(moduleName): Record<'js' | 'css', { path: string; release: string; editor: string }> | null {
-  const appManifestPath = path.resolve(__dirname, `'../manifest/${moduleName}.manifest.json`)
+  const appManifestPath = path.resolve(__dirname, `../manifest/${moduleName}.manifest.json`)
   if (!fs.existsSync(appManifestPath)) return null
   return {
     js: require(appManifestPath)[`${moduleName}.js`],
