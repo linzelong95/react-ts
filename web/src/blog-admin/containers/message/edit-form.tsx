@@ -5,7 +5,7 @@ import type { FC } from 'react'
 import type { ModalProps } from 'antd/lib/modal'
 import type { ToggleEditorialPanel, SaveData, ListItem } from '../message'
 
-interface CateForm extends ModalProps {
+interface EditFormProps extends ModalProps {
   initialValues?: ListItem
   onSave: SaveData
   onToggleEditorialPanel: ToggleEditorialPanel
@@ -18,7 +18,7 @@ const layout = {
   wrapperCol: { span: 17 },
 }
 
-const CategoryForm: FC<CateForm> = memo((props) => {
+const EditForm: FC<EditFormProps> = memo((props) => {
   const { initialValues, visible, onSave, onToggleEditorialPanel, ...restProps } = props
   const [form] = Form.useForm<FormDataWhenEdited>()
 
@@ -69,7 +69,7 @@ const CategoryForm: FC<CateForm> = memo((props) => {
                 <Select.Option value={1}>是</Select.Option>
               </Select>
             </Form.Item>
-            <Form.Item>{initialValues.message}</Form.Item>
+            <Form.Item label="原留言">{initialValues.message}</Form.Item>
           </>
         )}
         <Form.Item label="留言" name="message" rules={[{ required: true, message: '请输入留言内容!' }]}>
@@ -86,4 +86,4 @@ const CategoryForm: FC<CateForm> = memo((props) => {
   )
 })
 
-export default CategoryForm
+export default EditForm

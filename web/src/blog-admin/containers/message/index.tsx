@@ -2,7 +2,6 @@ import React, { memo, useMemo, useState, useCallback, useRef, useEffect } from '
 import { WrappedContainer } from '@common/components'
 import { message, Row, Col, Button, List, Checkbox, Avatar, Tag, Input, Tooltip, Badge, Modal } from 'antd'
 import {
-  UnlockOutlined,
   EyeOutlined,
   DeleteOutlined,
   HomeOutlined,
@@ -32,7 +31,7 @@ import styles from './index.less'
 export type ListItem = Message['listItemByAdminRole']
 export type ToggleEditorialPanel = (record?: ListItem) => void
 export type SaveData = (params: Message['editParams']) => void
-type HandleItems = (type: 'remove' | 'reply' | 'approve' | 'disapprove' | 'top' | 'unTop', record?: ListItem) => void
+type HandleItems = (type: 'remove' | 'approve' | 'disapprove' | 'top' | 'unTop', record?: ListItem) => void
 type FilterRequest = (type: 'ok' | 'exit' | 'clear') => void
 type TemporaryCondition = {
   commonFilterArr?: ['isTop'?, 'isApproved'?, 'isParent'?, 'isSon'?]
@@ -312,17 +311,6 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
                 删除
               </Button>
               <Button
-                icon={<UnlockOutlined />}
-                type="primary"
-                size="small"
-                onClick={() => {
-                  handleItems('reply')
-                }}
-                style={{ marginLeft: 10 }}
-              >
-                回复
-              </Button>
-              <Button
                 icon={<EyeOutlined />}
                 type="primary"
                 size="small"
@@ -432,7 +420,7 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
                 size="small"
                 type="primary"
                 onClick={() => {
-                  handleItems('reply', item)
+                  toggleEditorialPanel(item)
                 }}
               >
                 回复
@@ -499,7 +487,18 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
         )}
       />
     )
-  }, [loading, dataSource, total, pagination, allSelectedFlag, selectedItems, pageChange, toggleSelectOne, handleItems])
+  }, [
+    loading,
+    dataSource,
+    total,
+    pagination,
+    allSelectedFlag,
+    selectedItems,
+    pageChange,
+    toggleSelectOne,
+    handleItems,
+    toggleEditorialPanel,
+  ])
 
   const filterModalComponent = useMemo(() => {
     return (

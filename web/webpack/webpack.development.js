@@ -60,7 +60,8 @@ module.exports = merge(commonConfig, {
     port: 7002,
     // publicPath: '/static/',
     publicPath: '/',
-    hot: true, // 热更新
+    hot: true, // 尝试热替换，失败则尝试热更新
+    // hotOnly: true, // 只允许热替换
     open: true, // 打开默认浏览器
     compress: true, // 是否启用 gzip 压缩
     // stats: 'errors-only', // 终端仅打印 error

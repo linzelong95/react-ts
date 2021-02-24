@@ -10,13 +10,14 @@
     ["@babel/plugin-proposal-class-properties", { "loose": true }],
     "@babel/plugin-syntax-dynamic-import",
     "@babel/plugin-proposal-optional-chaining",
-    "@babel/plugin-proposal-nullish-coalescing-operator"
-  ],
-  "env": {
-    "development": {
-      "plugins": ["react-hot-loader/babel"]
-    }
-  }
+    "@babel/plugin-proposal-nullish-coalescing-operator",
+    "react-hot-loader/babel"
+  ]
+  // "env": {
+  //   "development": {
+  //     "plugins": ["react-hot-loader/babel"]
+  //   }
+  // }
 }
 
 // npm install babel-plugin-import --save-dev

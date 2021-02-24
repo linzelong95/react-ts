@@ -1,5 +1,6 @@
 import React from 'react'
 import { BrowserRouter } from 'react-router-dom'
+import { hot } from 'react-hot-loader/root'
 import { ErrorBoundary, BasicLayout } from '@common/components'
 import { Provider } from 'react-redux'
 import { ConfigProvider } from 'antd'
@@ -43,4 +44,4 @@ const Framework: FC<FrameworkOptions> = (props) => {
   )
 }
 
-export default Framework
+export default hot(Framework)
