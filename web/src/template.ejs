@@ -12,7 +12,7 @@
     <% } %>
     <% if(scripts && Array.isArray(scripts.jsList)) { %>
       <% for (const js of scripts.jsList) { %>
-        <script src="<%= js %>"></script>
+        <script defer type="text/javascript" src="<%= js %>"></script>
       <% } %>
     <% } %>
   </head>

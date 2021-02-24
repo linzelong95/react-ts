@@ -83,6 +83,7 @@ module.exports = merge(commonConfig, {
     proxy: {
       '/api/': {
         target: 'http://127.0.0.1:7001/',
+        // 该配置只是让后端读取request.getHeader("Host")是代理后的地址，但在浏览器控制面板还是显示源请求
         changeOrigin: true,
         // pathRewrite: {
         //   '^/api': '',
@@ -95,13 +96,14 @@ module.exports = merge(commonConfig, {
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
       'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization',
     },
+    host: '0.0.0.0', // 允许局域网中其他设备访问本地服务
   },
 
   plugins: [
     ...BUILD_MODULES.map((moduleName) => {
       if (moduleName === 'base') return null
       return new HtmlWebpackPlugin({
-        template: path.resolve(WEB_ROOT, './src/index.dev.ejs'),
+        template: path.resolve(WEB_ROOT, './src/template.ejs'),
         filename: `${moduleName}/index.html`,
         cache: false, // 特别重要：防止之后使用v6版本 copy-webpack-plugin 时代码修改一刷新页面为空问题。
         templateParameters: {
