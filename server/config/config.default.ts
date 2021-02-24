@@ -27,6 +27,8 @@ AuywA3t/EolsPMvFVQIDAQAB
 -----END PUBLIC KEY-----
 `
 
+const isApi = /^\/api\//
+
 export default (appInfo: EggAppInfo) => {
   const config = {} as PowerPartial<EggAppConfig>
 
@@ -71,11 +73,14 @@ export default (appInfo: EggAppInfo) => {
   }
 
   // 中间件
-  config.middleware = ['passport', 'request', 'response']
+  config.middleware = ['request', 'response', 'passport']
 
   // 中间件passport的默认参数
   config.passport = {
+    isApi,
     rsaPrivateKey,
+    adminUrlRegexList: [/^\/api\/admin\/.+/],
+    authUserUrlRegexList: [/^\/api\/user\/[^?]+\/(delete|save)/],
   }
 
   config.request = {
@@ -84,7 +89,7 @@ export default (appInfo: EggAppInfo) => {
 
   // 中间件response的默认配置
   config.response = {
-    isApi: /^\/api\//,
+    isApi,
   }
 
   config.security = {

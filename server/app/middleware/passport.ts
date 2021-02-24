@@ -10,6 +10,7 @@ import type { Context, Application } from 'egg'
 const LocalStrategy = passportLocal.Strategy
 
 module.exports = (options, app: Application) => {
+  const { rsaPrivateKey, isApi, adminUrlRegexList = [], authUserUrlRegexList = [] } = options || {}
   passport.serializeUser((user, done) => {
     // 序列化ctx.login()触发
     delete user.password
@@ -47,7 +48,7 @@ module.exports = (options, app: Application) => {
         // 私钥解密
         const rsaPwd = Buffer.from(password, 'base64')
         // const decrypted = crypto.privateDecrypt({ key: privateKey, padding: crypto.constants.RSA_PKCS1_PADDING }, rsaPwd);// 旧版本
-        const decrypted = crypto.privateDecrypt({ key: options.rsaPrivateKey, padding: constants.RSA_PKCS1_PADDING }, rsaPwd)
+        const decrypted = crypto.privateDecrypt({ key: rsaPrivateKey, padding: constants.RSA_PKCS1_PADDING }, rsaPwd)
         const md5Pwd = decrypted.toString('utf8') // 解密完成
         const user = await getRepository(User)
           .createQueryBuilder('user')
@@ -64,19 +65,25 @@ module.exports = (options, app: Application) => {
   app.use(passport.session())
   ;(app as any).passport = passport
   return async (ctx: Context, next: any) => {
-    const adminUrls = ['/admin/']
-    const userUrls = ['/user/comment/delete', '/user/comment/insert']
-    if (userUrls.some((i) => ctx.originalUrl.includes(i)) && !ctx.isAuthenticated()) {
+    const { originalUrl } = ctx
+    if (!isApi.test(originalUrl)) return await next()
+    if (authUserUrlRegexList.some((regex) => regex.test(originalUrl))) {
+      if (ctx.isAuthenticated()) return await next()
       ctx.body = { code: StatusCode.NOT_LOGGED, message: '用户未登录' }
+      return
     }
-    if (adminUrls.some((i) => ctx.originalUrl.includes(i))) {
+    if (adminUrlRegexList.some((regex) => regex.test(originalUrl))) {
       if (!ctx.isAuthenticated()) {
         // TODO
         // ctx.body = { message: '管理员未登录!', needRedirect: true }
         ctx.body = { code: StatusCode.NOT_LOGGED_FOR_ADMIN, message: '管理员未登录' }
-      } else if (ctx.state.user.roleName !== 'admin') {
-        ctx.body = { code: StatusCode.FORBIDDEN, message: '无权限操作' }
+        return
       }
+      if (ctx.isAuthenticated() && ctx.state.user.roleName !== 'admin') {
+        ctx.body = { code: StatusCode.FORBIDDEN, message: '无权限操作' }
+        return
+      }
+      return await next()
     }
     await next()
   }

@@ -51,6 +51,6 @@ export default class HomeController extends Controller {
     if (baseStatics?.js?.path) renderData.jsList.unshift(baseStatics.js.path)
     if (baseStatics?.css?.path) renderData.cssList.push(baseStatics.css.path)
     if (moduleStatics?.css?.path) renderData.cssList.push(moduleStatics.css.path)
-    ctx.render('index.ejs', renderData)
+    return ctx.render('index.ejs', renderData) // don't forget 'return'
   }
 }

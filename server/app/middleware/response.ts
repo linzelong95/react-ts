@@ -12,13 +12,12 @@ module.exports = (options, app: Application) => async (ctx: Context, next) => {
         ctx.body = { code: 404, message: 'Api not found!' }
         return
       }
-      ctx.render('error.ejs', {
+      return ctx.render('error.ejs', {
         ...app.config.locals,
         code: 404,
         message: '页面未找到',
         title: '页面未找到',
       })
-      return
     }
 
     const isApplicationJson = /application\/json/.test((ctx.response?.header?.['content-type'] as string) || '')
