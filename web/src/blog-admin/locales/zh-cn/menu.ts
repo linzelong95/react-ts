@@ -1,6 +1,6 @@
 export default {
   category: '分类',
-  baidu: '百度',
+  message: '留言',
   c: '路由c',
   d: '路由d',
   testC: '路由test-c',

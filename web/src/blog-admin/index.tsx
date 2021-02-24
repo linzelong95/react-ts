@@ -1,5 +1,6 @@
 import { renderApp } from '@common/components'
 import routes from './configs/routes'
+import './locales'
 
 renderApp({
   appName: 'my blog',

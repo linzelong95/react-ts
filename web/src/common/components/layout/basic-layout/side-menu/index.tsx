@@ -12,15 +12,15 @@ import type { MenuProps } from 'antd/es/menu'
 import type { DrawerProps } from 'antd/es/drawer'
 import styles from '../index.less'
 
-function getMenuItems(basename: string, routes: RouteConfig[], flattedAccessRoutes: RouteConfig[], t: TFunction<string>): JSX.Element[] {
+function getMenuItems(routes: RouteConfig[], flattedAccessRoutes: RouteConfig[], t: TFunction<string>): JSX.Element[] {
   return routes?.map((route) => {
     const { path, icon, menuKey } = route
     const enableRoute = flattedAccessRoutes.find((route) => route.path === path)
     if (path === '/' || path.includes('/:') || !enableRoute) return null
-    const menuName = t(`${basename.slice(1)}.menu.${menuKey}`)
+    const menuName = t(`menu.${menuKey}`)
     return route.routes?.length ? (
       <Menu.SubMenu key={path} icon={icon} title={menuName}>
-        {getMenuItems(basename, route.routes, flattedAccessRoutes, t)}
+        {getMenuItems(route.routes, flattedAccessRoutes, t)}
       </Menu.SubMenu>
     ) : (
       <Menu.Item key={path} icon={icon}>
@@ -31,7 +31,7 @@ function getMenuItems(basename: string, routes: RouteConfig[], flattedAccessRout
 }
 
 interface SideMenuProps {
-  basename: string
+  basename?: string // 暂时用不到
   routes: RouteConfig[]
   flattedAccessRoutes: Omit<RouteConfig, 'routes'>[]
   isSmallViewPort: boolean
@@ -41,14 +41,14 @@ interface SideMenuProps {
 }
 
 const SideMenu: FC<SideMenuProps> = memo((props) => {
-  const { basename, routes, flattedAccessRoutes, isMobile, isSmallViewPort, menuDrawerVisible, onToggleMenuDrawer } = props
+  const { routes, flattedAccessRoutes, isMobile, isSmallViewPort, menuDrawerVisible, onToggleMenuDrawer } = props
   const history = useHistory()
   const { pathname } = useLocation()
   const { t } = useTranslation()
   const [selectedMenuKeys, setSelectedMenuKeys] = useState<MenuProps['selectedKeys']>([])
   const [menuOpenKeys, setMenuOpenKeys] = useState<MenuProps['openKeys']>([])
   const enableRoute = flattedAccessRoutes.find((route) => route.path === selectedMenuKeys?.[0])
-  useTitle(`${t(`${basename.slice(1)}.menu.${enableRoute?.menuKey}`)}-briefNull`)
+  useTitle(`${t(`menu.${enableRoute?.menuKey}`)}-briefNull`)
   const [sideCollapsed, setSideCollapsed] = useState<SiderProps['collapsed']>(() => isSmallViewPort)
 
   const clickMenu = useCallback<MenuProps['onClick']>(
@@ -87,10 +87,10 @@ const SideMenu: FC<SideMenuProps> = memo((props) => {
         theme={isMobile ? 'dark' : 'light'}
         mode="inline"
       >
-        {getMenuItems(basename, routes, flattedAccessRoutes, t)}
+        {getMenuItems(routes, flattedAccessRoutes, t)}
       </Menu>
     ),
-    [basename, selectedMenuKeys, menuOpenKeys, routes, flattedAccessRoutes, isMobile, t, clickMenu, openChangeMenu],
+    [selectedMenuKeys, menuOpenKeys, routes, flattedAccessRoutes, isMobile, t, clickMenu, openChangeMenu],
   )
 
   return isMobile ? (

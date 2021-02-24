@@ -1,4 +1,5 @@
-import common from './common'
-import blogAdmin from './blog-admin'
-
-export default { common, 'blog-admin': blogAdmin }
+export default {
+  login: 'Login',
+  register: 'Register',
+  logout: 'Logout',
+}

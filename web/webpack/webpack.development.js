@@ -69,7 +69,14 @@ module.exports = merge(commonConfig, {
     disableHostCheck: true,
     quiet: true,
     // 如果devServer.publicPath不设置但output.publicPath为/additional-path/,这里需要修改为：{index:'/additional-path/'}
-    historyApiFallback: true,
+    // historyApiFallback: true,
+    historyApiFallback: {
+      rewrites: BUILD_MODULES.map((moduleName) => {
+        const regExp = new RegExp(`^\\/${moduleName}(\\/.*)*`)
+        return { from: regExp, to: `/${moduleName}` }
+      }),
+    },
+    openPage: BUILD_MODULES,
     watchOptions: {
       poll: true,
     },
@@ -91,10 +98,11 @@ module.exports = merge(commonConfig, {
   },
 
   plugins: [
-    !BUILD_MODULES.includes('base') &&
-      new HtmlWebpackPlugin({
+    ...BUILD_MODULES.map((moduleName) => {
+      if (moduleName === 'base') return null
+      return new HtmlWebpackPlugin({
         template: path.resolve(WEB_ROOT, './src/index.dev.ejs'),
-        filename: 'index.html',
+        filename: `${moduleName}/index.html`,
         cache: false, // 特别重要：防止之后使用v6版本 copy-webpack-plugin 时代码修改一刷新页面为空问题。
         templateParameters: {
           favicon: 'http://127.0.0.1:7001/public/assets/images/logo.png',
@@ -112,8 +120,8 @@ module.exports = merge(commonConfig, {
             },
             { cssList: [], jsList: [] },
           ),
+          chunks: [moduleName], // 若不设置则默认将当前entry多文件全部注入
           // chunksSortMode:'manual',//不设置时，默认顺序以entry的顺序
-          // chunks:['entry_1_name','entry_2_name'] //默认当前entry多文件（如果有多个的话）全部注入
           // excludeChunks:[],// 拒绝当前打包的入口文件的某些注入到html中，默认不排除
         },
         minify: isDevelopment
@@ -132,8 +140,8 @@ module.exports = merge(commonConfig, {
               minifyURLs: true,
               useShortDoctype: true,
             },
-      }),
-
+      })
+    }),
     new webpack.HotModuleReplacementPlugin(),
   ].filter(Boolean),
 })
