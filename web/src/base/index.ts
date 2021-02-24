@@ -40,5 +40,3 @@ import '@common/styles/index.global.less'
 ;(window as any).enUS = enUS
 ;(window as any).zhCN = zhCN
 ;(window as any).Sentry = Sentry
-
-if (module && module.hot) module.hot.accept()
