@@ -1,4 +1,6 @@
 const os = require('os')
+const fs = require('fs')
+const glob = require('glob')
 const path = require('path')
 
 const PROJECT_PATH = path.resolve(__dirname, '../../')
@@ -18,14 +20,25 @@ const WEB_ROOT = path.resolve(__dirname, '../')
 const PROJECT_NAME = path.parse(PROJECT_PATH).name
 // 项目依赖的公共模块
 const COMMON_MODULES = ['common']
-// 动态生成要编译的模块
-const BUILD_MODULES = process.env.BUILD_MODULES.split('&').filter((moduleName) => !COMMON_MODULES.includes(moduleName))
+// 动态生成要编译的模块,进入webpack构建时，才有process.env.BUILD_MODULES注入
+const envBuildModules = process && process.env && process.env.BUILD_MODULES
+const BUILD_MODULES = (envBuildModules && envBuildModules.split('&').filter((moduleName) => !COMMON_MODULES.includes(moduleName))) || []
+
+const ALL_MODULES = glob
+  .sync(`${WEB_ROOT}/src/*`)
+  .map((path) => {
+    if (fs.lstatSync(path).isFile()) return null
+    const [dirName] = path.split('/').slice(-1)
+    return dirName
+  })
+  .filter(Boolean)
 
 module.exports = {
   PROJECT_PATH,
   WEB_ROOT,
   PROJECT_NAME,
   BUILD_MODULES,
+  ALL_MODULES,
   COMMON_MODULES,
   RELEASE_TAG,
   MANIFEST_ROOT,

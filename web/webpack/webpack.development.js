@@ -2,9 +2,10 @@ const webpack = require('webpack')
 const { merge } = require('webpack-merge')
 const glob = require('glob')
 const path = require('path')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const commonConfig = require('./webpack.common')
-const { WEB_ROOT, PUBLIC_ROOT, BUILD_MODULES } = require('./constants')
+const { WEB_ROOT, PUBLIC_ROOT, BUILD_MODULES, ALL_MODULES } = require('./constants')
 
 // class MyInjectCustomScriptsPlugin {
 //   constructor(options) {
@@ -52,22 +53,23 @@ module.exports = merge(commonConfig, {
     assetModuleFilename: (pathData) => `${pathData.runtime}/js/asset/[name][ext][query]`,
   },
 
-  // DEV 配置
   devtool: 'eval-cheap-module-source-map',
-  watch: true,
-  target: 'web',
+  // watch: true, // devServer默认启动
+  // target: 'web', // 默认
   devServer: {
     port: 7002,
+    host: '127.0.0.1', // '0.0.0.0',允许局域网中其他设备访问本地服务
     // publicPath: '/static/',
     publicPath: '/',
     hot: true, // 尝试热替换，失败则尝试热更新
     // hotOnly: true, // 只允许热替换
+    injectHot: true,
     open: true, // 打开默认浏览器
+    progress: true, // 显示进度
     compress: true, // 是否启用 gzip 压缩
-    // stats: 'errors-only', // 终端仅打印 error
+    stats: 'errors-only', // 只在发生错误时输出
     clientLogLevel: 'silent', // 日志等级
     disableHostCheck: true,
-    quiet: true,
     // 如果devServer.publicPath不设置但output.publicPath为/additional-path/,这里需要修改为：{index:'/additional-path/'}
     // historyApiFallback: true,
     historyApiFallback: {
@@ -79,6 +81,10 @@ module.exports = merge(commonConfig, {
     openPage: BUILD_MODULES,
     watchOptions: {
       poll: true,
+      aggregateTimeout: 0,
+      ignored: ALL_MODULES.map((moduleName) =>
+        BUILD_MODULES.includes(moduleName) || moduleName === 'common' ? null : `**/${moduleName}/**`,
+      ).filter(Boolean),
     },
     proxy: {
       '/api/': {
@@ -96,24 +102,29 @@ module.exports = merge(commonConfig, {
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
       'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization',
     },
-    host: '0.0.0.0', // 允许局域网中其他设备访问本地服务
   },
 
   plugins: [
+    // 复制
+    new CopyWebpackPlugin({
+      patterns: [{ from: path.resolve(PUBLIC_ROOT, './base'), to: '/base' }],
+    }),
+
     ...BUILD_MODULES.map((moduleName) => {
       if (moduleName === 'base') return null
       return new HtmlWebpackPlugin({
         template: path.resolve(WEB_ROOT, './src/template.ejs'),
         filename: `${moduleName}/index.html`,
-        cache: false, // 特别重要：防止之后使用v6版本 copy-webpack-plugin 时代码修改一刷新页面为空问题。
+        inject: 'body',
+        scriptLoading: 'blocking',
         templateParameters: {
           favicon: 'http://127.0.0.1:7001/public/assets/images/logo.png',
           scripts: glob.sync(`${path.resolve(PUBLIC_ROOT, './base')}/**/*{.css,.js}`, { nodir: true }).reduce(
             (scripts, path) => {
-              const validPaths = path.split('/').slice(-2)
-              const file = `http://127.0.0.1:7001/public/base/${validPaths.join('/')}`
+              // const validPaths = path.split('/').slice(-2)
+              // const file = `http://127.0.0.1:7001/public/base/${validPaths.join('/')}`
+              const file = `/${path.split('/').slice(-3).join('/')}`
               if (file.endsWith('.js')) {
-                // 这样会导致locales没有包含进来，不过影响不大
                 if (!ifHandleAllLibs) scripts.jsList.push(file)
               } else {
                 scripts.cssList.push(file)
@@ -122,10 +133,10 @@ module.exports = merge(commonConfig, {
             },
             { cssList: [], jsList: [] },
           ),
-          chunks: [moduleName], // 若不设置则默认将当前entry多文件全部注入
-          // chunksSortMode:'manual',//不设置时，默认顺序以entry的顺序
-          // excludeChunks:[],// 拒绝当前打包的入口文件的某些注入到html中，默认不排除
         },
+        chunks: [moduleName], // 若不设置则默认将当前entry多文件全部注入
+        // chunksSortMode:'manual',//不设置时，默认顺序以entry的顺序
+        // excludeChunks:[],// 拒绝当前打包的入口文件的某些注入到html中，默认不排除
         minify: isDevelopment
           ? false
           : {

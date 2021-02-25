@@ -18,9 +18,6 @@ import enUS from 'antd/lib/locale/en_US'
 import zhCN from 'antd/lib/locale/zh_CN'
 import * as Sentry from '@sentry/browser'
 
-// // 语言
-// import '@common/locales'
-
 // 公共样式
 import '@common/styles/index.global.less'
 

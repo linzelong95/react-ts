@@ -2,7 +2,6 @@ const { merge } = require('webpack-merge')
 // const glob = require('glob')
 // const path = require('path')
 // const PurgeCSSPlugin = require('purgecss-webpack-plugin')
-// const CopyWebpackPlugin = require('copy-webpack-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
@@ -24,7 +23,7 @@ const productionConfig = {
   mode: 'production',
 
   output: {
-    filename: '[name]/js/[name].[contenthash:8].js',
+    filename: '[name]/js/[name]-[contenthash:8].js',
     path: PUBLIC_ROOT,
     publicPath: '/public/',
     chunkFilename: (pathData) => `${pathData.chunk.runtime}/js/router/[id].js`,
@@ -52,7 +51,7 @@ const productionConfig = {
   plugins: [
     // 抽离出css
     new MiniCssExtractPlugin({
-      filename: '[name]/css/[name].[contenthash:8].css',
+      filename: '[name]/css/[name]-[contenthash:8].css',
     }),
 
     // 删除无用文件
@@ -67,14 +66,6 @@ const productionConfig = {
     //   new PurgeCSSPlugin({
     //     paths: glob.sync(`${path.resolve(WEB_ROOT, './src')}/**/*`, { nodir: true }),
     //   }),
-
-    // 复制一些东西，如果有需要的话
-    // new CopyWebpackPlugin({
-    //   patterns: [
-    //     // TEST
-    //     { from: path.resolve(WEB_ROOT, 'src/public'), to: path.resolve(WEB_ROOT, 'dist/public') },
-    //   ],
-    // }),
 
     // sentry 上报
     // new SentryPlugin({

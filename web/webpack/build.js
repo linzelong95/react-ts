@@ -5,6 +5,8 @@ const execa = require('execa')
 const modules = process.argv.slice(3)
 const mode = process.argv[2]
 
+const { ALL_MODULES } = require('./constants')
+
 if (!['dev', 'dev-all-libs', 'build', 'build-all', 'analyzer'].includes(mode)) {
   throw new Error('您输入的指令有误')
 }
@@ -15,6 +17,10 @@ if (!modules.length) {
 
 if (modules.length > 1 && modules.includes('base')) {
   throw new Error('base模块请单独打包')
+}
+
+if (modules.some((module) => !ALL_MODULES.includes(module))) {
+  throw new Error('请检查模块是否存在')
 }
 
 const env = {

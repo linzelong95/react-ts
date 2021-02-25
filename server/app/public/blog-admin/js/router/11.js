@@ -1,2 +1,0 @@
-(self.webpackChunkyyy=self.webpackChunkyyy||[]).push([[11],{5011:function(e,t,n){"use strict";n.r(t);var u=n(63804),s=n.n(u),a=n(847);t.default=function(){(0,a.useHistory)(),(0,a.useParams)(),(0,a.useLocation)();return s().createElement(s().Fragment,null,s().createElement("div",null,"test-c 222"))}}}]);
-//# sourceMappingURL=11.js.map

@@ -10,13 +10,13 @@
         <link rel="stylesheet" href="<%= css %>"></link>
       <% } %>
     <% } %>
-    <% if(scripts && Array.isArray(scripts.jsList)) { %>
-      <% for (const js of scripts.jsList) { %>
-        <script defer type="text/javascript" src="<%= js %>"></script>
-      <% } %>
-    <% } %>
   </head>
   <body>
     <div id="root"></div>
+    <% if(scripts && Array.isArray(scripts.jsList)) { %>
+      <% for (const js of scripts.jsList) { %>
+        <script src="<%= js %>"></script>
+      <% } %>
+    <% } %>
   </body>
 </html>
