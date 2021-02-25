@@ -26,7 +26,7 @@ const productionConfig = {
     filename: '[name]/js/[name]-[contenthash:8].js',
     path: PUBLIC_ROOT,
     publicPath: '/public/',
-    chunkFilename: (pathData) => `${pathData.chunk.runtime}/js/router/[id].js`,
+    chunkFilename: (pathData) => `${pathData.chunk.runtime}/js/chunks/[id].js`,
     assetModuleFilename: (pathData) => `${pathData.runtime}/js/asset/[name]-[hash][ext][query]`,
   },
 
@@ -52,6 +52,7 @@ const productionConfig = {
     // 抽离出css
     new MiniCssExtractPlugin({
       filename: '[name]/css/[name]-[contenthash:8].css',
+      chunkFilename: (pathData) => `${pathData.chunk.runtime}/css/chunks/[id].css`,
     }),
 
     // 删除无用文件
