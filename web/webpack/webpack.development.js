@@ -53,8 +53,8 @@ module.exports = merge(commonConfig, {
   },
 
   devtool: 'eval-cheap-module-source-map',
-  // watch: true, // devServer默认启动
-  // target: 'web', // 默认
+  watch: true, // devServer默认启动
+  target: 'web', // 默认
   devServer: {
     port: 7002,
     host: '127.0.0.1', // '0.0.0.0',允许局域网中其他设备访问本地服务
@@ -62,14 +62,13 @@ module.exports = merge(commonConfig, {
     publicPath: '/',
     hot: true, // 尝试热替换，失败则尝试热更新
     // hotOnly: true, // 只允许热替换
-    injectHot: true,
     open: true, // 打开默认浏览器
     // progress: true, // 显示进度
     compress: true, // 是否启用 gzip 压缩
     stats: 'errors-only', // 只在发生错误时输出
     clientLogLevel: 'silent', // 日志等级
     quiet: true,
-    disableHostCheck: true,
+    // disableHostCheck: true,
     // 如果devServer.publicPath不设置但output.publicPath为/additional-path/,这里需要修改为：{index:'/additional-path/'}
     // historyApiFallback: true,
     historyApiFallback: {
@@ -81,7 +80,7 @@ module.exports = merge(commonConfig, {
     openPage: BUILD_MODULES,
     watchOptions: {
       poll: true,
-      aggregateTimeout: 0,
+      aggregateTimeout: 100,
       ignored: ALL_MODULES.map((moduleName) =>
         BUILD_MODULES.includes(moduleName) || moduleName === 'common' ? null : `**/${moduleName}/**`,
       ).filter(Boolean),

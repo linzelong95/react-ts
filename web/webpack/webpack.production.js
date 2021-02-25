@@ -30,7 +30,7 @@ const productionConfig = {
     assetModuleFilename: (pathData) => `${pathData.runtime}/js/asset/[name]-[hash][ext][query]`,
   },
 
-  devtool: 'source-map',
+  devtool: 'cheap-module-source-map',
 
   optimization: {
     minimize: true,

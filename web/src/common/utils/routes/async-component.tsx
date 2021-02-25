@@ -33,6 +33,8 @@ import type { RouteProps } from 'react-router-dom'
 
 function asyncComponent<T = RouteProps['component']>(importedComponent: () => Promise<{ default: T }>): T {
   class LazyComponent extends React.Component<unknown, { component: T }> {
+    unMounted = false
+
     constructor(props) {
       super(props)
       this.state = {
@@ -42,7 +44,11 @@ function asyncComponent<T = RouteProps['component']>(importedComponent: () => Pr
 
     async componentDidMount() {
       const componentRes = await importedComponent()
-      this.setState({ component: componentRes?.default })
+      if (!this.unMounted) this.setState({ component: componentRes?.default })
+    }
+
+    componentWillUnmount() {
+      this.unMounted = true
     }
 
     render() {

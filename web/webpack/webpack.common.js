@@ -80,6 +80,11 @@ module.exports = {
         ],
       },
       {
+        test: /\.js$/,
+        include: /node_modules\/react-dom/,
+        use: ['react-hot-loader/webpack'],
+      },
+      {
         // 不符合.global.less命名的按照模块引入组件
         test: new RegExp(`^(?!.*\\.global).*\\.less`),
         use: [

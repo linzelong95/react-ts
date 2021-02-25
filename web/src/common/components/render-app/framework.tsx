@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import { hot } from 'react-hot-loader/root'
 import { ErrorBoundary, BasicLayout } from '@common/components'
@@ -33,9 +33,11 @@ const Framework: FC<FrameworkOptions> = (props) => {
         <Provider store={store}>
           <BrowserRouter basename={basename}>
             <ConfigProvider locale={i18n.language === 'zh-CN' ? zhCN : enUS}>
-              <BasicLayout routes={routes} basename={basename}>
-                {renderRoutes(routes)}
-              </BasicLayout>
+              <Suspense fallback={<div>Loading...</div>}>
+                <BasicLayout routes={routes} basename={basename}>
+                  {renderRoutes(routes)}
+                </BasicLayout>
+              </Suspense>
             </ConfigProvider>
           </BrowserRouter>
         </Provider>
