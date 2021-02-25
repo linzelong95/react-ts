@@ -1,5 +1,6 @@
-import React, { createElement } from 'react'
+import React, { Suspense, createElement } from 'react'
 import { Redirect, Route, Switch } from 'react-router-dom'
+import { Spin } from 'antd'
 import { NotFound } from '@common/components'
 import { v4 as uuid } from 'uuid'
 import type { CElement } from 'react'
@@ -10,7 +11,19 @@ function renderRoute(route: RouteConfig, props: RouteComponentProps): JSX.Elemen
   const { component: Component, routes, redirect, path, wrappers } = route
   const redirectComponent = redirect && <Redirect key={`${uuid()}-redirect`} exact from={path} to={redirect} />
   const children = renderRoutes(routes, { redirectComponent, useNotFoundComponent: !Component || Boolean(routes?.length) })
-  let ret = Component ? <Component {...props}>{children}</Component> : children
+  let ret = Component ? (
+    <Suspense
+      fallback={
+        <div style={{ width: '100%', height: 100, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <Spin size="large" />
+        </div>
+      }
+    >
+      <Component {...props}>{children}</Component>
+    </Suspense>
+  ) : (
+    children
+  )
   if (wrappers?.length) {
     let len = wrappers.length - 1
     while (len >= 0) {
