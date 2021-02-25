@@ -1,5 +1,4 @@
 const os = require('os')
-const path = require('path')
 const webpack = require('webpack')
 const autoprefixer = require('autoprefixer')
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin')
@@ -22,7 +21,7 @@ const ifHandleAllLibs = process.env.IF_HANDLE_ALL_LIBS === 'all'
 module.exports = {
   // 应用入口
   entry: BUILD_MODULES.reduce((entryObject, currentModule) => {
-    entryObject[currentModule] = path.resolve(WEB_ROOT, `src/${currentModule}`)
+    entryObject[currentModule] = `${WEB_ROOT}/src/${currentModule}`
     return entryObject
   }, {}),
 
@@ -157,14 +156,15 @@ module.exports = {
 
     ...BUILD_MODULES.map((mdl) => {
       return new WebpackManifestPlugin({
-        fileName: path.resolve(MANIFEST_ROOT, `${mdl}.manifest.json`),
+        fileName: `${MANIFEST_ROOT}/${mdl}.manifest.json`,
         writeToFileEmit: true,
         seed: {},
         generate: (seed, files) => {
           for (const file of files) {
-            if (file.name === `${mdl}.js` || file.name === `${mdl}.css`) {
-              seed[file.name] = {
-                path: file.path,
+            const { name, path } = file
+            if (name === `${mdl}.js` || name === `${mdl}.css`) {
+              seed[name] = {
+                path,
                 editor: os.userInfo().username,
                 release: isDevelopment ? undefined : RELEASE_TAG,
               }
@@ -172,7 +172,7 @@ module.exports = {
           }
           return seed
         },
-        filter: (file) => file.name.endsWith('.js') || file.name.endsWith('.css'),
+        filter: (file) => /\.(js|css)$/.test(file.name),
       })
     }),
   ],

@@ -7,7 +7,7 @@ import getCombinedStore from '@common/store'
 import { NotFound } from '@common/components'
 import type { RouteConfig } from '@common/types'
 
-interface AppOptions {
+interface RenderAppProps {
   // 应用名称
   appName: string
   // 应用基础路径
@@ -20,13 +20,12 @@ interface AppOptions {
   initialStateMap?: Record<string, Record<string, any>>
 }
 
-function renderApp(options: AppOptions): void {
+function renderApp(options: RenderAppProps): void {
   const { reducerMap = {}, initialStateMap = {}, ...frameworkOptions } = options
   const { appName, basename } = frameworkOptions
   const { pathname } = window.location
 
-  // 如果当前路径符合 appPrefix，则渲染
-  if (!pathname.startsWith(basename) && !(window as any).__LOCK_APP_ROOT__) {
+  if (!pathname.startsWith(basename) && !(window as any).__LOCK__) {
     render(<NotFound />, document.querySelector('#root'))
     return
   }
@@ -35,7 +34,7 @@ function renderApp(options: AppOptions): void {
 
   // 开发环境下，可能同时启动多个模块，但NotFound最多只需要渲染一次
   if (process.env.NODE_ENV === 'development') {
-    ;(window as any).__LOCK_APP_ROOT__ = basename
+    ;(window as any).__LOCK__ = basename
   }
 
   const store = getCombinedStore(reducerMap, initialStateMap)

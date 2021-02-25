@@ -1,7 +1,6 @@
 const webpack = require('webpack')
 const { merge } = require('webpack-merge')
 const glob = require('glob')
-const path = require('path')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const commonConfig = require('./webpack.common')
@@ -65,10 +64,11 @@ module.exports = merge(commonConfig, {
     // hotOnly: true, // 只允许热替换
     injectHot: true,
     open: true, // 打开默认浏览器
-    progress: true, // 显示进度
+    // progress: true, // 显示进度
     compress: true, // 是否启用 gzip 压缩
     stats: 'errors-only', // 只在发生错误时输出
     clientLogLevel: 'silent', // 日志等级
+    quiet: true,
     disableHostCheck: true,
     // 如果devServer.publicPath不设置但output.publicPath为/additional-path/,这里需要修改为：{index:'/additional-path/'}
     // historyApiFallback: true,
@@ -107,19 +107,22 @@ module.exports = merge(commonConfig, {
   plugins: [
     // 复制
     new CopyWebpackPlugin({
-      patterns: [{ from: path.resolve(PUBLIC_ROOT, './base'), to: '/base' }],
+      patterns: [{ from: `${PUBLIC_ROOT}/base`, to: '/base' }],
     }),
 
     ...BUILD_MODULES.map((moduleName) => {
       if (moduleName === 'base') return null
       return new HtmlWebpackPlugin({
-        template: path.resolve(WEB_ROOT, './src/template.ejs'),
+        template: `${WEB_ROOT}/src/template.ejs`,
         filename: `${moduleName}/index.html`,
         inject: 'body',
-        scriptLoading: 'blocking',
+        chunks: [moduleName], // 若不设置则默认将当前entry多文件全部注入
+        // chunksSortMode:'manual',//不设置时，默认顺序以entry的顺序
+        // excludeChunks:[],// 拒绝当前打包的入口文件的某些注入到html中，默认不排除
+        // scriptLoading: 'blocking',
         templateParameters: {
           favicon: 'http://127.0.0.1:7001/public/assets/images/logo.png',
-          scripts: glob.sync(`${path.resolve(PUBLIC_ROOT, './base')}/**/*{.css,.js}`, { nodir: true }).reduce(
+          scripts: glob.sync(`${PUBLIC_ROOT}/base/**/*{.css,.js}`, { nodir: true }).reduce(
             (scripts, path) => {
               // const validPaths = path.split('/').slice(-2)
               // const file = `http://127.0.0.1:7001/public/base/${validPaths.join('/')}`
@@ -134,9 +137,6 @@ module.exports = merge(commonConfig, {
             { cssList: [], jsList: [] },
           ),
         },
-        chunks: [moduleName], // 若不设置则默认将当前entry多文件全部注入
-        // chunksSortMode:'manual',//不设置时，默认顺序以entry的顺序
-        // excludeChunks:[],// 拒绝当前打包的入口文件的某些注入到html中，默认不排除
         minify: isDevelopment
           ? false
           : {

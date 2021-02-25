@@ -25,7 +25,7 @@
     <div id="root"></div>
     <% if(Array.isArray(jsList)) { %>
       <% for (const js of jsList) { %>
-        <script src="<%= js %>"></script>
+        <script defer src="<%= js %>"></script>
       <% } %>
     <% } %>
     <script>window.scriptLoadedTime = Date.now()</script>

@@ -15,7 +15,7 @@
     <div id="root"></div>
     <% if(scripts && Array.isArray(scripts.jsList)) { %>
       <% for (const js of scripts.jsList) { %>
-        <script src="<%= js %>"></script>
+        <script defer src="<%= js %>"></script>
       <% } %>
     <% } %>
   </body>

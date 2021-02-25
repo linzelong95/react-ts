@@ -1,12 +1,7 @@
 {
-  "blog-admin.css": {
-    "path": "/public/blog-admin/css/blog-admin-5b4026d8.css",
-    "editor": "briefNull",
-    "release": "briefNull-1614249116792"
-  },
   "blog-admin.js": {
-    "path": "/public/blog-admin/js/blog-admin-0b367a7d.js",
-    "editor": "briefNull",
-    "release": "briefNull-1614249116792"
+    "path": "http://127.0.0.1:7002/blog-admin/js/blog-admin.js",
+    "release": "briefNull-1614257582878",
+    "editor": "briefNull"
   }
 }
