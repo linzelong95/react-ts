@@ -15,9 +15,6 @@ const externals = require('./externals')
 // 是否是开发环境
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
-// 是否重新处理所有依赖包
-const ifHandleAllLibs = process.env.IF_HANDLE_ALL_LIBS === 'all'
-
 module.exports = {
   // 应用入口
   entry: BUILD_MODULES.reduce((entryObject, currentModule) => {
@@ -29,7 +26,7 @@ module.exports = {
   context: WEB_ROOT,
 
   // 如果打包的是 base，externals 不被忽略
-  externals: BUILD_MODULES.includes('base') || ifHandleAllLibs ? {} : externals,
+  externals: BUILD_MODULES.includes('base') || isDevelopment ? {} : externals,
 
   // 路径及 alias 配置
   resolve: {

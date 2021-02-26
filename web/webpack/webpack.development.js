@@ -37,8 +37,6 @@ const { WEB_ROOT, PUBLIC_ROOT, BUILD_MODULES, ALL_MODULES } = require('./constan
 
 // 是否是开发环境
 const isDevelopment = process.env.NODE_ENV !== 'production'
-// 是否重新处理所有依赖包
-const ifHandleAllLibs = process.env.IF_HANDLE_ALL_LIBS === 'all'
 
 module.exports = merge(commonConfig, {
   mode: 'development',
@@ -88,8 +86,7 @@ module.exports = merge(commonConfig, {
     proxy: {
       '/api/': {
         target: 'http://127.0.0.1:7001/',
-        // 该配置只是让后端读取request.getHeader("Host")是代理后的地址，但在浏览器控制面板还是显示源请求
-        changeOrigin: true,
+        changeOrigin: true, // 该配置只是让后端读取request.getHeader("Host")是代理后的地址，但在浏览器控制面板还是显示源请求
         // pathRewrite: {
         //   '^/api': '',
         // },
@@ -104,9 +101,20 @@ module.exports = merge(commonConfig, {
   },
 
   plugins: [
-    // 复制
+    ...glob.sync(`${WEB_ROOT}/dist/dll/*.json`, { nodir: true }).map((path) => {
+      return new webpack.DllReferencePlugin({
+        context: WEB_ROOT,
+        manifest: require(path),
+      })
+    }),
+
     new CopyWebpackPlugin({
-      patterns: [{ from: `${PUBLIC_ROOT}/base`, to: '/base' }],
+      patterns: [
+        { from: `${PUBLIC_ROOT}/base`, to: '/base' },
+        ...glob.sync(`${WEB_ROOT}/dist/dll/*.js`, { nodir: true }).map((from) => {
+          return { from, to: '/dll' }
+        }),
+      ],
     }),
 
     ...BUILD_MODULES.map((moduleName) => {
@@ -116,24 +124,13 @@ module.exports = merge(commonConfig, {
         filename: `${moduleName}/index.html`,
         inject: 'body',
         chunks: [moduleName], // 若不设置则默认将当前entry多文件全部注入
-        // chunksSortMode:'manual',//不设置时，默认顺序以entry的顺序
-        // excludeChunks:[],// 拒绝当前打包的入口文件的某些注入到html中，默认不排除
-        // scriptLoading: 'blocking',
         templateParameters: {
           favicon: 'http://127.0.0.1:7001/public/assets/images/logo.png',
-          scripts: glob.sync(`${PUBLIC_ROOT}/base/**/*{.css,.js}`, { nodir: true }).reduce(
-            (scripts, path) => {
-              // const validPaths = path.split('/').slice(-2)
-              // const file = `http://127.0.0.1:7001/public/base/${validPaths.join('/')}`
-              const file = `/${path.split('/').slice(-3).join('/')}`
-              if (file.endsWith('.js')) {
-                if (!ifHandleAllLibs) scripts.jsList.push(file)
-              } else {
-                scripts.cssList.push(file)
-              }
-              return scripts
-            },
-            { cssList: [], jsList: [] },
+          cssList: glob.sync(`${PUBLIC_ROOT}/base/**/*.css`, { nodir: true }).map(
+            (path) => `/${path.split('/').slice(-3).join('/')}`, // '/base/css/xxx.css'
+          ),
+          jsList: glob.sync(`${WEB_ROOT}/dist/dll/*.js`, { nodir: true }).map(
+            (path) => `/${path.split('/').slice(-2).join('/')}`, // '/dll/xxx.js'
           ),
         },
         minify: isDevelopment
@@ -154,6 +151,7 @@ module.exports = merge(commonConfig, {
             },
       })
     }),
+
     new webpack.HotModuleReplacementPlugin(),
   ].filter(Boolean),
 })

@@ -2,7 +2,9 @@ const { merge } = require('webpack-merge')
 // const glob = require('glob')
 // const path = require('path')
 // const PurgeCSSPlugin = require('purgecss-webpack-plugin')
-const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
+// webpack v5用CssMinimizerPlugin，而不使用OptimizeCSSAssetsPlugin
+// const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 // const SentryPlugin = require('webpack-sentry-plugin')
@@ -30,21 +32,22 @@ const productionConfig = {
     assetModuleFilename: (pathData) => `${pathData.runtime}/js/asset/[name]-[hash][ext][query]`,
   },
 
-  devtool: 'cheap-module-source-map',
+  devtool: 'source-map',
 
   optimization: {
     minimize: true,
-    // webpack v5自带了TerserPlugin，这里可以不用配置
     minimizer: [
       new TerserPlugin({
-        parallel: true,
+        sourceMap: true,
         terserOptions: {
-          safari10: true,
+          format: {
+            comments: false,
+          },
           compress: { pure_funcs: ['console.log'] },
         },
         extractComments: false,
       }),
-      new OptimizeCSSAssetsPlugin(),
+      new CssMinimizerPlugin(),
     ],
   },
 

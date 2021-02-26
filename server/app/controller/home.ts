@@ -32,7 +32,7 @@ interface RenderData {
 export default class HomeController extends Controller {
   public async index() {
     const { ctx, config } = this
-    const { sentry } = config
+    const { sentry, env } = config
     let currentUrl = ctx.path
     if (/^\/(public|api)/.test(currentUrl)) return
     const moduleName = currentUrl.split('/')[1]
@@ -41,16 +41,17 @@ export default class HomeController extends Controller {
     const baseStatics = getModuleStatics('base')
     const renderData: RenderData = {
       jsList: [moduleStatics.js.path],
-      cssList: [],
+      cssList: moduleStatics?.css?.path ? [moduleStatics.css.path] : [],
       initialState: { user: ctx.state.user || {}, sentry, release: moduleStatics.js.release, showWaterMark: false },
       title: 'blog',
       keywords: 'blog',
       description: 'This is a blog',
       favicon: '',
     }
-    if (baseStatics?.js?.path) renderData.jsList.unshift(baseStatics.js.path)
-    if (baseStatics?.css?.path) renderData.cssList.push(baseStatics.css.path)
-    if (moduleStatics?.css?.path) renderData.cssList.push(moduleStatics.css.path)
+    if (env === 'prod') {
+      if (baseStatics?.js?.path) renderData.jsList.unshift(baseStatics.js.path)
+      if (baseStatics?.css?.path) renderData.cssList.unshift(baseStatics.css.path)
+    }
     return ctx.render('index.ejs', renderData) // don't forget 'return'
   }
 }

@@ -5,16 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>briefNull‘s project</title>
     <link rel="icon" href="<%= favicon %>" type="image/png"/>
-    <% if(scripts && Array.isArray(scripts.cssList)) { %>
-      <% for (const css of scripts.cssList) { %>
+    <% if(Array.isArray(cssList)) { %>
+      <% for (const css of cssList) { %>
         <link rel="stylesheet" href="<%= css %>"></link>
       <% } %>
     <% } %>
   </head>
   <body>
     <div id="root"></div>
-    <% if(scripts && Array.isArray(scripts.jsList)) { %>
-      <% for (const js of scripts.jsList) { %>
+    <% if(Array.isArray(jsList)) { %>
+      <% for (const js of jsList) { %>
         <script defer src="<%= js %>"></script>
       <% } %>
     <% } %>
