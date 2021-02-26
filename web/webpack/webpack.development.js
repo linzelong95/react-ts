@@ -11,7 +11,6 @@ const { WEB_ROOT, PUBLIC_ROOT, BUILD_MODULES, ALL_MODULES } = require('./constan
 //     this.options = options
 //   }
 
-//   // TODO:如何通过直接向webpack打包的文件区注入额外的js/css来达到目的?
 //   apply(compiler) {
 //     const { paths } = this.options
 //     compiler.hooks.compilation.tap('MyInjectCustomScriptsPlugin', (compilation) => {

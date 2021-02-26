@@ -48,10 +48,8 @@ export default class HomeController extends Controller {
       description: 'This is a blog',
       favicon: '',
     }
-    if (env === 'prod') {
-      if (baseStatics?.js?.path) renderData.jsList.unshift(baseStatics.js.path)
-      if (baseStatics?.css?.path) renderData.cssList.unshift(baseStatics.css.path)
-    }
+    if (baseStatics?.css?.path) renderData.cssList.unshift(baseStatics.css.path)
+    if (env === 'prod' && baseStatics?.js?.path) renderData.jsList.unshift(baseStatics.js.path)
     return ctx.render('index.ejs', renderData) // don't forget 'return'
   }
 }
