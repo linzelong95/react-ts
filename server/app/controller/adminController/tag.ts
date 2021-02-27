@@ -1,74 +1,51 @@
-// import { provide, controller, post, inject } from "midway";
+import { Controller } from 'egg'
+import { StatusCode } from '@constant/status'
 
-// @provide()
-// @controller("/admin/tag")
-// export class AdminTagController {
+export default class AdminTagController extends Controller {
+  async list(): Promise<void> {
+    const { ctx } = this
+    const {
+      conditionQuery: { isEnable, name = '', orderBy = {}, sortIdsArr = [] },
+      index = 1,
+      size = 10,
+    } = ctx.request.body
+    const [list, total] = await this.service.adminService.tag.list({ isEnable, name, orderBy, index, size, sortIdsArr })
+    ctx.body = { code: 0, data: { list, total } }
+  }
 
-//   @inject()
-//   adminTagService;
+  async save(): Promise<void> {
+    const { ctx } = this
+    const { id, name, isEnable, sortId } = ctx.request.body
+    const flag = await this.service.adminService.tag.save({ id, name, isEnable, sort: { id: sortId } })
+    const action = id ? '更新' : '添加'
+    if (!flag) ctx.throw(StatusCode.SERVER_ERROR, `${action}失败`)
+    ctx.body = { code: 0, message: `${action}成功` }
+  }
 
-//   @post("/list")
-//   async list(ctx): Promise<void> {
-//     const { conditionQuery: { isEnable, name = "", orderBy = {}, sortIdsArr = [] }, index = 1, size = 10 } = ctx.request.body;
-//     const [list, total] = await this.adminTagService.list({ isEnable, name, orderBy, index, size, sortIdsArr });
-//     ctx.body = { list, total };
-//   }
+  async delete(): Promise<void> {
+    const { ctx } = this
+    const { items } = ctx.request.body
+    const ids = items.map((i) => i.id)
+    const flag = await this.service.adminService.tag.delete(ids)
+    if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '删除失败')
+    ctx.body = { code: 0, message: '删除成功' }
+  }
 
-//   @post("/insert")
-//   @post("/update")
-//   async save(ctx): Promise<void> {
-//     const { id, name, isEnable, sortId } = ctx.request.body;
-//     const { flag, entity } = await this.adminTagService.save({ id, name, isEnable, sort: { id: sortId } });
-//     const action = id ? "更新" : "添加";
-//     if (!flag) {
-//       ctx.status = 400;
-//       ctx.body = { message: `${action}失败`, flag, entity };
-//       return;
-//     }
-//     ctx.status = 200;
-//     ctx.body = { message: `${action}成功`, flag, entity };
-//   }
+  async lock(): Promise<void> {
+    const { ctx } = this
+    const { items } = ctx.request.body
+    const ids = items.map((i) => i.id)
+    const flag = await this.service.adminService.tag.lock(ids)
+    if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '禁用失败')
+    ctx.body = { code: 0, message: '禁用成功' }
+  }
 
-//   @post("/delete")
-//   async delete(ctx): Promise<void> {
-//     const { items } = ctx.request.body;
-//     const ids = items.map(i => i.id);
-//     const flag = await this.adminTagService.delete(ids);
-//     if (!flag) {
-//       ctx.status = 400;
-//       ctx.body = { message: `删除失败`, flag };
-//       return;
-//     }
-//     ctx.status = 200;
-//     ctx.body = { message: `删除成功`, flag };
-//   }
-
-//   @post("/lock")
-//   async lock(ctx): Promise<void> {
-//     const { items } = ctx.request.body;
-//     const ids = items.map(i => i.id);
-//     const flag = await this.adminTagService.lock(ids);
-//     if (!flag) {
-//       ctx.status = 400;
-//       ctx.body = { message: `禁用失败`, flag };
-//       return;
-//     }
-//     ctx.status = 200;
-//     ctx.body = { message: `禁用成功`, flag };
-//   }
-
-//   @post("/unlock")
-//   async unlock(ctx): Promise<void> {
-//     const { items } = ctx.request.body;
-//     const ids = items.map(i => i.id);
-//     const flag = await this.adminTagService.unlock(ids);
-//     if (!flag) {
-//       ctx.status = 400;
-//       ctx.body = { message: `启用失败`, flag };
-//       return;
-//     }
-//     ctx.status = 200;
-//     ctx.body = { message: `启用成功`, flag };
-//   }
-
-// }
+  async unlock(): Promise<void> {
+    const { ctx } = this
+    const { items } = ctx.request.body
+    const ids = items.map((i) => i.id)
+    const flag = await this.service.adminService.tag.unlock(ids)
+    if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '启用失败')
+    ctx.body = { code: 0, message: '启用成功' }
+  }
+}

@@ -13,7 +13,7 @@ export default class AdminCategoryService extends Service {
     if (!orderBy.name || !['createDate', 'updateDate'].includes(orderBy.name)) orderByMap['category.createDate'] = 'ASC'
     return await this.repository
       .createQueryBuilder('category')
-      .innerJoinAndSelect('category.sort', 'sort', sortIdsArr.length ? `sort.id in (${sortIdsArr.join(',')})` : '1=1')
+      .innerJoinAndSelect('category.sort', 'sort', sortIdsArr?.length ? `sort.id in (${sortIdsArr.join(',')})` : '1=1')
       .where('category.name like :name', { name: `%${name}%` })
       .andWhere(id ? `category.id=${id}` : '1=1')
       .andWhere(isEnable !== undefined ? `category.isEnable=${isEnable}` : '1=1')

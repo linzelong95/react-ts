@@ -76,6 +76,7 @@ module.exports = {
     'prefer-regex-literals': 'off', // 允许使用new RegExp
     'no-use-before-define': 'off', // 解决'React' was used before it was defined的报错以及在上方调用下方声明的函数时的报错
     'no-unused-vars': 'warn',
+    'promise/no-callback-in-promise': 'off', // 此配置旨在允许在promise中执行callback
     '@typescript-eslint/no-var-requires': 'off', // 允许使用require导入变量
     '@typescript-eslint/no-extra-semi': 'off', // 跟prettier规则冲突
     '@typescript-eslint/no-explicit-any': 'off', // 允许使用ts的any类型

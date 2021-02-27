@@ -153,6 +153,7 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
       }
       if (callback) callback()
       message.success('操作成功')
+      setSelectedItems([])
       setPagination((prevValue) => ({ ...prevValue, current: 1 }))
     },
     [selectedItems],

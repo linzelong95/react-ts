@@ -16,7 +16,7 @@ import type { SearchProps } from 'antd/lib/input/Search'
 
 export type ListItem = (Sort | Category)['listItemByAdminRole']
 export type ToggleEditorialPanel = (editCateInSortPanel?: boolean, record?: ListItem) => void
-export type SaveData = (params: (Sort | Category)['editParams']) => void
+export type SaveData = (params: (Sort | Category)['editParams'], callback?: () => void) => void
 type TabKey = 'cate' | 'sort'
 type GetColumns = <T = unknown>(type: TabKey, excludes?: string[]) => TableProps<T>['columns']
 type HandleItems = (type: 'remove' | 'lock' | 'unlock', from?: TabKey, record?: ListItem) => void
@@ -73,7 +73,7 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
     const { columnKey, order } = sorter as SorterResult<ListItem>
     const orderBy = order ? { name: columnKey, by: order === 'descend' ? 'DESC' : 'ASC' } : {}
     const isEnable = filters?.isEnable?.[0] as 0 | 1
-    const sortIdsArr = filters?.sort as number[]
+    const sortIdsArr = (filters?.sort as number[]) || []
     setFilters(filters)
     setConditionQuery((prevValue) => ({ ...prevValue, orderBy, isEnable, sortIdsArr } as typeof conditionQuery))
   }, [])
@@ -114,6 +114,7 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
         return
       }
       message.success('操作成功')
+      setSelectedItems([])
       setPagination((prevValue) => ({ ...prevValue, current: 1 }))
       if (from === 'sort') getAllSortList()
     },
@@ -130,7 +131,7 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
   )
 
   const saveData = useCallback<SaveData>(
-    (params) => {
+    (params, callback) => {
       message.loading({ content: '正在提交...', key: 'saveData', duration: 0 })
       Promise.race(
         editFormType === 'sort'
@@ -141,6 +142,7 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
           if (err) throw err
           setPagination((prevValue) => ({ ...prevValue, current: 1 }))
           message.success({ content: '操作成功', key: 'saveData' })
+          if (callback) callback()
           if (editFormType === 'sort') getAllSortList()
         })
         .catch((error) => {
@@ -273,7 +275,7 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
 
   const actionBarComponent = useMemo<ReactNode>(() => {
     return (
-      <Row align="middle" style={{ marginBottom: '15px' }}>
+      <Row align="middle" style={{ marginBottom: 15 }}>
         <Col xs={12} sm={13} md={15} lg={16} xl={17}>
           <Button
             icon={<PlusOutlined />}

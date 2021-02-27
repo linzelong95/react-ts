@@ -1,6 +1,6 @@
 import type { Sort } from '@blog-admin/types'
 
-export default interface Category {
+export default interface Tag {
   listItemByAdminRole: {
     id: number
     createDate: string
@@ -11,25 +11,25 @@ export default interface Category {
     sort: Omit<Sort['listItemByAdminRole'], 'categories'>
   }
   getListResByAdminRole: {
-    list: Sort['listItemByAdminRole'][]
+    list: Tag['listItemByAdminRole'][]
     total: number
   }
-  getListParamsByAdminRole: {
-    index?: number
-    size?: number
-    conditionQuery?: {
-      isEnable?: 0 | 1
-      name?: string
-      orderBy?: { name: 'name' | 'isEnable' | 'createDate' | 'updateDate'; by: 'ASC' | 'DESC' }
-      sortIdsArr?: number[]
-      id?: number
-    }
-  }
-  // 添加service函数的入参ts
+  getListParamsByAdminRole: Partial<{
+    index: number
+    size: number
+    conditionQuery: Partial<{
+      isEnable: 0 | 1
+      name: string
+      orderBy: { name: 'name' | 'isEnable' | 'createDate' | 'updateDate'; by: 'ASC' | 'DESC' }
+      sortIdsArr: number[]
+      id: number
+    }>
+  }>
+  // 添加函数的入参ts
   editParams: Pick<Sort['listItemByAdminRole'], 'isEnable' | 'name'> & { id?: number; sortId: number }
   // 编辑时form的初始值
   formDataWhenEdited: {
-    name?: string
+    name: string
     isEnable: 0 | 1
     sort?: {
       key: number

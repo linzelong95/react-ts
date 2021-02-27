@@ -2,14 +2,16 @@ import { Controller } from 'egg'
 import { StatusCode } from '@constant/status'
 
 export default class AdminSortController extends Controller {
-  async list(ctx): Promise<void> {
+  async list(): Promise<void> {
+    const { ctx } = this
     const { conditionQuery = {}, index = 1, size = 10 } = ctx.request.body
     const { isEnable, isCateEnable, name = '', orderBy: orderBy = {} } = conditionQuery
     const [list, total] = await this.service.adminService.sort.list({ isEnable, isCateEnable, name, orderBy, index, size })
     ctx.body = { code: 0, data: { list, total } }
   }
 
-  async save(ctx): Promise<void> {
+  async save(): Promise<void> {
+    const { ctx } = this
     const { id, name, isEnable } = ctx.request.body
     const flag = await this.service.adminService.sort.save({ id, name, isEnable })
     const action = id ? '更新' : '添加'
@@ -17,7 +19,8 @@ export default class AdminSortController extends Controller {
     ctx.body = { code: 0, message: `${action}成功` }
   }
 
-  async delete(ctx): Promise<void> {
+  async delete(): Promise<void> {
+    const { ctx } = this
     const { items } = ctx.request.body
     const ids = items.map((i) => i.id)
     const flag = await this.service.adminService.sort.delete(ids)
@@ -25,7 +28,8 @@ export default class AdminSortController extends Controller {
     ctx.body = { code: 0, message: '删除成功' }
   }
 
-  async lock(ctx): Promise<void> {
+  async lock(): Promise<void> {
+    const { ctx } = this
     const { items } = ctx.request.body
     const ids = items.map((i) => i.id)
     const flag = await this.service.adminService.sort.lock(ids)
@@ -33,7 +37,8 @@ export default class AdminSortController extends Controller {
     ctx.body = { code: 0, message: '禁用成功' }
   }
 
-  async unlock(ctx): Promise<void> {
+  async unlock(): Promise<void> {
+    const { ctx } = this
     const { items } = ctx.request.body
     const ids = items.map((i) => i.id)
     const flag = await this.service.adminService.sort.unlock(ids)

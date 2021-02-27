@@ -1,126 +1,103 @@
-// import { provide, controller, post, inject } from "midway";
+import { Controller } from 'egg'
+import { StatusCode } from '@constant/status'
+import { Reply } from '@entity/Reply'
 
-// @provide()
-// @controller("/admin/reply")
-// export class AdminReplyController {
+export default class AdminReplyController extends Controller {
+  async list(ctx): Promise<void> {
+    const { conditionQuery = {}, index = 1, size = 10 } = ctx.request.body
+    const { reply = '', orderBy = {}, category = {}, articleIdsArr = [], isTop, isApproved, isRoot, prettyFormat } = conditionQuery
+    const [list, total] = await this.service.adminService.reply.list({
+      reply,
+      orderBy,
+      index,
+      size,
+      category,
+      articleIdsArr,
+      isTop,
+      isApproved,
+      isRoot,
+    })
+    let newList = [...list]
+    if (prettyFormat) {
+      const parentArr: (Reply & { children: Reply[] })[] = []
+      const sonArr: (Reply & { children?: Reply[] })[] = []
+      list.forEach((item) => {
+        if (!item.parentId) {
+          parentArr.push({ ...item, children: [] })
+        } else {
+          sonArr.push(item)
+        }
+      })
+      newList = parentArr.map((parentItem) => {
+        sonArr.forEach((sonItem) => {
+          if (sonItem.parentId === parentItem.id) parentItem.children = [...parentItem.children, sonItem]
+        })
+        return parentItem
+      })
+    }
+    ctx.body = { code: 0, data: { list: newList, total } }
+  }
 
-//   @inject()
-//   adminReplyService;
+  async save(ctx): Promise<void> {
+    const {
+      user: { id: userId },
+    } = ctx.state
+    const { id, reply, parentId = 0, fromId = userId, toId = userId, articleId, isApproved = 1 } = ctx.request.body
+    const flag = await this.service.adminService.reply.save({
+      id,
+      reply,
+      parentId,
+      from: { id: fromId },
+      to: { id: toId },
+      isApproved,
+      article: { id: articleId },
+    })
+    const action = id ? '更新' : '添加'
+    if (!flag) ctx.throw(StatusCode.SERVER_ERROR, `${action}失败`)
+    ctx.body = { code: 0, message: `${action}成功` }
+  }
 
-//   @post("/list")
-//   async list(ctx): Promise<void> {
-//     const { conditionQuery = {}, index = 1, size = 10 } = ctx.request.body;
-//     const { reply = "", orderBy = {}, category = {}, articleIdsArr = [], isTop, isApproved, isRoot, prettyFormat } = conditionQuery;
-//     const [list, total] = await this.adminReplyService.list({ reply, orderBy, index, size, category, articleIdsArr, isTop, isApproved, isRoot });
-//     let newList = [...list];
-//     if (prettyFormat) {
-//       const parentArr = [];
-//       const sonArr = [];
-//       list.forEach(i => {
-//         if (!i.parentId) {
-//           parentArr.push({ ...i, children: [] });
-//         } else {
-//           sonArr.push(i);
-//         }
-//       });
-//       newList = parentArr.map(i => {
-//         sonArr.forEach(v => {
-//           if (v.parentId === i.id) i.children = [...i.children, v];
-//         });
-//         return i;
-//       });
-//     }
-//     ctx.body = { list: newList, total };
-//   }
+  async delete(ctx): Promise<void> {
+    const { items } = ctx.request.body
+    const idsArr = items.map((item) => item.id)
+    const parentIdsArr: number[] = []
+    items.forEach((item) => {
+      if (item.parentId === 0) parentIdsArr.push(item.id)
+    })
+    const flag = await this.service.adminService.reply.delete({ idsArr, parentIdsArr })
+    if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '操作失败')
+    ctx.body = { code: 0, message: '操作成功' }
+  }
 
-//   @post("/insert")
-//   @post("/update")
-//   async save(ctx): Promise<void> {
-//     const { user: { id: userId } } = ctx.state;
-//     const { id, reply, parentId = 0, fromId = userId, toId = userId, articleId, isApproved = 1 } = ctx.request.body;
-//     const flag = await this.adminReplyService.save({ id, reply, parentId, from: { id: fromId }, to: { id: toId }, isApproved, article: { id: articleId } });
-//     const action = id ? "更新" : "添加";
-//     if (!flag) {
-//       ctx.status = 400;
-//       ctx.body = { message: `${action}失败`, flag };
-//       return;
-//     }
-//     ctx.status = 200;
-//     ctx.body = { message: `${action}成功`, flag };
-//   }
+  async approve(ctx): Promise<void> {
+    const { items } = ctx.request.body
+    const ids = items.map((i) => i.id)
+    const flag = await this.service.adminService.reply.approve(ids)
+    if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '操作失败')
+    ctx.body = { code: 0, message: '操作成功' }
+  }
 
-//   @post("/delete")
-//   async delete(ctx): Promise<void> {
-//     const { items } = ctx.request.body;
-//     const idsArr = items.map(i => i.id);
-//     const parentIdsArr = [];
-//     items.forEach(i => {
-//       if (i.parentId === 0) parentIdsArr.push(i.id);
-//     });
-//     const flag = await this.adminReplyService.delete({ idsArr, parentIdsArr });
-//     if (!flag) {
-//       ctx.status = 400;
-//       ctx.body = { message: `删除失败`, flag };
-//       return;
-//     }
-//     ctx.status = 200;
-//     ctx.body = { message: `删除成功`, flag };
-//   }
+  async disapprove(ctx): Promise<void> {
+    const { items } = ctx.request.body
+    const ids = items.map((i) => i.id)
+    const flag = await this.service.adminService.reply.disapprove(ids)
+    if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '操作失败')
+    ctx.body = { code: 0, message: '操作成功' }
+  }
 
-//   @post("/approve")
-//   async approve(ctx): Promise<void> {
-//     const { items } = ctx.request.body;
-//     const ids = items.map(i => i.id);
-//     const flag = await this.adminReplyService.approve(ids);
-//     if (!flag) {
-//       ctx.status = 400;
-//       ctx.body = { message: `操作失败`, flag };
-//       return;
-//     }
-//     ctx.status = 200;
-//     ctx.body = { message: `评论已通过`, flag };
-//   }
+  async top(ctx): Promise<void> {
+    const { items } = ctx.request.body
+    const ids = items.map((i) => i.id)
+    const flag = await this.service.adminService.reply.top(ids)
+    if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '操作失败')
+    ctx.body = { code: 0, message: '操作成功' }
+  }
 
-//   @post("/disapprove")
-//   async disapprove(ctx): Promise<void> {
-//     const { items } = ctx.request.body;
-//     const ids = items.map(i => i.id);
-//     const flag = await this.adminReplyService.disapprove(ids);
-//     if (!flag) {
-//       ctx.status = 400;
-//       ctx.body = { message: `操作失败`, flag };
-//       return;
-//     }
-//     ctx.status = 200;
-//     ctx.body = { message: `评论已设置为不通过`, flag };
-//   }
-
-//   @post("/top")
-//   async top(ctx): Promise<void> {
-//     const { items } = ctx.request.body;
-//     const ids = items.map(i => i.id);
-//     const flag = await this.adminReplyService.top(ids);
-//     if (!flag) {
-//       ctx.status = 400;
-//       ctx.body = { message: `置顶失败`, flag };
-//       return;
-//     }
-//     ctx.status = 200;
-//     ctx.body = { message: `置顶成功`, flag };
-//   }
-
-//   @post("/untop")
-//   async untop(ctx): Promise<void> {
-//     const { items } = ctx.request.body;
-//     const ids = items.map(i => i.id);
-//     const flag = await this.adminReplyService.untop(ids);
-//     if (!flag) {
-//       ctx.status = 400;
-//       ctx.body = { message: `取置失败`, flag };
-//       return;
-//     }
-//     ctx.status = 200;
-//     ctx.body = { message: `取置成功`, flag };
-//   }
-
-// }
+  async unTop(ctx): Promise<void> {
+    const { items } = ctx.request.body
+    const ids = items.map((i) => i.id)
+    const flag = await this.service.adminService.reply.unTop(ids)
+    if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '操作失败')
+    ctx.body = { code: 0, message: '操作成功' }
+  }
+}

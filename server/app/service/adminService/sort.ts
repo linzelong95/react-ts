@@ -1,6 +1,6 @@
 import { Service } from 'egg'
 import { getRepository } from 'typeorm'
-import { Sort } from '../../entity/Sort'
+import { Sort } from '@entity/Sort'
 
 export default class AdminSortService extends Service {
   repository = getRepository(Sort)

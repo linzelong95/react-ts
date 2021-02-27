@@ -4,13 +4,6 @@ import { AlipayOutlined, ZhihuOutlined } from '@ant-design/icons'
 
 const routes: RouteConfig[] = [
   {
-    path: '/category',
-    menuKey: 'category',
-    exact: true,
-    component: lazy(() => import(/* webpackPrefetch: true */ '@blog-admin/containers/category')),
-    icon: <AlipayOutlined />,
-  },
-  {
     path: '/message',
     menuKey: 'message',
     exact: true,
@@ -18,6 +11,20 @@ const routes: RouteConfig[] = [
     // authPoints: ['blog.super_admin-is', 'blog.personal_admin-is'],
     // authOperator: 'or',
     icon: <ZhihuOutlined />,
+  },
+  {
+    path: '/category',
+    menuKey: 'category',
+    exact: true,
+    component: lazy(() => import(/* webpackPrefetch: true */ '@blog-admin/containers/category')),
+    icon: <AlipayOutlined />,
+  },
+  {
+    path: '/tag',
+    menuKey: 'tag',
+    exact: true,
+    component: lazy(() => import(/* webpackPrefetch: true */ '@blog-admin/containers/tag')),
+    icon: <AlipayOutlined />,
   },
   {
     path: '/',
