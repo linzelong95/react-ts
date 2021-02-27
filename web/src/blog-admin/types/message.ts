@@ -24,29 +24,37 @@ export default interface Message {
   getListParamsByAdminRole: {
     index?: number
     size?: number
-    conditionQuery?: {
-      category?: Record<string, any>
-      title?: string
-      orderBy?: { name: 'isApproved' | 'isTop' | 'createDate'; by: 'ASC' | 'DESC' }
-    }
+    conditionQuery?: Partial<{
+      prettyFormat: boolean
+      isTop: 0 | 1
+      isApproved: 0 | 1
+      isRoot: 0 | 1
+      message: string
+      orderBy: { name: 'isApproved' | 'isTop' | 'createDate'; by: 'ASC' | 'DESC' }
+    }>
   }
   // 编辑service的入参ts
-  editParams: Pick<Message['listItemByAdminRole'], 'isTop' | 'message'> & {
-    id?: number
+  editParams: {
+    isTop?: 0 | 1
+    message: string
     toId?: number
     parentId?: number
     fromMail?: string
     toMail?: string
+    blog?: string
   }
   // 编辑时form的初始值
-  formDataWhenEdited: {
-    message?: string
-    to?: {
+  formDataWhenEdited: Partial<{
+    message: string
+    to: {
       key: number
       label: string
     }
     isTop: 0 | 1
-  }
+    parentId: number
+    fromMail: string
+    blog: string
+  }>
   // 删除service的入参ts
   removeParams: { items: { id: number; name?: string }[] }
   // 锁定service函数的入参ts

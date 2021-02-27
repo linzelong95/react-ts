@@ -3,7 +3,7 @@ import { Modal, Form, Input, Select, message } from 'antd'
 import type { Message } from '@blog-admin/types'
 import type { FC } from 'react'
 import type { ModalProps } from 'antd/lib/modal'
-import type { ToggleEditorialPanel, SaveData, ListItem } from '../message'
+import type { ToggleEditorialPanel, SaveData, ListItem } from '@blog-admin/containers/message'
 
 interface EditFormProps extends ModalProps {
   initialValues?: ListItem
@@ -36,9 +36,10 @@ const EditForm: FC<EditFormProps> = memo((props) => {
         const parentId = initialValues?.parentId === 0 ? id : initialValues?.parentId
         const toId = to?.key
         const toMail = to?.key !== undefined && typeof to.key !== 'number' && to.key !== '博主' ? to.key : '无'
-        onSave({ id, toMail, toId, parentId, isTop, message })
-        form.resetFields()
-        onToggleEditorialPanel()
+        onSave({ toMail, toId, parentId, isTop, message }, () => {
+          form.resetFields()
+          onToggleEditorialPanel()
+        })
       })
       .catch((error) => {
         message.error(error.message || '请检查表单填写是否正确')

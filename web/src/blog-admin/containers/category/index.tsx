@@ -5,7 +5,7 @@ import { UnlockOutlined, LockOutlined, DeleteOutlined, HomeOutlined, ReloadOutli
 import moment from 'moment'
 import { adminCategoryServices } from '@blog-admin/services/category'
 import { adminSortServices } from '@blog-admin/services/sort'
-import EditForm from './edit-form'
+import EditForm from '@blog-admin/components/category/edit-form'
 import type { FC, ReactNode } from 'react'
 import type { RouteComponentProps } from 'react-router'
 import type { Sort, Category } from '@blog-admin/types'

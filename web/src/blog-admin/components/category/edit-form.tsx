@@ -3,7 +3,7 @@ import { Modal, Form, Input, Select, message } from 'antd'
 import type { Sort, Category } from '@blog-admin/types'
 import type { FC } from 'react'
 import type { ModalProps } from 'antd/lib/modal'
-import type { ToggleEditorialPanel, SaveData, ListItem } from '../category'
+import type { ToggleEditorialPanel, SaveData, ListItem } from '@blog-admin/containers/category'
 
 interface CateForm extends ModalProps {
   type: 'cate' | 'sort'

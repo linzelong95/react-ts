@@ -88,6 +88,7 @@ module.exports = {
         '@typescript-eslint/no-var-requires': 'warn',
         // "@typescript-eslint/class-name-casing": ["error"],// 兼容性有问题，先取消
         '@typescript-eslint/class-name-casing': 'off',
+        '@typescript-eslint/no-non-null-assertion': 'off', // 此配置意在允许使用!断言
         '@typescript-eslint/type-annotation-spacing': ['error'],
         'no-unused-vars': 'off',
         '@typescript-eslint/no-unused-vars': [

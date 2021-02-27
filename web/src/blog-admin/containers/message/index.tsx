@@ -15,8 +15,10 @@ import {
   VerticalAlignMiddleOutlined,
   FilterOutlined,
   AlignCenterOutlined,
+  SolutionOutlined,
 } from '@ant-design/icons'
-import EditForm from './edit-form'
+import EditForm from '@blog-admin/components/message/edit-form'
+import MessageDrawer from '@blog-admin/components/message/message-drawer'
 import moment from 'moment'
 import { adminMessageServices } from '@blog-admin/services/message'
 import type { FC, ReactNode } from 'react'
@@ -30,8 +32,8 @@ import styles from './index.less'
 
 export type ListItem = Message['listItemByAdminRole']
 export type ToggleEditorialPanel = (record?: ListItem) => void
-export type SaveData = (params: Message['editParams']) => void
-type HandleItems = (type: 'remove' | 'approve' | 'disapprove' | 'top' | 'unTop', record?: ListItem) => void
+export type SaveData = (params: Message['editParams'], callback?: () => void) => void
+export type HandleItems = (type: 'remove' | 'approve' | 'disapprove' | 'top' | 'unTop', record?: ListItem, callback?: () => void) => void
 type FilterRequest = (type: 'ok' | 'exit' | 'clear') => void
 type TemporaryCondition = {
   commonFilterArr?: ['isTop'?, 'isApproved'?, 'isParent'?, 'isSon'?]
@@ -53,6 +55,7 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
   const [conditionQuery, setConditionQuery] = useState<ConditionQuery>({})
   const [filterModalVisible, setFilterModalVisible] = useState<boolean>(false)
   const [showSorterFlag, setShowSorterFlag] = useState<boolean>(false)
+  const [messageDrawerVisible, setMessageDrawerVisible] = useState<boolean>(false)
 
   const showDataByDefaultWay = useCallback<(event: React.MouseEvent<HTMLElement, MouseEvent>) => void>(() => {
     setConditionQuery({})
@@ -71,13 +74,14 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
     setEditFormVisible((prevValue) => !prevValue)
   }, [])
 
-  const saveData = useCallback<SaveData>(async (params) => {
+  const saveData = useCallback<SaveData>(async (params, callback) => {
     message.loading({ content: '正在提交...', key: 'saveData', duration: 0 })
     const [, saveErr] = await adminMessageServices.save(params)
     if (saveErr) {
       message.error({ content: saveErr.message || '提交失败', key: 'saveData' })
       return
     }
+    if (callback) callback()
     setPagination((prevValue) => ({ ...prevValue, current: 1 }))
     message.success({ content: '操作成功', key: 'saveData' })
   }, [])
@@ -99,7 +103,7 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
         : [...selectedItems, record]
       setSelectedItems(newSelectedItems)
       setAllSelectedFlag(
-        !dataSource.length
+        !dataSource?.length
           ? false
           : dataSource.every((listItem) => newSelectedItems.some((selectedItem) => selectedItem.id === listItem.id)),
       )
@@ -108,9 +112,12 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
   )
 
   const toggleShowSorter = useCallback<() => void>(() => {
-    if (!dataSource?.length) return
     setShowSorterFlag((prevValue) => !prevValue)
-  }, [dataSource])
+  }, [])
+
+  const toggleMessageDrawer = useCallback<() => void>(() => {
+    setMessageDrawerVisible((prevValue) => !prevValue)
+  }, [])
 
   const handleSort = useCallback<TagProps['onClick']>(
     ({ currentTarget }) => {
@@ -137,13 +144,14 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
   }, [])
 
   const handleItems = useCallback<HandleItems>(
-    async (type, record) => {
+    async (type, record, callback) => {
       const handlingItems = (record ? [record] : selectedItems).map((item) => ({ id: item.id }))
       const [, err] = await adminMessageServices[type]({ items: handlingItems })
       if (err) {
         message.error('操作失败')
         return
       }
+      if (callback) callback()
       message.success('操作成功')
       setPagination((prevValue) => ({ ...prevValue, current: 1 }))
     },
@@ -158,7 +166,11 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
       }
       setFilterModalVisible((prevValue) => !prevValue)
       if (type === 'exit') {
-        setTemporaryCondition((prevValue) => ({ ...prevValue, filterFlag: conditionQuery?.commonFilterArr?.length > 0 }))
+        setTemporaryCondition((prevValue) => ({
+          ...prevValue,
+          commonFilterArr: conditionQuery?.commonFilterArr,
+          filterFlag: conditionQuery?.commonFilterArr?.length > 0,
+        }))
         return
       }
       setTemporaryCondition((prevValue = {}) => {
@@ -177,7 +189,7 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
           isRoot,
           commonFilterArr,
         }))
-        return { ...prevValue, filterFlag: prevValue.commonFilterArr.length > 0 }
+        return { ...prevValue, filterFlag: prevValue?.commonFilterArr?.length > 0 }
       })
     },
     [conditionQuery],
@@ -207,165 +219,184 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
 
   const actionBarComponent = useMemo<ReactNode>(() => {
     return (
-      <Row align="middle" style={{ marginBottom: '15px' }}>
-        <Col xs={12} sm={13} md={15} lg={16} xl={17}>
-          <Button
-            icon={<PlusOutlined />}
-            type="primary"
-            size="small"
-            onClick={() => {
-              toggleEditorialPanel()
-            }}
-          >
-            新增
-          </Button>
-          <Button
-            icon={<FilterOutlined />}
-            type="primary"
-            danger={temporaryCondition.filterFlag}
-            size="small"
-            onClick={() => {
-              setFilterModalVisible(true)
-            }}
-            style={{ marginLeft: 10 }}
-          >
-            筛选
-          </Button>
-          <Button
-            icon={<StarOutlined />}
-            type="primary"
-            danger={allSelectedFlag}
-            size="small"
-            onClick={toggleSelectAll}
-            style={{ marginLeft: 10 }}
-          >
-            {allSelectedFlag ? '反选' : '全选'}
-            &nbsp;
-          </Button>
-          <Button
-            icon={<AlignCenterOutlined />}
-            type="primary"
-            danger={showSorterFlag}
-            size="small"
-            onClick={toggleShowSorter}
-            style={{ marginLeft: 10 }}
-          >
-            排序
-          </Button>
-          {showSorterFlag && (
-            <>
-              <Tag color="magenta" id="default" style={{ marginLeft: 10, cursor: 'pointer' }} onClick={handleSort}>
-                默认
-              </Tag>
-              <Tag color="magenta" id="createDate" style={{ cursor: 'pointer' }} onClick={handleSort}>
-                时间
-                {conditionQuery?.orderBy?.name === 'createDate' && conditionQuery?.orderBy?.by === 'DESC' ? (
-                  <CaretDownOutlined />
-                ) : (
-                  <CaretUpOutlined />
-                )}
-              </Tag>
-              <Tag color="magenta" id="isApproved" style={{ cursor: 'pointer' }} onClick={handleSort}>
-                显示
-                {conditionQuery?.orderBy?.name === 'isApproved' && conditionQuery?.orderBy?.by === 'DESC' ? (
-                  <CaretDownOutlined />
-                ) : (
-                  <CaretUpOutlined />
-                )}
-              </Tag>
-              <Tag color="magenta" id="isTop" style={{ cursor: 'pointer' }} onClick={handleSort}>
-                置顶
-                {conditionQuery?.orderBy?.name === 'isTop' && conditionQuery?.orderBy?.by === 'DESC' ? (
-                  <CaretDownOutlined />
-                ) : (
-                  <CaretUpOutlined />
-                )}
-              </Tag>
-            </>
-          )}
-          {selectedItems.length > 0 && (
-            <>
-              <Badge count={selectedItems.length} title="已选项数">
-                <Button
-                  icon={<ReloadOutlined />}
-                  type="primary"
-                  size="small"
-                  onClick={() => {
-                    setSelectedItems([])
-                  }}
-                  style={{ marginLeft: 10 }}
-                >
-                  清空
-                </Button>
-              </Badge>
-              <Button
-                icon={<DeleteOutlined />}
-                type="primary"
-                danger
-                size="small"
-                onClick={() => {
-                  handleItems('remove')
-                }}
-                style={{ marginLeft: 10 }}
-              >
-                删除
-              </Button>
-              <Button
-                icon={<EyeOutlined />}
-                type="primary"
-                size="small"
-                onClick={() => {
-                  handleItems('approve')
-                }}
-                style={{ marginLeft: 10 }}
-              >
-                展示
-              </Button>
-              <Button
-                icon={<EyeInvisibleOutlined />}
-                type="primary"
-                size="small"
-                onClick={() => {
-                  handleItems('disapprove')
-                }}
-                style={{ marginLeft: 10 }}
-              >
-                隐藏
-              </Button>
-              <Button
-                icon={<VerticalAlignTopOutlined />}
-                type="primary"
-                size="small"
-                onClick={() => {
-                  handleItems('top')
-                }}
-                style={{ marginLeft: 10 }}
-              >
-                置顶
-              </Button>
-              <Button
-                icon={<VerticalAlignMiddleOutlined />}
-                type="primary"
-                size="small"
-                onClick={() => {
-                  handleItems('unTop')
-                }}
-                style={{ marginLeft: 10 }}
-              >
-                取置
-              </Button>
-            </>
-          )}
-        </Col>
-        <Col xs={2} sm={2} md={1} lg={1} xl={1}>
-          <Tooltip title="默认展示">
-            <Button type="primary" icon={<HomeOutlined />} shape="circle" size="small" onClick={showDataByDefaultWay} />
-          </Tooltip>
-        </Col>
-        <Col xs={10} sm={9} md={8} lg={7} xl={6}>
-          <Input.Search ref={inputSearchRef} placeholder="Enter something" onSearch={handleSearch} enterButton allowClear />
-        </Col>
-      </Row>
+      <>
+        <Row align="middle" style={{ marginBottom: 15 }}>
+          <Col xs={12} sm={13} md={15} lg={16} xl={17}>
+            <Button
+              icon={<PlusOutlined />}
+              type="primary"
+              size="small"
+              onClick={() => {
+                toggleEditorialPanel()
+              }}
+            >
+              新增
+            </Button>
+            <Button
+              icon={<FilterOutlined />}
+              type="primary"
+              danger={temporaryCondition.filterFlag}
+              size="small"
+              onClick={() => {
+                setFilterModalVisible(true)
+              }}
+              style={{ marginLeft: 10 }}
+            >
+              筛选
+            </Button>
+            <Button
+              icon={<StarOutlined />}
+              type="primary"
+              danger={allSelectedFlag}
+              size="small"
+              onClick={toggleSelectAll}
+              style={{ marginLeft: 10 }}
+            >
+              {allSelectedFlag ? '反选' : '全选'}
+              &nbsp;
+            </Button>
+            <Button
+              icon={<AlignCenterOutlined />}
+              type="primary"
+              danger={showSorterFlag}
+              size="small"
+              onClick={toggleShowSorter}
+              style={{ marginLeft: 10 }}
+            >
+              排序
+            </Button>
+            <Button
+              icon={<SolutionOutlined />}
+              type="primary"
+              danger={messageDrawerVisible}
+              size="small"
+              onClick={toggleMessageDrawer}
+              style={{ marginLeft: 10 }}
+            >
+              视图
+            </Button>
+          </Col>
+          <Col xs={2} sm={2} md={1} lg={1} xl={1}>
+            <Tooltip title="默认展示">
+              <Button type="primary" icon={<HomeOutlined />} shape="circle" size="small" onClick={showDataByDefaultWay} />
+            </Tooltip>
+          </Col>
+          <Col xs={10} sm={9} md={8} lg={7} xl={6}>
+            <Input.Search ref={inputSearchRef} placeholder="Enter something" onSearch={handleSearch} enterButton allowClear />
+          </Col>
+        </Row>
+        {(selectedItems?.length > 0 || showSorterFlag) && (
+          <Row align="middle" justify="space-between" style={{ marginBottom: 15 }}>
+            <Col>
+              {selectedItems?.length > 0 && (
+                <>
+                  <Badge count={selectedItems.length} title="已选项数">
+                    <Button
+                      icon={<ReloadOutlined />}
+                      type="primary"
+                      size="small"
+                      onClick={() => {
+                        setSelectedItems([])
+                      }}
+                    >
+                      清空
+                    </Button>
+                  </Badge>
+                  <Button
+                    icon={<DeleteOutlined />}
+                    type="primary"
+                    danger
+                    size="small"
+                    onClick={() => {
+                      handleItems('remove')
+                    }}
+                    style={{ marginLeft: 10 }}
+                  >
+                    删除
+                  </Button>
+                  <Button
+                    icon={<EyeOutlined />}
+                    type="primary"
+                    size="small"
+                    onClick={() => {
+                      handleItems('approve')
+                    }}
+                    style={{ marginLeft: 10 }}
+                  >
+                    展示
+                  </Button>
+                  <Button
+                    icon={<EyeInvisibleOutlined />}
+                    type="primary"
+                    size="small"
+                    onClick={() => {
+                      handleItems('disapprove')
+                    }}
+                    style={{ marginLeft: 10 }}
+                  >
+                    隐藏
+                  </Button>
+                  <Button
+                    icon={<VerticalAlignTopOutlined />}
+                    type="primary"
+                    size="small"
+                    onClick={() => {
+                      handleItems('top')
+                    }}
+                    style={{ marginLeft: 10 }}
+                  >
+                    置顶
+                  </Button>
+                  <Button
+                    icon={<VerticalAlignMiddleOutlined />}
+                    type="primary"
+                    size="small"
+                    onClick={() => {
+                      handleItems('unTop')
+                    }}
+                    style={{ marginLeft: 10 }}
+                  >
+                    取置
+                  </Button>
+                </>
+              )}
+            </Col>
+            <Col>
+              {showSorterFlag && (
+                <>
+                  <Tag color="magenta" id="default" style={{ marginLeft: 10, cursor: 'pointer' }} onClick={handleSort}>
+                    默认
+                  </Tag>
+                  <Tag color="magenta" id="createDate" style={{ cursor: 'pointer' }} onClick={handleSort}>
+                    时间
+                    {conditionQuery?.orderBy?.name === 'createDate' && conditionQuery?.orderBy?.by === 'DESC' ? (
+                      <CaretDownOutlined />
+                    ) : (
+                      <CaretUpOutlined />
+                    )}
+                  </Tag>
+                  <Tag color="magenta" id="isApproved" style={{ cursor: 'pointer' }} onClick={handleSort}>
+                    显示
+                    {conditionQuery?.orderBy?.name === 'isApproved' && conditionQuery?.orderBy?.by === 'DESC' ? (
+                      <CaretDownOutlined />
+                    ) : (
+                      <CaretUpOutlined />
+                    )}
+                  </Tag>
+                  <Tag color="magenta" id="isTop" style={{ cursor: 'pointer' }} onClick={handleSort}>
+                    置顶
+                    {conditionQuery?.orderBy?.name === 'isTop' && conditionQuery?.orderBy?.by === 'DESC' ? (
+                      <CaretDownOutlined />
+                    ) : (
+                      <CaretUpOutlined />
+                    )}
+                  </Tag>
+                </>
+              )}
+            </Col>
+          </Row>
+        )}
+      </>
     )
   }, [
     showSorterFlag,
@@ -373,6 +404,8 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
     temporaryCondition,
     selectedItems,
     allSelectedFlag,
+    messageDrawerVisible,
+    toggleMessageDrawer,
     toggleEditorialPanel,
     toggleSelectAll,
     handleItems,
@@ -527,7 +560,7 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
               { label: '父留言', value: 'isParent' },
               { label: '子留言', value: 'isSon' },
             ]}
-            value={temporaryCondition.commonFilterArr}
+            value={temporaryCondition?.commonFilterArr || []}
             onChange={(value) => {
               setTemporaryCondition((prevValue) => ({ ...prevValue, commonFilterArr: value } as TemporaryCondition))
             }}
@@ -538,17 +571,33 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
   }, [filterModalVisible, temporaryCondition, filterRequest])
 
   const editFormComponent = useMemo<ReactNode>(() => {
-    if (!editFormVisible) return null
     return (
-      <EditForm visible={editFormVisible} initialValues={editFormData} onToggleEditorialPanel={toggleEditorialPanel} onSave={saveData} />
+      editFormVisible && (
+        <EditForm visible={editFormVisible} initialValues={editFormData} onToggleEditorialPanel={toggleEditorialPanel} onSave={saveData} />
+      )
     )
   }, [editFormVisible, editFormData, toggleEditorialPanel, saveData])
+
+  const messageDrawerComponent = useMemo(() => {
+    return (
+      messageDrawerVisible && (
+        <MessageDrawer
+          visible={messageDrawerVisible}
+          onToggleMessageDrawer={toggleMessageDrawer}
+          onSave={saveData}
+          onHandleItems={handleItems}
+        />
+      )
+    )
+  }, [messageDrawerVisible, toggleMessageDrawer, handleItems, saveData])
+
   return (
     <WrappedContainer>
       {actionBarComponent}
       {contentListComponent}
       {editFormComponent}
       {filterModalComponent}
+      {messageDrawerComponent}
     </WrappedContainer>
   )
 })
