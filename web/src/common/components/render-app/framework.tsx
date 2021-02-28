@@ -2,7 +2,7 @@ import React from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import { renderRoutes } from '@common/utils'
 import { hot } from 'react-hot-loader/root'
-import { ErrorBoundary, BasicLayout } from '@common/components'
+import { ErrorBoundary } from '@common/components'
 import { Provider } from 'react-redux'
 import { ConfigProvider } from 'antd'
 import { useTranslation } from 'react-i18next'
@@ -32,11 +32,7 @@ const Framework: FC<FrameworkOptions> = (props) => {
       <ErrorBoundary>
         <Provider store={store}>
           <BrowserRouter basename={basename}>
-            <ConfigProvider locale={i18n.language === 'zh-CN' ? zhCN : enUS}>
-              <BasicLayout routes={routes} basename={basename}>
-                {renderRoutes(routes)}
-              </BasicLayout>
-            </ConfigProvider>
+            <ConfigProvider locale={i18n.language === 'zh-CN' ? zhCN : enUS}>{renderRoutes(routes, basename)}</ConfigProvider>
           </BrowserRouter>
         </Provider>
       </ErrorBoundary>

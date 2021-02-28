@@ -81,13 +81,10 @@ http.interceptors.response.use(
 )
 
 /**
- * 经过 tryCatch 封装的方法
  * @param {AxiosRequestConfig} config axios 原始配置
- * @return {[T, AxiosError]} 返回一个元组，第一个为请求的结果，第二个为错误对象
+ * @return {[T, AxiosError]} 返回一个元组，[请求结果，错误对象]
  *
- * const [res, err] = await request({ method: 'GET', data: { a: 1 } })
- * if (err) { return console.error(err) }
- * console.log(res.code)  // 0
+ * const [res, err] = await request({ method: 'GET', data: { param: 'example' } })
  *
  */
 export function request<T = any>(config: AxiosRequestConfig): Promise<[T, null] | [null, AxiosError]> {

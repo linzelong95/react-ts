@@ -27,7 +27,7 @@ export default class UserMessageService extends Service {
   async save(options) {
     let flag = true
     const replyEntity = this.repository.create({ ...options })
-    await this.repository.save(replyEntity).catch((e) => {
+    await this.repository.save(replyEntity).catch(() => {
       flag = false
     })
     return flag

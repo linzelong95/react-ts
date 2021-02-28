@@ -9,13 +9,19 @@ import Header from './header'
 import Footer from './footer'
 import SideMenu from './side-menu'
 import type { FC } from 'react'
+import type { RouteComponentProps } from 'react-router'
 import type { DrawerProps } from 'antd/es/drawer'
 import type { StoreState } from '@common/store/types'
 import type { RouteConfig } from '@common/types'
 import styles from './index.less'
 
-const BasicLayout: FC<{ routes?: RouteConfig[]; basename: string }> = memo((props) => {
-  const { routes, basename, children } = props
+interface BasicLayoutProps extends RouteComponentProps {
+  routes?: RouteConfig[]
+  basename?: string
+}
+
+const BasicLayout: FC<BasicLayoutProps> = memo((props) => {
+  const { routes, basename = '/', children } = props
   const { pathname } = useLocation()
   const userInfo = useSelector<StoreState, StoreState['user']>((state) => state.user)
   const isSmallViewPort = useMobile({ includePad: true, includeTraditionalSmallViewPort: 767 })

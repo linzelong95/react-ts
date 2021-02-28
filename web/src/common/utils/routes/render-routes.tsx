@@ -7,10 +7,12 @@ import type { CElement } from 'react'
 import type { SwitchProps, RedirectProps, RouteComponentProps } from 'react-router-dom'
 import type { RouteConfig } from '@common/types'
 
-function renderRoute(route: RouteConfig, props: RouteComponentProps): JSX.Element {
+function renderRoute(route: RouteConfig, props: RouteComponentProps, allRoutes: RouteConfig[], basename: string): JSX.Element {
   const { component: Component, routes, redirect, path, wrappers } = route
   const redirectComponent = redirect && <Redirect key={`${uuid()}-redirect`} exact from={path} to={redirect} />
-  const children = renderRoutes(routes, { redirectComponent, useNotFoundComponent: !Component || Boolean(routes?.length) })
+  const useNotFoundComponent = !Component || Boolean(routes?.length)
+  const children = renderRoutes(routes, basename, allRoutes, { redirectComponent, useNotFoundComponent })
+  const formativeProps = path === '/' && Component ? { ...props, basename, routes: allRoutes } : { ...props }
   let ret = Component ? (
     <Suspense
       fallback={
@@ -19,7 +21,7 @@ function renderRoute(route: RouteConfig, props: RouteComponentProps): JSX.Elemen
         </div>
       }
     >
-      <Component {...props}>{children}</Component>
+      <Component {...formativeProps}>{children}</Component>
     </Suspense>
   ) : (
     children
@@ -27,7 +29,7 @@ function renderRoute(route: RouteConfig, props: RouteComponentProps): JSX.Elemen
   if (wrappers?.length) {
     let len = wrappers.length - 1
     while (len >= 0) {
-      ret = createElement(wrappers[len] as any, props, ret)
+      ret = createElement(wrappers[len] as any, formativeProps, ret)
       len -= 1
     }
   }
@@ -36,17 +38,25 @@ function renderRoute(route: RouteConfig, props: RouteComponentProps): JSX.Elemen
 
 type RenderRoutes = (
   routes: RouteConfig[],
+  basename?: string,
+  allRoutes?: RouteConfig[],
   extraParams?: { redirectComponent?: CElement<RedirectProps, Redirect>; useNotFoundComponent?: boolean },
 ) => CElement<SwitchProps, Switch>
 
-const renderRoutes: RenderRoutes = (routes = [], extraParams = {}) => {
+const renderRoutes: RenderRoutes = (routes = [], basename, allRoutes, extraParams = {}) => {
   const { redirectComponent, useNotFoundComponent = true } = extraParams
   return (
     <Switch key={uuid()}>
       {routes.map((route) => {
         const { menuKey, path, exact, strict, sensitive } = route
         if (path.startsWith('http')) return null
-        return <Route key={menuKey} {...{ path, exact, strict, sensitive }} render={(props) => renderRoute(route, props)} />
+        return (
+          <Route
+            key={menuKey}
+            {...{ path, exact, strict, sensitive }}
+            render={(props) => renderRoute(route, props, allRoutes || route.routes, basename)}
+          />
+        )
       })}
       {redirectComponent}
       {useNotFoundComponent && <Route key={`${uuid()}-not-found`} component={NotFound} />}

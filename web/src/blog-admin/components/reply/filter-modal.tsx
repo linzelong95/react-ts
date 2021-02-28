@@ -34,8 +34,6 @@ const FilterModal: ForwardRefRenderFunction<FilterModalRef, FilterModalProps> = 
   const [temporaryCondition, setTemporaryCondition] = useState<TemporaryCondition>({})
   const [articleSearch, setArticleSearch] = useState<string>(undefined)
 
-  console.log(temporaryCondition)
-
   const getListParams = useMemo<ArticleTypeCollection['getListParamsByAdminRole']>(
     () => ({
       index: 1,
