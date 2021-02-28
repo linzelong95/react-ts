@@ -5,9 +5,9 @@ import { adminSortServices } from '@blog-admin/services/sort'
 import { adminArticleServices } from '@blog-admin/services/article'
 import type { SetStateAction, Dispatch, ForwardRefRenderFunction } from 'react'
 import type { ModalProps } from 'antd/lib/modal'
-import type { TreeProps } from 'antd/lib/tree'
+import type { SelectValue } from 'antd/lib/select'
 import type { ConditionQuery } from '@blog-admin/containers/reply'
-import type { Sort } from '@blog-admin/types'
+import type { Sort, ArticleTypeCollection } from '@blog-admin/types'
 
 type FilterRequest = (type: 'ok' | 'exit' | 'clear') => void
 
@@ -19,8 +19,8 @@ interface FilterModalProps extends ModalProps {
 
 export type TemporaryCondition = {
   commonFilterArr?: ['isTop'?, 'isApproved'?, 'isParent'?, 'isSon'?]
-  filteredSortArr?: any[]
-  articleArr?: any[]
+  filteredSortArr?: string[]
+  articleArr?: { key: number; label: string }[]
   filterFlag?: boolean
 }
 
@@ -29,12 +29,14 @@ export type FilterModalRef = { clear: () => void }
 const FilterModal: ForwardRefRenderFunction<FilterModalRef, FilterModalProps> = (props, ref) => {
   const { visible, conditionQuery, onSetFilterModalVisible, onSetConditionQuery } = props
 
-  const [filterType, setFilterType] = useState<'catalog' | 'article'>()
+  const [filterType, setFilterType] = useState<'catalog' | 'article'>('catalog')
   const [allSortList, setAllSortList] = useState<Sort['getListResByAdminRole']['list']>([])
   const [temporaryCondition, setTemporaryCondition] = useState<TemporaryCondition>({})
   const [articleSearch, setArticleSearch] = useState<string>(undefined)
 
-  const getListParams = useMemo<any>(
+  console.log(temporaryCondition)
+
+  const getListParams = useMemo<ArticleTypeCollection['getListParamsByAdminRole']>(
     () => ({
       index: 1,
       size: 10,
@@ -48,7 +50,7 @@ const FilterModal: ForwardRefRenderFunction<FilterModalRef, FilterModalProps> = 
       message.error(articleErr.message || '获取列表失败')
       return []
     }
-    return articleRes?.data?.list
+    return articleRes?.data?.list || []
   }, [articleRes, articleErr])
 
   useImperativeHandle(
@@ -58,10 +60,6 @@ const FilterModal: ForwardRefRenderFunction<FilterModalRef, FilterModalProps> = 
     }),
     [],
   )
-
-  const catalogTreeSelect = useCallback<TreeProps['onCheck']>((filteredSortArr) => {
-    console.log(filteredSortArr)
-  }, [])
 
   const filterRequest = useCallback<FilterRequest>(
     (type) => {
@@ -73,31 +71,43 @@ const FilterModal: ForwardRefRenderFunction<FilterModalRef, FilterModalProps> = 
       if (type === 'exit') {
         setTemporaryCondition((prevValue) => ({
           ...prevValue,
-          commonFilterArr: conditionQuery?.commonFilterArr,
-          filterFlag: conditionQuery?.commonFilterArr?.length > 0,
+          commonFilterArr: conditionQuery?.commonFilterArr || [],
+          filteredSortArr: conditionQuery?.filteredSortArr || [],
+          articleArr: conditionQuery?.articleArr || [],
         }))
         return
       }
-      setTemporaryCondition((prevValue = {}) => {
-        const { commonFilterArr = [] } = prevValue
-        const isApproved = commonFilterArr.includes?.('isApproved') ? 0 : undefined
-        const isTop = commonFilterArr.includes?.('isTop') ? 1 : undefined
-        const isRoot = (() => {
-          if (commonFilterArr.includes('isParent') && !commonFilterArr.includes('isSon')) return 1
-          if (!commonFilterArr.includes('isParent') && commonFilterArr.includes('isSon')) return 0
-          return undefined
-        })()
-        onSetConditionQuery((oldValue) => ({
-          ...oldValue,
-          isApproved,
-          isTop,
-          isRoot,
-          commonFilterArr,
-        }))
-        return { ...prevValue, filterFlag: prevValue?.commonFilterArr?.length > 0 }
+      const { filteredSortArr = [], articleArr = [], commonFilterArr = [] } = temporaryCondition
+      const isApproved = commonFilterArr.includes?.('isApproved') ? 0 : undefined
+      const isTop = commonFilterArr.includes?.('isTop') ? 1 : undefined
+      const isRoot = (() => {
+        if (commonFilterArr.includes('isParent') && !commonFilterArr.includes('isSon')) return 1
+        if (!commonFilterArr.includes('isParent') && commonFilterArr.includes('isSon')) return 0
+        return undefined
+      })()
+      const articleIdsArr = articleArr.map((article) => article.key)
+      const category = { sortIdsArr: [], cateIdsArr: [] }
+      filteredSortArr.forEach((item) => {
+        const arr = item.split('-')
+        if (arr.length === 1) {
+          category.sortIdsArr.push(Number(arr[0]))
+        } else if (!category.sortIdsArr.includes(Number(arr[0]))) {
+          category.cateIdsArr.push(Number(arr.pop()))
+        }
       })
+      onSetConditionQuery((oldValue) => ({
+        ...oldValue,
+        isApproved,
+        isTop,
+        isRoot,
+        commonFilterArr,
+        filteredSortArr,
+        articleArr,
+        articleIdsArr,
+        category,
+      }))
     },
-    [conditionQuery, onSetFilterModalVisible, onSetConditionQuery],
+    [conditionQuery, temporaryCondition, onSetFilterModalVisible, onSetConditionQuery],
   )
 
   useEffect(() => {
@@ -143,7 +153,7 @@ const FilterModal: ForwardRefRenderFunction<FilterModalRef, FilterModalProps> = 
       <div style={{ textAlign: 'center' }}>
         <Radio.Group size="small" value={filterType} buttonStyle="solid" onChange={({ target }) => setFilterType(target.value)}>
           <Radio.Button value="catalog">
-            <Badge dot={temporaryCondition.filteredSortArr && temporaryCondition.filteredSortArr.length > 0}>
+            <Badge dot={temporaryCondition?.filteredSortArr?.length > 0}>
               <span style={{ marginLeft: 10, marginRight: 10 }}>按分类</span>
             </Badge>
           </Radio.Button>
@@ -159,9 +169,9 @@ const FilterModal: ForwardRefRenderFunction<FilterModalRef, FilterModalProps> = 
         <Tree
           checkable
           showLine
-          onCheck={catalogTreeSelect}
-          defaultExpandedKeys={temporaryCondition.filteredSortArr || []}
-          checkedKeys={temporaryCondition.filteredSortArr || []}
+          onCheck={(value) => setTemporaryCondition((prevValue) => ({ ...prevValue, filteredSortArr: (value as unknown) as string[] }))}
+          expandedKeys={temporaryCondition?.filteredSortArr || []}
+          checkedKeys={temporaryCondition?.filteredSortArr || []}
         >
           {allSortList.map((item) => (
             <Tree.TreeNode title={item.name} key={`${item.id}`} selectable={false} disabled={item.isEnable === 0}>
@@ -187,9 +197,11 @@ const FilterModal: ForwardRefRenderFunction<FilterModalRef, FilterModalProps> = 
             notFoundContent={null}
             loading={articleLoading}
             filterOption={false}
-            onChange={(articleArr) => setTemporaryCondition((prevValue) => ({ ...prevValue, articleArr }))}
+            onChange={(value) =>
+              setTemporaryCondition((prevValue) => ({ ...prevValue, articleArr: (value as unknown) as TemporaryCondition['articleArr'] }))
+            }
             onSearch={setArticleSearch}
-            value={temporaryCondition.articleArr}
+            value={(temporaryCondition.articleArr as unknown) as SelectValue}
             style={{ width: 350 }}
           >
             {articleList.map((article) => (

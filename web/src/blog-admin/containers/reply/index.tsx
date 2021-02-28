@@ -33,7 +33,7 @@ export type ListItem = ReplyTypeCollection['listItemByAdminRole']
 export type ToggleEditorialPanel = (record?: ListItem) => void
 export type SaveData = (params: ReplyTypeCollection['editParams'], callback?: () => void) => void
 export type HandleItems = (type: 'remove' | 'approve' | 'disapprove' | 'top' | 'unTop', record?: ListItem, callback?: () => void) => void
-export type ConditionQuery = ReplyTypeCollection['getListParamsByAdminRole']['conditionQuery'] & Pick<TemporaryCondition, 'commonFilterArr'>
+export type ConditionQuery = ReplyTypeCollection['getListParamsByAdminRole']['conditionQuery'] & TemporaryCondition
 
 const MessageManagement: FC<RouteComponentProps> = memo(() => {
   const inputSearchRef = useRef<Input>(null)
@@ -47,15 +47,17 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
   const [filterModalVisible, setFilterModalVisible] = useState<boolean>(false)
   const [showSorterFlag, setShowSorterFlag] = useState<boolean>(false)
 
-  const getListParams = useMemo<ReplyTypeCollection['getListParamsByAdminRole']>(
-    () => ({
+  const getListParams = useMemo<ReplyTypeCollection['getListParamsByAdminRole']>(() => {
+    const neededConditionQuery = { ...conditionQuery, commonFilterArr: undefined, articleArr: undefined, filteredSortArr: undefined }
+    return {
       index: pagination.current,
       size: pagination.pageSize,
-      conditionQuery: conditionQuery,
-    }),
-    [pagination, conditionQuery],
-  )
+      conditionQuery: neededConditionQuery,
+    }
+  }, [pagination, conditionQuery])
+
   const [loading, replyRes, replyErr, forceRequest] = useService(adminReplyServices.getList, getListParams)
+
   const [total, dataSource] = useMemo(() => {
     if (replyErr) {
       message.error(replyErr.message || '获取列表失败')
@@ -156,7 +158,7 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
 
   const handleItems = useCallback<HandleItems>(
     async (type, record, callback) => {
-      const handlingItems = (record ? [record] : selectedItems).map((item) => ({ id: item.id }))
+      const handlingItems = (record ? [record] : selectedItems).map((item) => ({ id: item.id, parentId: item.parentId }))
       const [, err] = await adminReplyServices[type]({ items: handlingItems })
       if (err) {
         message.error('操作失败')
@@ -199,7 +201,9 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
             <Button
               icon={<FilterOutlined />}
               type="primary"
-              // danger={temporaryCondition.filterFlag}
+              danger={Boolean(
+                conditionQuery?.filteredSortArr?.length || conditionQuery?.articleArr?.length || conditionQuery?.commonFilterArr?.length,
+              )}
               size="small"
               onClick={() => {
                 setFilterModalVisible(true)

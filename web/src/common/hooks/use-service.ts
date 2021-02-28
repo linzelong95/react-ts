@@ -4,13 +4,15 @@ import { CommonResponse, CommonError } from '@common/types'
 function useService<R extends unknown, D extends unknown>(
   service: (params: D) => Promise<[CommonResponse<R>, CommonError]>,
   data: D,
+  disabled?: boolean,
 ): [boolean, CommonResponse<R>, CommonError, () => void] {
   const [flag, setFlag] = useState<boolean>(false)
-  const [loading, setLoading] = useState<boolean>(true)
+  const [loading, setLoading] = useState<boolean>(() => !disabled)
   const [res, setRes] = useState<CommonResponse<R>>(null)
   const [err, setErr] = useState<CommonError>(null)
 
   useEffect(() => {
+    if (disabled) return
     setLoading(true)
     ;(async () => {
       const [res, err] = await service(data)
@@ -18,7 +20,7 @@ function useService<R extends unknown, D extends unknown>(
       setErr(err)
       setLoading(false)
     })()
-  }, [flag, data, service])
+  }, [disabled, flag, data, service])
 
   const forceRequest = useCallback<() => void>(() => {
     setFlag((prevValue) => !prevValue)

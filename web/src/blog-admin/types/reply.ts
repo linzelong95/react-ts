@@ -37,6 +37,8 @@ export default interface Reply {
       isApproved: 0 | 1
       isRoot: 0 | 1
       reply: string
+      articleIdsArr: number[]
+      category: { sortIdsArr?: number[]; cateIdsArr?: number[] }
       orderBy: { name: 'isApproved' | 'isTop' | 'createDate'; by: 'ASC' | 'DESC' }
     }>
   }
@@ -63,13 +65,13 @@ export default interface Reply {
     }
   }>
   // 删除service的入参ts
-  removeParams: { items: { id: number; name?: string }[] }
+  removeParams: { items: { id: number; name?: string; parentId?: number }[] }
   // 锁定service函数的入参ts
-  topParams: { items: { id: number; name?: string }[] }
+  topParams: { items: { id: number; name?: string; parentId?: number }[] }
   // 解锁service函数的入参ts
-  unTopParams: { items: { id: number; name?: string }[] }
+  unTopParams: { items: { id: number; name?: string; parentId?: number }[] }
   // 不展示service函数的入参ts
-  disapproveParams: { items: { id: number; name?: string }[] }
+  disapproveParams: { items: { id: number; name?: string; parentId?: number }[] }
   // 展示/过审service函数的入参ts
-  approveParams: { items: { id: number; name?: string }[] }
+  approveParams: { items: { id: number; name?: string; parentId?: number }[] }
 }

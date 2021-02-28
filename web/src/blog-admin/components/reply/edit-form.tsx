@@ -1,6 +1,8 @@
-import React, { memo, useCallback, useMemo } from 'react'
+import React, { memo, useCallback, useMemo, useState } from 'react'
 import { Modal, Form, Input, Select, message } from 'antd'
-import type { ReplyTypeCollection } from '@blog-admin/types'
+import { useService } from '@common/hooks'
+import { adminArticleServices } from '@blog-admin/services/article'
+import type { ReplyTypeCollection, ArticleTypeCollection } from '@blog-admin/types'
 import type { FC } from 'react'
 import type { ModalProps } from 'antd/lib/modal'
 import type { ToggleEditorialPanel, SaveData, ListItem } from '@blog-admin/containers/reply'
@@ -13,14 +15,27 @@ interface EditFormProps extends ModalProps {
 
 type FormDataWhenEdited = ReplyTypeCollection['formDataWhenEdited']
 
-const layout = {
-  labelCol: { span: 5 },
-  wrapperCol: { span: 17 },
-}
-
 const EditForm: FC<EditFormProps> = memo((props) => {
   const { initialValues, visible, onSave, onToggleEditorialPanel, ...restProps } = props
   const [form] = Form.useForm<FormDataWhenEdited>()
+  const [articleSearch, setArticleSearch] = useState<string>(undefined)
+
+  const getListParams = useMemo<ArticleTypeCollection['getListParamsByAdminRole']>(
+    () => ({
+      index: 1,
+      size: 10,
+      conditionQuery: { title: articleSearch?.trim() },
+    }),
+    [articleSearch],
+  )
+  const [articleLoading, articleRes, articleErr] = useService(adminArticleServices.getList, getListParams, Boolean(initialValues?.id))
+  const articleList = useMemo(() => {
+    if (articleErr) {
+      message.error(articleErr.message || '获取列表失败')
+      return []
+    }
+    return articleRes?.data?.list || []
+  }, [articleRes, articleErr])
 
   const handleCancel = useCallback<ModalProps['onCancel']>(() => {
     form.resetFields()
@@ -32,10 +47,10 @@ const EditForm: FC<EditFormProps> = memo((props) => {
       .validateFields()
       .then((values) => {
         const { id } = initialValues || {}
-        const { to, isTop, reply } = values
+        const { to, isTop, reply, article } = values
         const parentId = initialValues?.parentId === 0 ? id : initialValues?.parentId
         const toId = to?.key
-        const articleId = 1
+        const articleId = article.key
         onSave({ toId, parentId, isTop, reply, articleId }, () => {
           form.resetFields()
           onToggleEditorialPanel()
@@ -47,36 +62,54 @@ const EditForm: FC<EditFormProps> = memo((props) => {
   }, [form, initialValues, onSave, onToggleEditorialPanel])
 
   const editingFormData = useMemo<FormDataWhenEdited>(() => {
-    const { isTop = 1, from } = initialValues || {}
-    const to = { key: from.id, label: from.nickName }
-    return { isTop, to } as FormDataWhenEdited
+    const { isTop = 0, from, article: prevArticle } = initialValues || {}
+    const article = prevArticle && { key: prevArticle.id, label: prevArticle.title }
+    const to = from && { key: from.id, label: from.nickName }
+    return { isTop, to, article } as FormDataWhenEdited
   }, [initialValues])
 
   return (
     <Modal
       destroyOnClose
-      title={initialValues?.id ? '更新' : '添加'}
+      title={initialValues?.id ? '回复' : '添加'}
       visible={visible}
       onOk={handleOk}
       onCancel={handleCancel}
       maskClosable={false}
       {...restProps}
     >
-      <Form {...layout} form={form} initialValues={editingFormData}>
+      <Form labelCol={{ span: 5 }} wrapperCol={{ span: 17 }} form={form} initialValues={editingFormData}>
+        <Form.Item label="文章" name="article" rules={[{ required: true, message: '请选择文章!' }]}>
+          <Select
+            labelInValue
+            showSearch
+            disabled={Boolean(initialValues?.id)}
+            loading={articleLoading}
+            notFoundContent={null}
+            filterOption={false}
+            onSearch={setArticleSearch}
+          >
+            {articleList.map((article) => (
+              <Select.Option value={article.id} key={article.id}>
+                {article.title}
+              </Select.Option>
+            ))}
+          </Select>
+        </Form.Item>
         {initialValues?.id && (
           <>
             <Form.Item label="回复对象" name="to">
               <Select disabled labelInValue>
-                <Select.Option value={1}>是</Select.Option>
+                <Select.Option value={editingFormData?.to?.key}>{editingFormData?.to?.label}</Select.Option>
               </Select>
             </Form.Item>
-            <Form.Item label="原留言">{initialValues.reply}</Form.Item>
+            <Form.Item label="原评论">{initialValues.reply}</Form.Item>
           </>
         )}
-        <Form.Item label="留言" name="message" rules={[{ required: true, message: '请输入留言内容!' }]}>
+        <Form.Item label="评论" name="reply" rules={[{ required: true, message: '请输入评论内容!' }]}>
           <Input.TextArea rows={2} />
         </Form.Item>
-        <Form.Item label="是否置顶" name="isTop" rules={[{ required: true, message: '请选择是否置顶!' }]} style={{ marginBottom: 0 }}>
+        <Form.Item label="置顶" name="isTop" rules={[{ required: true, message: '请选择是否置顶!' }]} style={{ marginBottom: 0 }}>
           <Select>
             <Select.Option value={1}>是</Select.Option>
             <Select.Option value={0}>否</Select.Option>

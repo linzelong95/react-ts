@@ -37,7 +37,6 @@ export type HandleItems = (type: 'remove' | 'approve' | 'disapprove' | 'top' | '
 type FilterRequest = (type: 'ok' | 'exit' | 'clear') => void
 type TemporaryCondition = {
   commonFilterArr?: ['isTop'?, 'isApproved'?, 'isParent'?, 'isSon'?]
-  filterFlag?: boolean
 }
 type ConditionQuery = Message['getListParamsByAdminRole']['conditionQuery'] & Pick<TemporaryCondition, 'commonFilterArr'>
 
@@ -145,7 +144,7 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
 
   const handleItems = useCallback<HandleItems>(
     async (type, record, callback) => {
-      const handlingItems = (record ? [record] : selectedItems).map((item) => ({ id: item.id }))
+      const handlingItems = (record ? [record] : selectedItems).map((item) => ({ id: item.id, parentId: item.parentId }))
       const [, err] = await adminMessageServices[type]({ items: handlingItems })
       if (err) {
         message.error('操作失败')
@@ -170,30 +169,26 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
         setTemporaryCondition((prevValue) => ({
           ...prevValue,
           commonFilterArr: conditionQuery?.commonFilterArr,
-          filterFlag: conditionQuery?.commonFilterArr?.length > 0,
         }))
         return
       }
-      setTemporaryCondition((prevValue = {}) => {
-        const { commonFilterArr = [] } = prevValue
-        const isApproved = commonFilterArr.includes?.('isApproved') ? 0 : undefined
-        const isTop = commonFilterArr.includes?.('isTop') ? 1 : undefined
-        const isRoot = (() => {
-          if (commonFilterArr.includes('isParent') && !commonFilterArr.includes('isSon')) return 1
-          if (!commonFilterArr.includes('isParent') && commonFilterArr.includes('isSon')) return 0
-          return undefined
-        })()
-        setConditionQuery((oldValue) => ({
-          ...oldValue,
-          isApproved,
-          isTop,
-          isRoot,
-          commonFilterArr,
-        }))
-        return { ...prevValue, filterFlag: prevValue?.commonFilterArr?.length > 0 }
-      })
+      const { commonFilterArr = [] } = temporaryCondition
+      const isApproved = commonFilterArr.includes?.('isApproved') ? 0 : undefined
+      const isTop = commonFilterArr.includes?.('isTop') ? 1 : undefined
+      const isRoot = (() => {
+        if (commonFilterArr.includes('isParent') && !commonFilterArr.includes('isSon')) return 1
+        if (!commonFilterArr.includes('isParent') && commonFilterArr.includes('isSon')) return 0
+        return undefined
+      })()
+      setConditionQuery((oldValue) => ({
+        ...oldValue,
+        isApproved,
+        isTop,
+        isRoot,
+        commonFilterArr,
+      }))
     },
-    [conditionQuery],
+    [conditionQuery, temporaryCondition],
   )
 
   useEffect(() => {
@@ -236,7 +231,7 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
             <Button
               icon={<FilterOutlined />}
               type="primary"
-              danger={temporaryCondition.filterFlag}
+              danger={Boolean(conditionQuery?.commonFilterArr?.length)}
               size="small"
               onClick={() => {
                 setFilterModalVisible(true)
@@ -402,7 +397,6 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
   }, [
     showSorterFlag,
     conditionQuery,
-    temporaryCondition,
     selectedItems,
     allSelectedFlag,
     messageDrawerVisible,

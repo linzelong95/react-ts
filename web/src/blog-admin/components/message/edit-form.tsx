@@ -13,11 +13,6 @@ interface EditFormProps extends ModalProps {
 
 type FormDataWhenEdited = Message['formDataWhenEdited']
 
-const layout = {
-  labelCol: { span: 5 },
-  wrapperCol: { span: 17 },
-}
-
 const EditForm: FC<EditFormProps> = memo((props) => {
   const { initialValues, visible, onSave, onToggleEditorialPanel, ...restProps } = props
   const [form] = Form.useForm<FormDataWhenEdited>()
@@ -55,19 +50,19 @@ const EditForm: FC<EditFormProps> = memo((props) => {
   return (
     <Modal
       destroyOnClose
-      title={initialValues?.id ? '更新' : '添加'}
+      title={initialValues?.id ? '回复' : '添加'}
       visible={visible}
       onOk={handleOk}
       onCancel={handleCancel}
       maskClosable={false}
       {...restProps}
     >
-      <Form {...layout} form={form} initialValues={editingFormData}>
+      <Form labelCol={{ span: 5 }} wrapperCol={{ span: 17 }} form={form} initialValues={editingFormData}>
         {initialValues?.id && (
           <>
             <Form.Item label="回复对象" name="to">
               <Select disabled labelInValue>
-                <Select.Option value={1}>是</Select.Option>
+                <Select.Option value={editingFormData?.to?.key}>{editingFormData?.to?.label}</Select.Option>
               </Select>
             </Form.Item>
             <Form.Item label="原留言">{initialValues.message}</Form.Item>

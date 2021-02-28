@@ -49,7 +49,7 @@ export default class AdminMessageController extends Controller {
     const { items } = ctx.request.body
     const idsArr = items.map((item) => item.id)
     const parentIdsArr = items.reduce((parentIdsArr, item) => {
-      if (item.parentId === 0) parentIdsArr.push(item.id)
+      if (!item.parentId) parentIdsArr.push(item.id)
       return parentIdsArr
     }, [])
     const flag = await this.service.adminService.message.delete({ idsArr, parentIdsArr })

@@ -63,10 +63,10 @@ export default class AdminReplyController extends Controller {
     const { ctx } = this
     const { items } = ctx.request.body
     const idsArr = items.map((item) => item.id)
-    const parentIdsArr: number[] = []
-    items.forEach((item) => {
-      if (item.parentId === 0) parentIdsArr.push(item.id)
-    })
+    const parentIdsArr = items.reduce((parentIdsArr, item) => {
+      if (!item.parentId) parentIdsArr.push(item.id)
+      return parentIdsArr
+    }, [])
     const flag = await this.service.adminService.reply.delete({ idsArr, parentIdsArr })
     if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '操作失败')
     ctx.body = { code: 0, message: '操作成功' }
