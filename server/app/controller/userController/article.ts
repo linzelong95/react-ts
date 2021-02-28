@@ -1,24 +1,21 @@
-// import { provide, controller, post, inject } from "midway";
+import { Controller } from 'egg'
 
-// @provide()
-// @controller("/user/article")
-// export class UserArticleController {
+export default class UserArticleController extends Controller {
+  async list(): Promise<void> {
+    const { ctx } = this
+    const {
+      conditionQuery: { title = '', orderBy = {}, category = {}, tagIdsArr = [], articleId },
+      index = 1,
+      size = 10,
+    } = ctx.request.body
+    const [list, total] = await this.service.userService.article.list({ articleId, title, orderBy, index, size, category, tagIdsArr })
+    ctx.body = { code: 0, data: { list, total } }
+  }
 
-//   @inject()
-//   userArticleService;
-
-//   @post("/list")
-//   async list(ctx): Promise<void> {
-//     const { conditionQuery: { title = "", orderBy = {}, category = {}, tagIdsArr = [], articleId }, index = 1, size = 10 } = ctx.request.body;
-//     const [list, total] = await this.userArticleService.list({ articleId, title, orderBy, index, size, category, tagIdsArr });
-//     ctx.body = { list, total };
-//   }
-
-//   @post("/content")
-//   async content(ctx) {
-//     const { articleId } = ctx.request.body;
-//     const content = await this.userArticleService.content({ articleId });
-//     ctx.body = { "list": content };
-//   }
-
-// }
+  async content() {
+    const { ctx } = this
+    const { articleId } = ctx.request.body
+    const content = await this.service.userService.article.content({ articleId })
+    ctx.body = { code: 0, data: { list: content } }
+  }
+}

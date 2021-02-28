@@ -1,67 +1,70 @@
-// import { provide, controller, post, inject } from "midway";
+import { Controller } from 'egg'
+import { StatusCode } from '@constant/status'
+import { Reply } from '@entity/Reply'
 
-// @provide()
-// @controller("/user/reply")
-// export class UserReplyController {
+export default class UserReplyController extends Controller {
+  async list(): Promise<void> {
+    const { ctx } = this
+    const { conditionQuery = {}, index = 1, size = 10 } = ctx.request.body
+    const { reply = '', orderBy = {}, category = {}, articleIdsArr = [], isTop, isApproved, isRoot, prettyFormat } = conditionQuery
+    const [list, total] = await this.service.userService.reply.list({
+      reply,
+      orderBy,
+      index,
+      size,
+      category,
+      articleIdsArr,
+      isTop,
+      isApproved,
+      isRoot,
+    })
+    let newList = [...list]
+    if (prettyFormat) {
+      const parentArr: (Reply & { children: Reply[] })[] = []
+      const sonArr: (Reply & { children?: Reply[] })[] = []
+      list.forEach((item) => {
+        if (!item.parentId) {
+          parentArr.push({ ...item, children: [] })
+        } else {
+          sonArr.push(item)
+        }
+      })
+      newList = parentArr.map((parentItem) => {
+        sonArr.forEach((sonItem) => {
+          if (sonItem.parentId === parentItem.id) parentItem.children = [...parentItem.children, sonItem]
+        })
+        return parentItem
+      })
+    }
+    ctx.body = { code: 0, data: { list: newList, total } }
+  }
 
-//   @inject()
-//   userReplyService;
+  async save(): Promise<void> {
+    const { ctx } = this
+    const { id, reply, parentId = 0, fromId, toId, articleId, isApproved = 0 } = ctx.request.body
+    const flag = await this.service.userService.reply.save({
+      id,
+      reply,
+      parentId,
+      from: { id: fromId },
+      to: { id: toId },
+      isApproved,
+      article: { id: articleId },
+    })
+    if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '操作失败')
+    ctx.body = { code: 0, message: '操作成功' }
+  }
 
-//   @post("/list")
-//   async list(ctx): Promise<void> {
-//     const { conditionQuery = {}, index = 1, size = 10 } = ctx.request.body;
-//     const { reply = "", orderBy = {}, category = {}, articleIdsArr = [], isTop, isApproved, isRoot, prettyFormat } = conditionQuery;
-//     const [list, total] = await this.userReplyService.list({ reply, orderBy, index, size, category, articleIdsArr, isTop, isApproved, isRoot });
-//     let newList = [...list];
-//     if (prettyFormat) {
-//       const parentArr = [];
-//       const sonArr = [];
-//       list.forEach(i => {
-//         if (!i.parentId) {
-//           parentArr.push({ ...i, children: [] });
-//         } else {
-//           sonArr.push(i);
-//         }
-//       });
-//       newList = parentArr.map(i => {
-//         sonArr.forEach(v => {
-//           if (v.parentId === i.id) i.children = [...i.children, v];
-//         });
-//         return i;
-//       });
-//     }
-//     ctx.body = { list: newList, total };
-//   }
-
-//   @post("/insert")
-//   async save(ctx): Promise<void> {
-//     const { id, reply, parentId = 0, fromId, toId, articleId, isApproved = 0 } = ctx.request.body;
-//     const flag = await this.userReplyService.save({ id, reply, parentId, from: { id: fromId }, to: { id: toId }, isApproved, article: { id: articleId } });
-//     const action = id ? "更新" : "添加";
-//     if (!flag) {
-//       ctx.status = 400;
-//       ctx.body = { message: `${action}失败`, flag };
-//       return;
-//     }
-//     ctx.status = 200;
-//     ctx.body = { message: `${action}成功`, flag };
-//   }
-
-//   @post("/delete")
-//   async delete(ctx): Promise<void> {
-//     const { items } = ctx.request.body;
-//     const idsArr = items.map(i => i.id);
-//     const parentIdsArr = [];
-//     items.forEach(i => {
-//       if (i.parentId === 0) parentIdsArr.push(i.id);
-//     });
-//     const flag = await this.userReplyService.delete({ idsArr, parentIdsArr });
-//     if (!flag) {
-//       ctx.status = 400;
-//       ctx.body = { message: `删除失败`, flag };
-//       return;
-//     }
-//     ctx.status = 200;
-//     ctx.body = { message: `删除成功`, flag };
-//   }
-// }
+  async delete(): Promise<void> {
+    const { ctx } = this
+    const { items } = ctx.request.body
+    const idsArr = items.map((i) => i.id)
+    const parentIdsArr = items.reduce((parentIdsArr, item) => {
+      if (!item.parentId) parentIdsArr.push(item.id)
+      return parentIdsArr
+    }, [])
+    const flag = await this.service.userService.reply.delete({ idsArr, parentIdsArr })
+    if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '操作失败')
+    ctx.body = { code: 0, message: '操作成功' }
+  }
+}
