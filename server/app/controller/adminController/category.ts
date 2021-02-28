@@ -22,7 +22,7 @@ export default class AdminCategoryController extends Controller {
   async delete(): Promise<void> {
     const { ctx } = this
     const { items } = ctx.request.body
-    const ids = items.map((i) => i.id)
+    const ids = items.map((item) => item.id)
     const flag = await this.service.adminService.category.delete(ids)
     if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '删除失败')
     ctx.body = { code: 0, message: '删除成功' }
@@ -31,7 +31,7 @@ export default class AdminCategoryController extends Controller {
   async lock(): Promise<void> {
     const { ctx } = this
     const { items } = ctx.request.body
-    const ids = items.map((i) => i.id)
+    const ids = items.map((item) => item.id)
     const flag = await this.service.adminService.category.lock(ids)
     if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '禁用失败')
     ctx.body = { code: 0, message: '禁用成功' }
@@ -40,7 +40,7 @@ export default class AdminCategoryController extends Controller {
   async unlock(): Promise<void> {
     const { ctx } = this
     const { items } = ctx.request.body
-    const ids = items.map((i) => i.id)
+    const ids = items.map((item) => item.id)
     const flag = await this.service.adminService.category.unlock(ids)
     if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '启用失败')
     ctx.body = { code: 0, message: '启用成功' }

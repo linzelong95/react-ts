@@ -4,6 +4,13 @@ import { AlipayOutlined, ZhihuOutlined } from '@ant-design/icons'
 
 const routes: RouteConfig[] = [
   {
+    path: '/reply',
+    menuKey: 'reply',
+    exact: true,
+    component: lazy(() => import(/* webpackPrefetch: true */ '@blog-admin/containers/reply')),
+    icon: <AlipayOutlined />,
+  },
+  {
     path: '/message',
     menuKey: 'message',
     exact: true,

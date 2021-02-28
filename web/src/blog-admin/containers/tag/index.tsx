@@ -118,7 +118,7 @@ const TagManagement: FC<RouteComponentProps> = memo(() => {
       }
       if (callback) callback()
       const { pageSize, current } = pagination
-      if (params.id && dataSource?.length === pageSize) {
+      if (!params.id && dataSource?.length === pageSize) {
         setPagination((prevValue) => ({ ...prevValue, current: current + 1 }))
       } else {
         forceRequest()

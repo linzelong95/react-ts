@@ -68,57 +68,37 @@ export default class AdminArticleService extends Service {
   }
 
   async delete(ids: number[]) {
-    let flag = true
     const result = await this.repository.delete(ids)
-    if (!result.raw.affectedRows) {
-      flag = false
-    }
-    return flag
+    return Boolean(result.raw.affectedRows)
   }
 
   async lock(ids: number[]) {
-    let flag = true
     const result = await this.repository
       .createQueryBuilder()
       .update(Article)
       .set({ isEnable: 0 })
       .where('id in (:...ids)', { ids })
       .execute()
-    if (!result.raw.affectedRows) {
-      flag = false
-    }
-    return flag
+    return Boolean(result.raw.affectedRows)
   }
 
   async unlock(ids: number[]) {
-    let flag = true
     const result = await this.repository
       .createQueryBuilder()
       .update(Article)
       .set({ isEnable: 1 })
       .where('id in (:...ids)', { ids })
       .execute()
-    if (!result.raw.affectedRows) {
-      flag = false
-    }
-    return flag
+    return Boolean(result.raw.affectedRows)
   }
 
   async top(ids: number[]) {
-    let flag = true
     const result = await this.repository.createQueryBuilder().update(Article).set({ isTop: 1 }).where('id in (:...ids)', { ids }).execute()
-    if (!result.raw.affectedRows) {
-      flag = false
-    }
-    return flag
+    return Boolean(result.raw.affectedRows)
   }
 
   async unTop(ids: number[]) {
-    let flag = true
     const result = await this.repository.createQueryBuilder().update(Article).set({ isTop: 0 }).where('id in (:...ids)', { ids }).execute()
-    if (!result.raw.affectedRows) {
-      flag = false
-    }
-    return flag
+    return Boolean(result.raw.affectedRows)
   }
 }

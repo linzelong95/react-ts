@@ -60,7 +60,7 @@ export default class AdminMessageController extends Controller {
   async approve(): Promise<void> {
     const { ctx } = this
     const { items } = ctx.request.body
-    const ids = items.map((i) => i.id)
+    const ids = items.map((item) => item.id)
     const flag = await this.service.adminService.message.approve(ids)
     if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '操作失败')
     ctx.body = { code: 0, message: '操作成功' }
@@ -69,7 +69,7 @@ export default class AdminMessageController extends Controller {
   async disapprove(): Promise<void> {
     const { ctx } = this
     const { items } = ctx.request.body
-    const ids = items.map((i) => i.id)
+    const ids = items.map((item) => item.id)
     const flag = await this.service.adminService.message.disapprove(ids)
     if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '操作失败')
     ctx.body = { code: 0, message: '操作成功' }
@@ -78,7 +78,7 @@ export default class AdminMessageController extends Controller {
   async top(): Promise<void> {
     const { ctx } = this
     const { items } = ctx.request.body
-    const ids = items.map((i) => i.id)
+    const ids = items.map((item) => item.id)
     const flag = await this.service.adminService.message.top(ids)
     if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '操作失败')
     ctx.body = { code: 0, message: '操作成功' }
@@ -87,7 +87,7 @@ export default class AdminMessageController extends Controller {
   async unTop(): Promise<void> {
     const { ctx } = this
     const { items } = ctx.request.body
-    const ids = items.map((i) => i.id)
+    const ids = items.map((item) => item.id)
     const flag = await this.service.adminService.message.unTop(ids)
     if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '操作失败')
     ctx.body = { code: 0, message: '操作成功' }

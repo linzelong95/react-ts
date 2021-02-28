@@ -3,7 +3,8 @@ import { StatusCode } from '@constant/status'
 import { Reply } from '@entity/Reply'
 
 export default class AdminReplyController extends Controller {
-  async list(ctx): Promise<void> {
+  async list(): Promise<void> {
+    const { ctx } = this
     const { conditionQuery = {}, index = 1, size = 10 } = ctx.request.body
     const { reply = '', orderBy = {}, category = {}, articleIdsArr = [], isTop, isApproved, isRoot, prettyFormat } = conditionQuery
     const [list, total] = await this.service.adminService.reply.list({
@@ -38,7 +39,8 @@ export default class AdminReplyController extends Controller {
     ctx.body = { code: 0, data: { list: newList, total } }
   }
 
-  async save(ctx): Promise<void> {
+  async save(): Promise<void> {
+    const { ctx } = this
     const {
       user: { id: userId },
     } = ctx.state
@@ -57,7 +59,8 @@ export default class AdminReplyController extends Controller {
     ctx.body = { code: 0, message: `${action}成功` }
   }
 
-  async delete(ctx): Promise<void> {
+  async delete(): Promise<void> {
+    const { ctx } = this
     const { items } = ctx.request.body
     const idsArr = items.map((item) => item.id)
     const parentIdsArr: number[] = []
@@ -69,33 +72,37 @@ export default class AdminReplyController extends Controller {
     ctx.body = { code: 0, message: '操作成功' }
   }
 
-  async approve(ctx): Promise<void> {
+  async approve(): Promise<void> {
+    const { ctx } = this
     const { items } = ctx.request.body
-    const ids = items.map((i) => i.id)
+    const ids = items.map((item) => item.id)
     const flag = await this.service.adminService.reply.approve(ids)
     if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '操作失败')
     ctx.body = { code: 0, message: '操作成功' }
   }
 
-  async disapprove(ctx): Promise<void> {
+  async disapprove(): Promise<void> {
+    const { ctx } = this
     const { items } = ctx.request.body
-    const ids = items.map((i) => i.id)
+    const ids = items.map((item) => item.id)
     const flag = await this.service.adminService.reply.disapprove(ids)
     if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '操作失败')
     ctx.body = { code: 0, message: '操作成功' }
   }
 
-  async top(ctx): Promise<void> {
+  async top(): Promise<void> {
+    const { ctx } = this
     const { items } = ctx.request.body
-    const ids = items.map((i) => i.id)
+    const ids = items.map((item) => item.id)
     const flag = await this.service.adminService.reply.top(ids)
     if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '操作失败')
     ctx.body = { code: 0, message: '操作成功' }
   }
 
-  async unTop(ctx): Promise<void> {
+  async unTop(): Promise<void> {
+    const { ctx } = this
     const { items } = ctx.request.body
-    const ids = items.map((i) => i.id)
+    const ids = items.map((item) => item.id)
     const flag = await this.service.adminService.reply.unTop(ids)
     if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '操作失败')
     ctx.body = { code: 0, message: '操作成功' }

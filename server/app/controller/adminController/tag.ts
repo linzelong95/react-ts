@@ -4,11 +4,8 @@ import { StatusCode } from '@constant/status'
 export default class AdminTagController extends Controller {
   async list(): Promise<void> {
     const { ctx } = this
-    const {
-      conditionQuery: { isEnable, name = '', orderBy = {}, sortIdsArr = [] },
-      index = 1,
-      size = 10,
-    } = ctx.request.body
+    const { conditionQuery = {}, index = 1, size = 10 } = ctx.request.body
+    const { isEnable, name = '', orderBy = {}, sortIdsArr = [] } = conditionQuery
     const [list, total] = await this.service.adminService.tag.list({ isEnable, name, orderBy, index, size, sortIdsArr })
     ctx.body = { code: 0, data: { list, total } }
   }
@@ -25,7 +22,7 @@ export default class AdminTagController extends Controller {
   async delete(): Promise<void> {
     const { ctx } = this
     const { items } = ctx.request.body
-    const ids = items.map((i) => i.id)
+    const ids = items.map((item) => item.id)
     const flag = await this.service.adminService.tag.delete(ids)
     if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '删除失败')
     ctx.body = { code: 0, message: '删除成功' }
@@ -34,7 +31,7 @@ export default class AdminTagController extends Controller {
   async lock(): Promise<void> {
     const { ctx } = this
     const { items } = ctx.request.body
-    const ids = items.map((i) => i.id)
+    const ids = items.map((item) => item.id)
     const flag = await this.service.adminService.tag.lock(ids)
     if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '禁用失败')
     ctx.body = { code: 0, message: '禁用成功' }
@@ -43,7 +40,7 @@ export default class AdminTagController extends Controller {
   async unlock(): Promise<void> {
     const { ctx } = this
     const { items } = ctx.request.body
-    const ids = items.map((i) => i.id)
+    const ids = items.map((item) => item.id)
     const flag = await this.service.adminService.tag.unlock(ids)
     if (!flag) ctx.throw(StatusCode.SERVER_ERROR, '启用失败')
     ctx.body = { code: 0, message: '启用成功' }

@@ -6,8 +6,7 @@ export default (app: Application) => {
 
   newRouter.post('/list', controller.adminController.article.list)
   newRouter.post('/content', controller.adminController.article.content)
-  newRouter.post('/insert', controller.adminController.article.save)
-  newRouter.post('/update', controller.adminController.article.save)
+  newRouter.post('/save', controller.adminController.article.save)
   newRouter.post('/delete', controller.adminController.article.delete)
   newRouter.post('/lock', controller.adminController.article.lock)
   newRouter.post('/unlock', controller.adminController.article.unlock)
