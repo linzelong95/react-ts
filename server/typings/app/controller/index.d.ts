@@ -10,6 +10,7 @@ import ExportAdminControllerMessage from '../../../app/controller/adminControlle
 import ExportAdminControllerReply from '../../../app/controller/adminController/reply';
 import ExportAdminControllerSort from '../../../app/controller/adminController/sort';
 import ExportAdminControllerTag from '../../../app/controller/adminController/tag';
+import ExportCommonControllerCosController from '../../../app/controller/commonController/cosController';
 import ExportUploadControllerUpload from '../../../app/controller/uploadController/upload';
 import ExportUserControllerArticle from '../../../app/controller/userController/article';
 import ExportUserControllerCourse from '../../../app/controller/userController/course';
@@ -31,6 +32,9 @@ declare module 'egg' {
       reply: ExportAdminControllerReply;
       sort: ExportAdminControllerSort;
       tag: ExportAdminControllerTag;
+    }
+    commonController: {
+      cosController: ExportCommonControllerCosController;
     }
     uploadController: {
       upload: ExportUploadControllerUpload;

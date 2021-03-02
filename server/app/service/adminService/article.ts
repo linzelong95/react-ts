@@ -57,7 +57,7 @@ export default class AdminArticleService extends Service {
   }
 
   async save(options) {
-    const { content, id, imageUrl = '/public/img/article/defaultImg.jpeg' } = options
+    const { content, id, imageUrl = '/public/assets/images/default/article.jpeg' } = options
     const contentEntity = id ? await getRepository(Content).findOne({ article: id }) : {}
     let flag = true
     const articleEntity = this.repository.create({ ...options, imageUrl, content: { ...contentEntity, content } })

@@ -4,15 +4,10 @@ import type { Application } from 'egg'
 
 export default (app: Application) => {
   app.beforeStart(async () => {
-    const { env } = app.config
-    // const dir = env === 'prod' ? 'dist' : 'src'
+    const { mysql } = app.config
     await createConnection({
       type: 'mysql',
-      host: env === 'prod' ? '127.0.0.1' : '120.78.139.146',
-      port: 3306,
-      username: 'root',
-      password: 'admin',
-      database: 'myblog',
+      ...mysql,
       synchronize: true,
       logging: false,
       entities: [`${__dirname}/app/entity/**/*{.ts,.js}`],

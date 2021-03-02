@@ -30,9 +30,10 @@ declare module '*.png' {
 
 declare module '*.css'
 declare module '*.less'
-// declare module '*.svg';
-// declare module '*.png';
+
 declare module '*.json' {
   const content: Record<string, unknown>
   export default content
 }
+
+declare const __SERVER_ORIGIN__: string

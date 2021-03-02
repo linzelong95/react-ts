@@ -1,3 +1,5 @@
 export * from './icon-creator'
 export * from './layout'
+export * from './file-storage'
 export { default as renderApp } from './render-app'
+export { default as Ellipsis } from './ellipsis'

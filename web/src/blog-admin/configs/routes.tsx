@@ -7,9 +7,16 @@ const routes: RouteConfig[] = [
   {
     path: '/',
     menuKey: 'index',
-    redirect: '/reply',
+    redirect: '/article',
     component: BasicLayout,
     routes: [
+      {
+        path: '/article',
+        menuKey: 'article',
+        exact: true,
+        component: lazy(() => import(/* webpackPrefetch: true */ '@blog-admin/containers/article')),
+        icon: <AlipayOutlined />,
+      },
       {
         path: '/reply',
         menuKey: 'reply',

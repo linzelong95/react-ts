@@ -37,14 +37,14 @@ const TagManagement: FC<RouteComponentProps> = memo(() => {
     [pagination, conditionQuery],
   )
 
-  const [loading, messageRes, messageErr, forceRequest] = useService(adminTagServices.getList, getListParams)
+  const [loading, tagRes, tagErr, forceRequest] = useService(adminTagServices.getList, getListParams)
   const [total, dataSource] = useMemo(() => {
-    if (messageErr) {
-      message.error(messageErr.message || '获取列表失败')
+    if (tagErr) {
+      message.error(tagErr.message || '获取列表失败')
       return [0, []]
     }
-    return [messageRes?.data?.total || 0, messageRes?.data?.list || []]
-  }, [messageRes, messageErr])
+    return [tagRes?.data?.total || 0, tagRes?.data?.list || []]
+  }, [tagRes, tagErr])
 
   const showDataByDefaultWay = useCallback<(event: React.MouseEvent<HTMLElement, MouseEvent>) => void>(() => {
     setConditionQuery({})

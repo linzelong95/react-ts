@@ -32,13 +32,31 @@ const isApi = /^\/api\//
 export default (appInfo: EggAppInfo) => {
   const config = {} as PowerPartial<EggAppConfig>
 
-  // override config from framework / plugin
-  // use for cookie sign key, should change to your own and keep security
-  config.keys = appInfo.name + '_blog'
+  // 保密
+  config.keys = appInfo.name + '_test'
 
+  // 保密
   config.rsaPrivateKey = rsaPrivateKey
 
   config.rsaPublicKey = rsaPublicKey
+
+  config.cos = {
+    bucket: 'brief',
+    appId: '1302086393',
+    region: 'ap-shenzhen-fsi',
+    cosUrl: 'https://brief-1302086393.cos.ap-shenzhen-fsi.myqcloud.com',
+    secretId: 'xxx', // 保密
+    secretKey: 'xxx', // 保密
+  }
+
+  config.mysql = {
+    host: '120.78.139.146',
+    // host:'127.0.0.1',
+    port: 3306,
+    username: 'root',
+    password: 'admin',
+    database: 'myblog',
+  }
 
   config.session = {
     key: 'EGG_SESS',
@@ -173,7 +191,7 @@ export default (appInfo: EggAppInfo) => {
     defaultTitle: '【blog Alarm】',
     defaultSender: 'blog-alarm',
     defaultEmailSender: 'blog',
-    receivers: ['briefNull'], // 默认收件人
+    receivers: ['briefNull'],
   }
 
   // sentry 配置

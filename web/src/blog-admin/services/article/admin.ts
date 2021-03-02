@@ -9,6 +9,10 @@ export function getList(
   return post<CommonResponse<ArticleTypeCollection['getListResByAdminRole']>, typeof params>(articleApis.ADMIN_LIST, params)
 }
 
+export function getContent(params: { articleId: number }): ServiceResult<{ list: string }> {
+  return post<CommonResponse<{ list: string }>, typeof params>(articleApis.ADMIN_CONTENT, params)
+}
+
 export function save(params: ArticleTypeCollection['editParams']): ServiceResult {
   return post<CommonResponse, typeof params>(articleApis.ADMIN_SAVE, params)
 }

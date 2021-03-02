@@ -18,6 +18,9 @@ module.exports = {
       typescript: {},
     },
   },
+  globals: {
+    __SERVER_ORIGIN__: 'readonly',
+  },
   extends: [
     'standard',
     'standard-react',
@@ -71,6 +74,7 @@ module.exports = {
     'unicorn/prevent-abbreviations': 'off',
     'unicorn/no-useless-undefined': 'off', // 允许设置undefined
     'unicorn/explicit-length-check': 'off', // 允许length不跟某个值比较， 如'xxx'.length?1:0
+    'unicorn/no-unreadable-array-destructuring': 'off', // 此配置旨在允许不读取多个元组元素，如[, , fileKey]
     // 'unicorn/catch-error-name': 'off',
     'react/react-in-jsx-scope': 'error',
     'prefer-regex-literals': 'off', // 允许使用new RegExp

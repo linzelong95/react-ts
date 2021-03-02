@@ -15,7 +15,7 @@ import type { StoreState } from '@common/store/types'
 import type { RouteConfig } from '@common/types'
 import styles from './index.less'
 
-interface BasicLayoutProps extends RouteComponentProps {
+interface BasicLayoutProps extends RouteComponentProps<Record<string, never>> {
   routes?: RouteConfig[]
   basename?: string
 }
