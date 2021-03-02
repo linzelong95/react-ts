@@ -33,9 +33,7 @@ function renderApp(options: RenderAppProps): void {
   console.log(`当前渲染 App 为：${appName}`)
 
   // 开发环境下，可能同时启动多个模块，但NotFound最多只需要渲染一次
-  if (process?.env?.NODE_ENV === 'development') {
-    ;(window as any).__LOCK__ = basename
-  }
+  if (__IS_DEV_MODE__) (window as any).__LOCK__ = basename
 
   const store = getCombinedStore(reducerMap, initialStateMap)
 

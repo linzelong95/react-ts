@@ -1,4 +1,5 @@
 import type { Category, TagTypeCollection } from '@blog-admin/types'
+import type { UploadProps } from 'antd/lib/upload'
 
 export default interface Article {
   listItemByAdminRole: {
@@ -30,18 +31,26 @@ export default interface Article {
     }>
   }
   // 添加service函数的入参ts
-  editParams: Pick<Article['listItemByAdminRole'], 'isEnable' | 'title'> & { id?: number; sortId: number }
+  editParams: {
+    id?: number
+    title: string
+    abstract?: string
+    content: string
+    isTop: 0 | 1
+    tags?: { id: number; name: string }[]
+    imageUrl: string
+    category: { id: number }
+  }
   // 编辑时form的初始值
   formDataWhenEdited: {
+    id?: number
     title?: string
+    abstract?: string
     content?: string
     category?: [number, number]
     isTop?: 0 | 1
-    sort?: {
-      key: number
-      label: string
-    }
     tags?: { key: number; label: string }[]
+    imageUrl?: UploadProps['fileList']
   }
   // 删除service函数的入参ts
   removeParams: { items: { id: number; name?: string }[] }

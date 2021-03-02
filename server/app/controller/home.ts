@@ -1,6 +1,9 @@
 import { Controller } from 'egg'
 const path = require('path')
 const fs = require('fs')
+// const glob = require('glob')
+
+// const WEB_ROOT = path.resolve(__dirname, '../', '../', '../', 'web')
 
 function getModuleStatics(moduleName): Record<'js' | 'css', { path: string; release: string; editor: string }> | null {
   const appManifestPath = path.resolve(__dirname, `../manifest/${moduleName}.manifest.json`)
@@ -49,6 +52,11 @@ export default class HomeController extends Controller {
       favicon: '',
     }
     if (baseStatics?.css?.path) renderData.cssList.unshift(baseStatics.css.path)
+    // if (env !== 'prod') {
+    //   glob.sync(`${WEB_ROOT}/dist/dll/*.js`, { nodir: true }).forEach((path) => {
+    //     renderData.jsList.unshift(`/${path.split('/').slice(-2).join('/')}`) // '/dll/xxx.js'
+    //   })
+    // }
     if (env === 'prod' && baseStatics?.js?.path) renderData.jsList.unshift(baseStatics.js.path)
     return ctx.render('index.ejs', renderData) // don't forget 'return'
   }

@@ -1,12 +1,14 @@
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import { Modal, Form, Input, Select, Cascader, message } from 'antd'
+import { PlusOutlined } from '@ant-design/icons'
 import { useService } from '@common/hooks'
 import { Upload, Download, Preview } from '@common/components'
 import { adminTagServices } from '@blog-admin/services/tag'
-import type { UploadProps } from 'antd/lib/upload'
 import type { ArticleTypeCollection, TagTypeCollection, Sort } from '@blog-admin/types'
 import type { FC } from 'react'
 import type { ModalProps } from 'antd/lib/modal'
+import type { CascaderProps } from 'antd/lib/cascader'
+import type { UploadProps } from 'antd/lib/upload'
 import type { ToggleEditorialPanel, SaveData, DetailItem } from '@blog-admin/containers/article'
 
 interface EditFormProps extends ModalProps {
@@ -41,19 +43,10 @@ const EditForm: FC<EditFormProps> = memo((props) => {
     return tagRes?.data?.list || []
   }, [tagRes, tagErr])
 
-  // const formatFileList = useCallback<UploadProps['onChange']>(({ fileList }) => {
-  //   console.log(98, fileList)
-  //   const validFileList = fileList.filter((file) => file.url && ['uploading', 'done'].includes(file.status))
-  //   if (validFileList.length < fileList.length) Modal.error({ title: '上传失败', okText: '知道了' })
-  //   return validFileList
-  // }, [])
-
-  const formatFileList = useCallback<UploadProps['onChange']>((fileList) => {
-    console.log(8888, fileList)
-    if (Array.isArray(fileList)) {
-      return fileList
-    }
-    return fileList.fileList
+  const formatFileList = useCallback<UploadProps['onChange']>(({ fileList }) => {
+    const validFileList = fileList.filter((file) => file.url && ['uploading', 'done'].includes(file.status))
+    if (validFileList.length < fileList.length) Modal.error({ title: '上传失败', okText: '知道了' })
+    return validFileList
   }, [])
 
   const handleCancel = useCallback<ModalProps['onCancel']>(() => {
@@ -66,36 +59,53 @@ const EditForm: FC<EditFormProps> = memo((props) => {
       .validateFields()
       .then((values) => {
         const { id } = initialValues || {}
-        console.log(values, id, onSave, onToggleEditorialPanel)
-        // const { to, isTop, title } = values
-        // const articleId = article.key
-        // onSave({ id, isTop, title, articleId }, () => {
-        //   form.resetFields()
-        //   onToggleEditorialPanel()
-        // })
+        const { title, category, imageUrl, isTop, tags, abstract, content = '先测试测试' } = values
+        const params: ArticleTypeCollection['editParams'] = {
+          id,
+          title,
+          abstract,
+          content,
+          isTop,
+          tags: tags.map((tag) => ({ id: tag.key, name: tag.label })),
+          imageUrl: imageUrl?.[0]?.url,
+          category: { id: category[category.length - 1] },
+        }
+        onSave(params, () => {
+          form.resetFields()
+          onToggleEditorialPanel()
+        })
       })
       .catch((error) => {
         message.error(error.message || '请检查表单填写是否正确')
       })
   }, [form, initialValues, onSave, onToggleEditorialPanel])
 
+  const categoryChange = useCallback<CascaderProps['onChange']>(
+    (value) => {
+      form.setFieldsValue({ tags: [] })
+      setSortIdsArr(value.slice(0, 1) as number[])
+    },
+    [form],
+  )
+
   useEffect(() => {
-    setCategoryOptions(
-      allSortList
-        .filter((sort) => sort?.categories?.length > 0)
-        .map((sort) => ({
-          ...sort,
-          disabled: !sort?.isEnable,
-          categories: sort?.categories?.map?.((category) => ({ ...category, disabled: !category.isEnable })) || [],
-        })),
-    )
+    const formattedCategories = allSortList
+      .filter((sort) => sort?.categories?.length > 0)
+      .map((sort) => ({
+        ...sort,
+        disabled: !sort?.isEnable,
+        categories: sort?.categories?.map?.((category) => ({ ...category, disabled: !category.isEnable })) || [],
+      }))
+    setCategoryOptions(formattedCategories)
   }, [allSortList])
 
   const editingFormData = useMemo<FormDataWhenEdited>(() => {
-    const { isTop = 0, category, imageUrl, tags, content } = initialValues || {}
+    const { isTop = 0, category, imageUrl, tags, content, abstract, title } = initialValues || {}
     if (category?.sort?.id) setSortIdsArr([category.sort.id])
-    const fileList = imageUrl ? [{ uid: -1, url: imageUrl }] : []
+    const fileList = imageUrl ? [{ uid: '-1', url: imageUrl }] : []
     return {
+      title,
+      abstract,
       isTop,
       fileList,
       content,
@@ -114,10 +124,6 @@ const EditForm: FC<EditFormProps> = memo((props) => {
       maskClosable={false}
       {...restProps}
     >
-      <Download token="https://brief-1302086393.cos.ap-shenzhen-fsi.myqcloud.com/blog_system/202103/b57a39d3-3f94-4043-8ad5-b1059748e47b_article.jpeg" />
-      <Preview token="https://brief-1302086393.cos.ap-shenzhen-fsi.myqcloud.com/blog_system/202103/b57a39d3-3f94-4043-8ad5-b1059748e47b_article.jpeg" />
-      <Preview token="https://brief-1302086393.cos.ap-shenzhen-fsi.myqcloud.com/blog_system/202103/ffd9b77f-7d28-46f3-a1c8-e14bb06b7ccf_林泽龙_前端开发_两年经验.pdf" />
-      <Preview token="https://brief-1302086393.cos.ap-shenzhen-fsi.myqcloud.com/blog_system/202103/06b18b6e-7156-40ef-8d7e-c845def2f274_林泽龙_前端开发_两年经验.docx" />
       <Form labelCol={{ span: 5 }} wrapperCol={{ span: 17 }} form={form} initialValues={editingFormData}>
         <Form.Item label="标题" name="title" rules={[{ required: true, message: '请输入标题!' }]}>
           <Input />
@@ -125,11 +131,16 @@ const EditForm: FC<EditFormProps> = memo((props) => {
         <Form.Item
           label="封面"
           name="imageUrl"
-          getValueFromEvent={formatFileList}
           valuePropName="fileList"
+          getValueFromEvent={formatFileList}
           rules={[{ required: true, message: '请上传附件' }]}
         >
-          <Upload maxFiles={1} />
+          <Upload maxFiles={1} listType="picture-card">
+            <div>
+              <PlusOutlined />
+              <div style={{ marginTop: 8 }}>Upload</div>
+            </div>
+          </Upload>
         </Form.Item>
         <Form.Item label="摘要" name="abstract">
           <Input.TextArea rows={2} />
@@ -138,15 +149,15 @@ const EditForm: FC<EditFormProps> = memo((props) => {
           <Cascader
             options={categoryOptions}
             fieldNames={{ label: 'name', value: 'id', children: 'categories' }}
-            onChange={(value) => setSortIdsArr(value.slice(0, 1) as number[])}
+            onChange={categoryChange}
             placeholder="Please select"
           />
         </Form.Item>
         <Form.Item label="标签" name="tags" rules={[{ required: true, message: '请选择文章!' }]}>
           <Select
             labelInValue
-            showSearch
-            disabled={Boolean(initialValues?.id)}
+            mode="multiple"
+            disabled={!sortIdsArr?.length}
             loading={tagLoading}
             notFoundContent={null}
             filterOption={false}
@@ -165,6 +176,10 @@ const EditForm: FC<EditFormProps> = memo((props) => {
           </Select>
         </Form.Item>
       </Form>
+      <Download token="https://brief-1302086393.cos.ap-shenzhen-fsi.myqcloud.com/blog_system/202103/b57a39d3-3f94-4043-8ad5-b1059748e47b_article.jpeg" />
+      <Preview token="https://brief-1302086393.cos.ap-shenzhen-fsi.myqcloud.com/blog_system/202103/b57a39d3-3f94-4043-8ad5-b1059748e47b_article.jpeg" />
+      <Preview token="https://brief-1302086393.cos.ap-shenzhen-fsi.myqcloud.com/blog_system/202103/ffd9b77f-7d28-46f3-a1c8-e14bb06b7ccf_林泽龙_前端开发_两年经验.pdf" />
+      <Preview token="https://brief-1302086393.cos.ap-shenzhen-fsi.myqcloud.com/blog_system/202103/06b18b6e-7156-40ef-8d7e-c845def2f274_林泽龙_前端开发_两年经验.docx" />
     </Modal>
   )
 })

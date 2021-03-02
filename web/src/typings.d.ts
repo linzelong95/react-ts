@@ -37,3 +37,4 @@ declare module '*.json' {
 }
 
 declare const __SERVER_ORIGIN__: string
+declare const __IS_DEV_MODE__: boolean

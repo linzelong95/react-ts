@@ -126,8 +126,14 @@ module.exports = {
   // 插件
   plugins: [
     // 约定全局变量，页面上直接使用，不需要import，.eslintrc.js的globals属性需要做相应配置{_:'readonly'}
-    new webpack.ProvidePlugin({
+    // new webpack.ProvidePlugin({
+    //   _: 'lodash',
+    // }),
+
+    // 约定全局常量
+    new webpack.DefinePlugin({
       __SERVER_ORIGIN__: JSON.stringify(isDevelopment ? 'http:127.0.0.1:7001' : ''),
+      __IS_DEV_MODE__: JSON.stringify(process.env.NODE_ENV === 'development'),
     }),
 
     // TS 类型检查

@@ -20,6 +20,7 @@ module.exports = {
   },
   globals: {
     __SERVER_ORIGIN__: 'readonly',
+    __IS_DEV_MODE__: 'readonly',
   },
   extends: [
     'standard',

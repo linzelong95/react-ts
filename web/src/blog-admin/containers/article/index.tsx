@@ -426,19 +426,24 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
             <Card
               cover={<img alt="cover" src={item.imageUrl || 'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png'} />}
               actions={[
-                <Button key="form" type="primary" onClick={() => toggleEditorialPanel(item)}>
+                <Button key="form" size="small" type="primary" onClick={() => toggleEditorialPanel(item)}>
                   编辑
                 </Button>,
-                <Button key="delete" type="primary" danger onClick={() => handleItems('remove', item)}>
+                <Button key="delete" size="small" type="primary" danger onClick={() => handleItems('remove', item)}>
                   删除
                 </Button>,
-                <Button key="whetherTop" type="primary" onClick={() => handleItems(item.isTop === 1 ? 'unTop' : 'top', item)}>
+                <Button key="whetherTop" size="small" type="primary" onClick={() => handleItems(item.isTop === 1 ? 'unTop' : 'top', item)}>
                   {item.isTop === 1 ? '置顶' : '取置'}
                 </Button>,
-                <Button key="whetherLock" type="primary" onClick={() => handleItems(item.isEnable === 1 ? 'lock' : 'unlock', item)}>
+                <Button
+                  key="whetherLock"
+                  size="small"
+                  type="primary"
+                  onClick={() => handleItems(item.isEnable === 1 ? 'lock' : 'unlock', item)}
+                >
                   {item.isEnable === 1 ? '禁用' : '启用'}
                 </Button>,
-                <Button key="detail" type="primary" onClick={() => readArticle(item)}>
+                <Button key="detail" size="small" type="primary" onClick={() => readArticle(item)}>
                   详情
                 </Button>,
               ]}

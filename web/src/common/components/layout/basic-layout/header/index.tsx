@@ -110,7 +110,7 @@ const Header: FC<HeaderProps> = memo((props) => {
   }, [accountLocalStorage, userInfo, dispatch])
 
   useEffect(() => {
-    if (process?.env?.NODE_ENV === 'development') return
+    if (__IS_DEV_MODE__) return
     Sentry.setUser({ username: userInfo?.account })
   }, [userInfo])
 
