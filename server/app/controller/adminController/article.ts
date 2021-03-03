@@ -23,8 +23,8 @@ export default class AdminArticleController extends Controller {
   async content() {
     const { ctx } = this
     const { articleId } = ctx.request.body
-    const content = await this.service.adminService.article.content({ articleId })
-    ctx.body = { code: 0, data: { list: content } }
+    const res = await this.service.adminService.article.content({ articleId })
+    ctx.body = { code: 0, data: res?.content }
   }
 
   async save(): Promise<void> {

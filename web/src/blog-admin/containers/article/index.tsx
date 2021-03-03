@@ -97,7 +97,7 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
       message.error('获取内容详情失败')
       return
     }
-    setEditFormData({ ...record, content: contentRes.data.list })
+    setEditFormData({ ...record, content: contentRes.data })
     setEditFormVisible((prevValue) => !prevValue)
   }, [])
 
@@ -201,7 +201,7 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
       message.error('获取内容详情失败')
       return
     }
-    setOneDetail({ ...record, content: contentRes.data.list })
+    setOneDetail({ ...record, content: contentRes.data })
     setDetailDrawerVisible(true)
   }, [])
 

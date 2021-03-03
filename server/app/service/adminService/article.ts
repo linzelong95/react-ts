@@ -53,7 +53,7 @@ export default class AdminArticleService extends Service {
 
   async content(options) {
     const { articleId } = options
-    return await getRepository(Content).find({ article: articleId })
+    return await getRepository(Content).findOne({ article: articleId })
   }
 
   async save(options) {

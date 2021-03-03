@@ -1,5 +1,6 @@
 import type { Category, TagTypeCollection } from '@blog-admin/types'
 import type { UploadProps } from 'antd/lib/upload'
+import type { EditorState } from 'braft-editor'
 
 export default interface Article {
   listItemByAdminRole: {
@@ -46,7 +47,7 @@ export default interface Article {
     id?: number
     title?: string
     abstract?: string
-    content?: string
+    content?: EditorState
     category?: [number, number]
     isTop?: 0 | 1
     tags?: { key: number; label: string }[]

@@ -15,7 +15,7 @@ export default class UserArticleController extends Controller {
   async content() {
     const { ctx } = this
     const { articleId } = ctx.request.body
-    const content = await this.service.userService.article.content({ articleId })
-    ctx.body = { code: 0, data: { list: content } }
+    const res = await this.service.userService.article.content({ articleId })
+    ctx.body = { code: 0, data: res?.content }
   }
 }

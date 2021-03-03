@@ -1,15 +1,19 @@
-import React, { memo, useCallback, useEffect, useMemo, useState } from 'react'
-import { Modal, Form, Input, Select, Cascader, message } from 'antd'
+import React, { memo, useCallback, useEffect, useMemo, useState, useRef } from 'react'
+import { Modal, Form, Input, Select, Cascader, Row, Col, message } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { useService } from '@common/hooks'
-import { Upload } from '@common/components'
+import { Upload, RichEditor } from '@common/components'
 import { adminTagServices } from '@blog-admin/services/tag'
+import BraftEditor from 'braft-editor'
+import Cropper from 'react-cropper'
 import type { ArticleTypeCollection, TagTypeCollection, Sort } from '@blog-admin/types'
-import type { FC } from 'react'
+import type { FC, ReactNode } from 'react'
 import type { ModalProps } from 'antd/lib/modal'
 import type { CascaderProps } from 'antd/lib/cascader'
 import type { UploadProps } from 'antd/lib/upload'
+import type { ReactCropperProps, ReactCropperElement } from 'react-cropper'
 import type { ToggleEditorialPanel, SaveData, DetailItem } from '@blog-admin/containers/article'
+import 'cropperjs/dist/cropper.css'
 
 interface EditFormProps extends ModalProps {
   initialValues?: DetailItem
@@ -25,6 +29,9 @@ const EditForm: FC<EditFormProps> = memo((props) => {
   const [form] = Form.useForm<FormDataWhenEdited>()
   const [sortIdsArr, setSortIdsArr] = useState<number[]>([])
   const [categoryOptions, setCategoryOptions] = useState<any[]>([])
+  const [croppingFileUrl, setCroppingFileUrl] = useState<string>(null)
+
+  const cropperRef = useRef<ReactCropperElement>(null)
 
   const getTagListParams = useMemo<TagTypeCollection['getListParamsByAdminRole']>(
     () => ({
@@ -43,9 +50,10 @@ const EditForm: FC<EditFormProps> = memo((props) => {
     return tagRes?.data?.list || []
   }, [tagRes, tagErr])
 
-  const formatFileList = useCallback<UploadProps['onChange']>(({ fileList }) => {
+  const formatFileList = useCallback<UploadProps['onChange']>(({ file, fileList }) => {
     const validFileList = fileList.filter((file) => file.url && ['uploading', 'done'].includes(file.status))
     if (validFileList.length < fileList.length) Modal.error({ title: '上传失败', okText: '知道了' })
+    if (file.status === 'done') setCroppingFileUrl(file.url)
     return validFileList
   }, [])
 
@@ -59,12 +67,12 @@ const EditForm: FC<EditFormProps> = memo((props) => {
       .validateFields()
       .then((values) => {
         const { id } = initialValues || {}
-        const { title, category, imageUrl, isTop, tags, abstract, content = '先测试测试' } = values
+        const { title, category, imageUrl, isTop, tags, abstract, content } = values
         const params: ArticleTypeCollection['editParams'] = {
           id,
           title,
           abstract,
-          content,
+          content: content.toHTML(),
           isTop,
           tags: tags.map((tag) => ({ id: tag.key, name: tag.label })),
           imageUrl: imageUrl?.[0]?.url,
@@ -102,40 +110,110 @@ const EditForm: FC<EditFormProps> = memo((props) => {
   const editingFormData = useMemo<FormDataWhenEdited>(() => {
     const { isTop = 0, category, imageUrl, tags, content, abstract, title } = initialValues || {}
     if (category?.sort?.id) setSortIdsArr([category.sort.id])
-    const fileList = imageUrl ? [{ uid: '-1', url: imageUrl }] : []
+    const fileList = imageUrl ? [{ uid: '-1', url: imageUrl, status: 'done' }] : []
     return {
       title,
       abstract,
       isTop,
-      fileList,
-      content,
+      imageUrl: fileList,
+      content: BraftEditor.createEditorState(content),
       category: category?.sort?.id ? [category.sort.id, category.id] : [],
       tags: tags?.map?.((tag) => ({ key: tag.id, label: tag.name })) || [],
     } as FormDataWhenEdited
   }, [initialValues])
 
+  const onCrop = useCallback<ReactCropperProps['crop']>(() => {
+    const cropper = cropperRef?.current?.cropper
+    console.log(cropper.getCroppedCanvas().toDataURL())
+  }, [])
+
+  const handleBeforeUpload = useCallback<UploadProps['beforeUpload']>((file) => {
+    console.log(file)
+    return false
+  }, [])
+
+  const CropperModalComponent = useMemo<ReactNode>(() => {
+    return (
+      <Modal title="裁剪" visible={Boolean(croppingFileUrl)} onOk={handleOk} maskClosable={false} keyboard={false}>
+        <Cropper src={croppingFileUrl} style={{ height: 400, width: '100%' }} initialAspectRatio={16 / 9} crop={onCrop} ref={cropperRef} />
+      </Modal>
+    )
+  }, [croppingFileUrl, handleOk, onCrop])
+
   return (
     <Modal
       destroyOnClose
+      width={1000}
       title={initialValues?.id ? '更新' : '添加'}
       visible={visible}
       onOk={handleOk}
       onCancel={handleCancel}
       maskClosable={false}
+      keyboard={false}
       {...restProps}
     >
-      <Form labelCol={{ span: 5 }} wrapperCol={{ span: 17 }} form={form} initialValues={editingFormData}>
+      <Form labelCol={{ span: 3 }} wrapperCol={{ span: 19 }} form={form} initialValues={editingFormData}>
         <Form.Item label="标题" name="title" rules={[{ required: true, message: '请输入标题!' }]}>
           <Input />
+        </Form.Item>
+        <Form.Item noStyle>
+          <Row>
+            <Col span={12}>
+              <Form.Item
+                label="分类"
+                name="category"
+                labelCol={{ span: 6 }}
+                wrapperCol={{ span: 16 }}
+                rules={[{ required: true, message: '请选择分类!' }]}
+              >
+                <Cascader
+                  options={categoryOptions}
+                  fieldNames={{ label: 'name', value: 'id', children: 'categories' }}
+                  onChange={categoryChange}
+                  placeholder="Please select"
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="标签"
+                name="tags"
+                labelCol={{ span: 4 }}
+                wrapperCol={{ span: 16 }}
+                rules={[{ required: true, message: '请选择文章!' }]}
+              >
+                <Select
+                  labelInValue
+                  mode="multiple"
+                  disabled={!sortIdsArr?.length}
+                  loading={tagLoading}
+                  notFoundContent={null}
+                  filterOption={false}
+                >
+                  {tagList?.map?.((tag) => (
+                    <Select.Option value={tag.id} key={tag.id}>
+                      {tag.name}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form.Item>
+        <Form.Item label="置顶" name="isTop" rules={[{ required: true, message: '请选择是否置顶!' }]}>
+          <Select>
+            <Select.Option value={1}>是</Select.Option>
+            <Select.Option value={0}>否</Select.Option>
+          </Select>
         </Form.Item>
         <Form.Item
           label="封面"
           name="imageUrl"
           valuePropName="fileList"
           getValueFromEvent={formatFileList}
-          rules={[{ required: true, message: '请上传附件' }]}
+          rules={[{ required: true, message: '请上传封面' }]}
         >
-          <Upload maxFiles={1} listType="picture-card">
+          <Upload maxFiles={1} listType="picture-card" accept="image/*" beforeUpload={handleBeforeUpload}>
             <div>
               <PlusOutlined />
               <div style={{ marginTop: 8 }}>Upload</div>
@@ -145,37 +223,11 @@ const EditForm: FC<EditFormProps> = memo((props) => {
         <Form.Item label="摘要" name="abstract">
           <Input.TextArea rows={2} />
         </Form.Item>
-        <Form.Item label="分类" name="category" rules={[{ required: true, message: '请选择分类!' }]}>
-          <Cascader
-            options={categoryOptions}
-            fieldNames={{ label: 'name', value: 'id', children: 'categories' }}
-            onChange={categoryChange}
-            placeholder="Please select"
-          />
-        </Form.Item>
-        <Form.Item label="标签" name="tags" rules={[{ required: true, message: '请选择文章!' }]}>
-          <Select
-            labelInValue
-            mode="multiple"
-            disabled={!sortIdsArr?.length}
-            loading={tagLoading}
-            notFoundContent={null}
-            filterOption={false}
-          >
-            {tagList?.map?.((tag) => (
-              <Select.Option value={tag.id} key={tag.id}>
-                {tag.name}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
-        <Form.Item label="置顶" name="isTop" rules={[{ required: true, message: '请选择是否置顶!' }]} style={{ marginBottom: 0 }}>
-          <Select>
-            <Select.Option value={1}>是</Select.Option>
-            <Select.Option value={0}>否</Select.Option>
-          </Select>
+        <Form.Item label="正文" name="content" rules={[{ required: true, message: '请输入正文!' }]} style={{ marginBottom: 0 }}>
+          <RichEditor />
         </Form.Item>
       </Form>
+      {CropperModalComponent}
     </Modal>
   )
 })
