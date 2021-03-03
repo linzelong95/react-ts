@@ -2,7 +2,7 @@ import React, { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import { Modal, Form, Input, Select, Cascader, message } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { useService } from '@common/hooks'
-import { Upload, Download, Preview } from '@common/components'
+import { Upload } from '@common/components'
 import { adminTagServices } from '@blog-admin/services/tag'
 import type { ArticleTypeCollection, TagTypeCollection, Sort } from '@blog-admin/types'
 import type { FC } from 'react'
@@ -176,10 +176,6 @@ const EditForm: FC<EditFormProps> = memo((props) => {
           </Select>
         </Form.Item>
       </Form>
-      <Download token="https://brief-1302086393.cos.ap-shenzhen-fsi.myqcloud.com/blog_system/202103/b57a39d3-3f94-4043-8ad5-b1059748e47b_article.jpeg" />
-      <Preview token="https://brief-1302086393.cos.ap-shenzhen-fsi.myqcloud.com/blog_system/202103/b57a39d3-3f94-4043-8ad5-b1059748e47b_article.jpeg" />
-      <Preview token="https://brief-1302086393.cos.ap-shenzhen-fsi.myqcloud.com/blog_system/202103/ffd9b77f-7d28-46f3-a1c8-e14bb06b7ccf_林泽龙_前端开发_两年经验.pdf" />
-      <Preview token="https://brief-1302086393.cos.ap-shenzhen-fsi.myqcloud.com/blog_system/202103/06b18b6e-7156-40ef-8d7e-c845def2f274_林泽龙_前端开发_两年经验.docx" />
     </Modal>
   )
 })

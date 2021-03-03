@@ -1,7 +1,7 @@
 {
-  "name": "yyy",
+  "name": "blog",
   "version": "1.0.0",
-  "description": "xxx",
+  "description": "a blog where we can study together.",
   "main": "index.js",
   "scripts": {
     "dev": "node ./webpack/build.js dev",
@@ -12,23 +12,24 @@
   },
   "repository": {
     "type": "git",
-    "url": "xx"
+    "url": "https://github.com/linzelong95/react-ts"
   },
   "keywords": [
+    "blog",
     "react-project",
     "typescript-project",
     "react-typescript"
   ],
   "author": {
-    "name": "xxx",
-    "url": "xxx",
-    "email": "xxx@qq.com"
+    "name": "linzelong95",
+    "url": "http://120.78.139.146",
+    "email": "linzelong95@163.com"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://xxx"
+    "url": "https://github.com/linzelong95/react-ts/issues"
   },
-  "homepage": "https://xxx#readme",
+  "homepage": "https://github.com/linzelong95/react-ts#readme",
   "dependencies": {
     "@sentry/browser": "^6.2.0",
     "antd": "^4.10.3",

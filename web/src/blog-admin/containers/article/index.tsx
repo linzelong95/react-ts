@@ -410,7 +410,7 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
       <List
         loading={loading}
         dataSource={dataSource}
-        grid={{ gutter: 16, sm: 1, md: 2, xl: 3, xxl: 3 }}
+        grid={{ gutter: 16, sm: 1, md: 2, xl: 3 }}
         pagination={{
           showQuickJumper: true,
           showSizeChanger: true,
@@ -451,7 +451,8 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
                 cursor: 'pointer',
                 position: 'relative',
                 overflow: 'hidden',
-                background: (selectedItems.some((i) => i.id === item.id) && '#FFFFE0') || (!item.isEnable && '#fafafa'),
+                background:
+                  (selectedItems.some((selectedItem) => selectedItem.id === item.id) && '#FFFFE0') || (!item.isEnable && '#fafafa'),
               }}
               onClick={() => toggleSelectOne(item)}
             >
@@ -479,7 +480,7 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
                     </div>
                     <Ellipsis lines={2} style={{ height: 40 }}>
                       摘要：
-                      {item.abstract ? item.abstract : '无'}
+                      {item?.abstract || '无'}
                     </Ellipsis>
                     <div style={{ marginTop: 5, fontSize: 12 }}>
                       <div style={{ float: 'left' }}>{moment(new Date(item.createDate)).format('YYYY-MM-DD')}</div>
