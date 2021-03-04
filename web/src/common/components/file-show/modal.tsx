@@ -1,8 +1,8 @@
 import React, { memo, FC } from 'react'
 import { Modal, Button } from 'antd'
 import { ModalProps } from 'antd/lib/modal'
-import Preview from '../preview'
-import { isPreviewSupported } from '../utils'
+import { FileShow } from '@common/components'
+import { isPreviewSupported } from '@common/utils'
 
 interface PreviewModalProps extends ModalProps {
   token: string
@@ -37,7 +37,7 @@ const PreviewModal: FC<PreviewModalProps> = memo((props) => {
       ]}
       {...otherProps}
     >
-      <Preview token={token} height={height} />
+      <FileShow token={token} height={height} />
     </Modal>
   )
 })

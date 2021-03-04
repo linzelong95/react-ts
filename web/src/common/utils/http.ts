@@ -1,8 +1,9 @@
 import { v4 as uuid } from 'uuid'
 import { parse } from 'qs'
-import axios, { AxiosError, AxiosResponse, AxiosRequestConfig } from 'axios'
+import axios from 'axios'
 import { tryCatch } from './util'
-import { CommonResponse, CommonError, ServiceResult } from '@common/types'
+import type { AxiosError, AxiosResponse, AxiosRequestConfig } from 'axios'
+import type { CommonResponse, CommonError, ServiceResult } from '@common/types'
 
 export enum StatusCode {
   BAD_REQ = 400, // Bad Request 客户端请求的语法错误，服务器无法理解

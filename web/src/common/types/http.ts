@@ -1,12 +1,5 @@
-/**
- * 统一返回类型封装
- */
 import { AxiosError, AxiosResponse } from 'axios'
 
-/**
- * 统一的响应类型
- * @param {unknown} T 数据类型
- */
 export interface CommonResponse<T = unknown> {
   // 业务返回码
   code: number
@@ -18,9 +11,6 @@ export interface CommonResponse<T = unknown> {
   data: T
 }
 
-/**
- * 统一的错误对象
- */
 export interface CommonError {
   // 错误码
   code: number

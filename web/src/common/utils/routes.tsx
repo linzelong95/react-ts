@@ -43,7 +43,7 @@ type RenderRoutes = (
   extraParams?: { redirectComponent?: CElement<RedirectProps, Redirect>; useNotFoundComponent?: boolean },
 ) => CElement<SwitchProps, Switch>
 
-const renderRoutes: RenderRoutes = (routes = [], basename, allRoutes, extraParams = {}) => {
+export const renderRoutes: RenderRoutes = (routes = [], basename, allRoutes, extraParams = {}) => {
   const { redirectComponent, useNotFoundComponent = true } = extraParams
   return (
     <Switch key={uuid()}>
@@ -64,4 +64,16 @@ const renderRoutes: RenderRoutes = (routes = [], basename, allRoutes, extraParam
   )
 }
 
-export default renderRoutes
+export function flatRoutes(routes: RouteConfig[] = [], userAuthPoints?: string[]): Omit<RouteConfig, 'routes'>[] {
+  return routes.reduce((flattedRoutes, route) => {
+    const { authPoints, authOperator = 'or' } = route
+    if (Array.isArray(authPoints) && Array.isArray(userAuthPoints)) {
+      const isPass: boolean =
+        (authOperator === 'or' && userAuthPoints.some((userAuthPoint) => authPoints.includes(userAuthPoint))) ||
+        (authOperator === 'and' && authPoints.length > 0 && authPoints.every((authPoint) => userAuthPoints.includes(authPoint)))
+      if (!isPass) return flattedRoutes
+    }
+    flattedRoutes = [...flattedRoutes, route, ...flatRoutes(route.routes, userAuthPoints)]
+    return flattedRoutes
+  }, [])
+}

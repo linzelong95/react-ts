@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useMemo, memo } from 'react'
 import { Tooltip, message } from 'antd'
 import { DownloadOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons'
-import PreviewModal from '../preview/modal'
+import PreviewModal from '../file-show/modal'
 import { getCosSignature } from '@common/services/cos'
-import { COS_URL } from '../constant'
-import { isPreviewSupported } from '../utils'
+import { COS_URL } from '@common/constants/cos'
+import { isPreviewSupported } from '@common/utils'
 import type { FC, ReactNode, CSSProperties, AnchorHTMLAttributes } from 'react'
 
 export function getFilename(token: string): string {

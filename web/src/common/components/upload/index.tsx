@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, forwardRef, useMemo, memo } from 'react'
 import { Upload as AntdUpload, message, Modal, Button } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
-import { COS_URL } from '../constant'
+import { COS_URL } from '@common/constants/cos'
 import { getCosSignature } from '@common/services/cos'
 import moment from 'moment'
 import { v4 as uuid } from 'uuid'

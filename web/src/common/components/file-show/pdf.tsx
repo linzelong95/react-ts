@@ -1,5 +1,5 @@
 import React, { FC, useState, useRef, useLayoutEffect, memo, useMemo } from 'react'
-import { COS_URL } from '../constant'
+import { COS_URL } from '@common/constants/cos'
 
 interface PDFPreviewProps {
   fileKey: string
