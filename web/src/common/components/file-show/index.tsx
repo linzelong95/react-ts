@@ -3,7 +3,7 @@ import { Spin } from 'antd'
 import ImagePreview from './image'
 import PDFPreview from './pdf'
 import { getCosSignature } from '@common/services/cos'
-import { getFileType } from '../utils'
+import { getFileType } from '@common/utils'
 import type { FC, CSSProperties } from 'react'
 
 const styles: CSSProperties = {

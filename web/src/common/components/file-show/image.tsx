@@ -1,5 +1,5 @@
 import React, { FC, memo } from 'react'
-import { COS_URL } from '../constant'
+import { COS_URL } from '@common/constants/cos'
 
 interface ImagePreviewProps {
   fileKey: string

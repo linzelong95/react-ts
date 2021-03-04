@@ -43,12 +43,13 @@ const EditForm: FC<EditFormProps> = memo((props) => {
   )
   const [tagLoading, tagRes, tagErr] = useService(adminTagServices.getList, getTagListParams, !sortIdsArr?.length)
   const tagList = useMemo(() => {
+    if (!sortIdsArr?.length) return []
     if (tagErr) {
       message.error(tagErr.message || '获取列表失败')
       return []
     }
     return tagRes?.data?.list || []
-  }, [tagRes, tagErr])
+  }, [sortIdsArr, tagRes, tagErr])
 
   const formatFileList = useCallback<UploadProps['onChange']>(({ file, fileList }) => {
     const validFileList = fileList.filter((file) => file.url && ['uploading', 'done'].includes(file.status))
@@ -129,12 +130,13 @@ const EditForm: FC<EditFormProps> = memo((props) => {
 
   const handleBeforeUpload = useCallback<UploadProps['beforeUpload']>((file) => {
     console.log(file)
-    return false
+    return true
   }, [])
 
   const CropperModalComponent = useMemo<ReactNode>(() => {
+    const flag = false
     return (
-      <Modal title="裁剪" visible={Boolean(croppingFileUrl)} onOk={handleOk} maskClosable={false} keyboard={false}>
+      <Modal title="裁剪" visible={flag} onOk={handleOk} maskClosable={false} keyboard={false}>
         <Cropper src={croppingFileUrl} style={{ height: 400, width: '100%' }} initialAspectRatio={16 / 9} crop={onCrop} ref={cropperRef} />
       </Modal>
     )

@@ -1,15 +1,21 @@
 import React, { memo, useState, useCallback, useMemo, useEffect } from 'react'
 import { message, List, Avatar } from 'antd'
 import { PictureOutlined, EyeOutlined } from '@ant-design/icons'
+import moment from 'moment'
+import { v4 as uuid } from 'uuid'
 import { Upload } from '@common/components'
 import { useService, useLocalStorage } from '@common/hooks'
 import { adminTagServices } from '@blog-admin/services/tag'
 import BraftEditor from 'braft-editor'
 import { ContentUtils } from 'braft-utils'
 import { Modifier, EditorState } from 'draft-js'
-import { UploadProps } from 'antd/lib/upload'
-import { UploadFile } from 'antd/lib/upload/interface'
-import type { BraftEditorProps, EditorState as IEditorState } from 'braft-editor'
+import { upload } from '@common/utils'
+import { COS_URL } from '@common/constants/cos'
+import { getCosSignature } from '@common/services/cos'
+import type { UploadProps } from 'antd/lib/upload'
+import type { UploadFile } from 'antd/lib/upload/interface'
+import type { UploadRequestOption } from 'rc-upload/lib/interface'
+import type { BraftEditorProps, MediaType, EditorState as IEditorState } from 'braft-editor'
 import type { FC, ReactNode } from 'react'
 import 'braft-editor/dist/index.css'
 
@@ -175,77 +181,37 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
     }
   }, [])
 
-  // TODO
-  const myUploadFn = useCallback((param: any) => {
-    // param
-    // {
-    //   file: [File Object],
-    //   progress: function (progress) {
-    //     // progress为0到100
-    //   },
-    //   libraryId: 'XXXXX',
-    //   success: function (res) {
-    //     // res须为一个包含已上传文件url属性的对象：
-    //   },
-    //   error: function (err) {
-
-    //   }
-    // }
-    const serverURL = 'http://upload-server'
-    const xhr = new XMLHttpRequest()
-    const fd = new FormData()
-    fd.append('file', param.file)
-
-    xhr.upload.addEventListener(
-      'progress',
-      (event) => {
-        param.progress((event.loaded / event.total) * 100)
+  const myUploadFn = useCallback<MediaType['uploadFn']>(async (param) => {
+    const { file, progress, success, error } = param
+    const key = `blog_system/${moment().format('YYYYMM')}/${uuid()}_${file.name}`
+    const url = `${COS_URL}/${key}`
+    const cosUploadSignature = await getCosSignature()
+    upload({
+      method: 'POST',
+      action: COS_URL,
+      file: param.file as UploadRequestOption['file'],
+      data: {
+        key,
+        Signature: cosUploadSignature,
+        success_action_status: '200',
       },
-      false,
-    )
-    xhr.addEventListener(
-      'load',
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      (res) => {
-        param.success({
-          url: xhr.responseText,
+      onError: (error as unknown) as UploadRequestOption['onError'],
+      onProgress: (event) => progress(event.percent),
+      onSuccess: () => {
+        success({
+          url,
           meta: {
-            id: 'xxx',
-            title: 'xxx',
-            alt: 'xxx',
+            id: (param as any).id || uuid(),
+            title: 'image',
+            alt: 'image',
             loop: true, // 指定音视频是否循环播放
             autoPlay: true, // 指定音视频是否自动播放
             controls: true, // 指定音视频是否显示控制栏
-            poster: 'http://xxx/xx.png', // 指定视频播放器的封面
+            poster: `${__SERVER_ORIGIN__}/public/assets/images/default/poster.jpeg`, // 指定视频播放器的封面
           },
         })
       },
-      false,
-    )
-    xhr.addEventListener(
-      'error',
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      (res) => {
-        param.error({
-          msg: 'unable to upload.',
-        })
-      },
-      false,
-    )
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    xhr.addEventListener(
-      'abort',
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      (res) => {
-        param.error({
-          msg: 'unable to upload.',
-        })
-      },
-      false,
-    )
-
-    xhr.open('POST', serverURL, true)
-    xhr.send(fd)
+    })
   }, [])
 
   const handlePreview = useCallback<() => void>(() => {
@@ -358,7 +324,7 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
             }}
           >
             <List.Item.Meta
-              avatar={<Avatar size="small" src={'http://xxx'} />}
+              avatar={<Avatar size="small" src={`${__SERVER_ORIGIN__}/public/assets/images/default/avatar.jpeg`} />}
               title={<div style={{ marginLeft: -10, paddingTop: 2 }}>{item.name}</div>}
             />
           </List.Item>
@@ -396,6 +362,7 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
           'emoji',
           'fullscreen',
           'table',
+          'media',
         ]}
         extendControls={[
           {
