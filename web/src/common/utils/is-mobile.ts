@@ -1,8 +1,4 @@
-/**
- * 判断是否为移动端访问
- */
 export function isMobile(includeIPad: boolean): boolean {
-  let isMobile = false
   const { userAgent } = navigator
   const regExps = [
     /iphone/i,
@@ -20,17 +16,5 @@ export function isMobile(includeIPad: boolean): boolean {
     /\b(crios|chrome).+mobile/i,
     /mobile.+firefox\b/i,
   ]
-
-  for (const regexp of regExps) {
-    if (regexp.test(userAgent)) {
-      isMobile = true
-      break
-    }
-  }
-
-  if (/ipad/i.test(userAgent) && !includeIPad) {
-    isMobile = false
-  }
-
-  return isMobile
+  return /ipad/i.test(userAgent) && !includeIPad ? false : regExps.some((regex) => regex.test(userAgent))
 }

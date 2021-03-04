@@ -2,10 +2,6 @@ import md5 from 'crypto-js/md5'
 import hex from 'crypto-js/enc-hex'
 import JSEncrypt from 'jsencrypt'
 
-/**
- * tryCatch return Promise<[R, Error]>
- * @param {Promise<R>} promise
- */
 export async function tryCatch<R, E = Error>(promise: Promise<R> | R): Promise<[R, null] | [null, E]> {
   try {
     const res: R = await promise

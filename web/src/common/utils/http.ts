@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid'
 import { parse } from 'qs'
 import axios, { AxiosError, AxiosResponse, AxiosRequestConfig } from 'axios'
 import { tryCatch } from './util'
-import { CommonError } from '@common/types'
+import { CommonResponse, CommonError, ServiceResult } from '@common/types'
 
 export enum StatusCode {
   BAD_REQ = 400, // Bad Request 客户端请求的语法错误，服务器无法理解
@@ -41,7 +41,7 @@ http.interceptors.request.use((req: AxiosRequestConfig) => {
 
 // 响应时做一些操作
 http.interceptors.response.use(
-  (res: AxiosResponse<{ code: number; message?: string; data?: Record<string, any> }>) => {
+  (res: AxiosResponse<{ code: number; message?: string; data?: Record<string, unknown> }>) => {
     const {
       status,
       data: { code, message },
@@ -60,7 +60,7 @@ http.interceptors.response.use(
     }
     return res
   },
-  (err: AxiosError<{ code: number; message?: string; data?: Record<string, any> }>) => {
+  (err: AxiosError<{ code: number; message?: string; data?: Record<string, unknown> }>) => {
     // 服务端代码错误，如访问ctx.a.b(ctx不存在a变量)时
     const {
       response: { status, statusText, data },
@@ -87,26 +87,26 @@ http.interceptors.response.use(
  * const [res, err] = await request({ method: 'GET', data: { param: 'example' } })
  *
  */
-export function request<T = any>(config: AxiosRequestConfig): Promise<[T, null] | [null, AxiosError]> {
-  return tryCatch<T, AxiosError>(http(config).then((res) => res.data))
+export function request<T = unknown>(config: AxiosRequestConfig): Promise<[CommonResponse<T>, null] | [null, AxiosError]> {
+  return tryCatch<CommonResponse<T>, AxiosError>(http(config).then((res) => res.data))
 }
 
-export function get<T = any>(url: string, data: any = {}, config?: AxiosRequestConfig): Promise<[T, null] | [null, CommonError]> {
-  return tryCatch<T, CommonError>(http.get(url, { ...config, params: data }).then((res) => res.data))
+export function get<T = unknown>(url: string, data: unknown = {}, config?: AxiosRequestConfig): ServiceResult<T> {
+  return tryCatch<CommonResponse<T>, CommonError>(http.get(url, { ...config, params: data }).then((res) => res.data))
 }
 
-export function post<T = any, D = any>(url: string, data?: D, config?: AxiosRequestConfig): Promise<[T, null] | [null, CommonError]> {
-  return tryCatch<T, CommonError>(http.post(url, data, config).then((res) => res.data))
+export function post<T = unknown, D = unknown>(url: string, data?: D, config?: AxiosRequestConfig): ServiceResult<T> {
+  return tryCatch<CommonResponse<T>, CommonError>(http.post(url, data, config).then((res) => res.data))
 }
 
-export function put<T = any, D = any>(url: string, data?: D, config?: AxiosRequestConfig): Promise<[T, null] | [null, CommonError]> {
-  return tryCatch<T, CommonError>(http.put(url, data, config).then((res) => res.data))
+export function put<T = unknown, D = unknown>(url: string, data?: D, config?: AxiosRequestConfig): ServiceResult<T> {
+  return tryCatch<CommonResponse<T>, CommonError>(http.put(url, data, config).then((res) => res.data))
 }
 
-export function del<T = any>(url: string, config?: AxiosRequestConfig): Promise<[T, null] | [null, CommonError]> {
-  return tryCatch<T, CommonError>(http.delete(url, config).then((res) => res.data))
+export function del<T = unknown>(url: string, config?: AxiosRequestConfig): ServiceResult<T> {
+  return tryCatch<CommonResponse<T>, CommonError>(http.delete(url, config).then((res) => res.data))
 }
 
-export function patch<T = any, D = any>(url: string, data?: D, config?: AxiosRequestConfig): Promise<[T, null] | [null, CommonError]> {
-  return tryCatch<T, CommonError>(http.patch(url, data, config).then((res) => res.data))
+export function patch<T = unknown, D = unknown>(url: string, data?: D, config?: AxiosRequestConfig): ServiceResult<T> {
+  return tryCatch<CommonResponse<T>, CommonError>(http.patch(url, data, config).then((res) => res.data))
 }
