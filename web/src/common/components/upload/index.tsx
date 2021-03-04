@@ -3,6 +3,7 @@ import { Upload as AntdUpload, message, Modal, Button } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
 import { COS_URL } from '@common/constants/cos'
 import { getCosSignature } from '@common/services/cos'
+import Crop from './crop'
 import moment from 'moment'
 import { v4 as uuid } from 'uuid'
 import type { ForwardRefRenderFunction } from 'react'
@@ -10,11 +11,12 @@ import type { UploadProps as AntdUploadProps, UploadFile } from 'antd/lib/upload
 
 export interface UploadProps extends AntdUploadProps {
   maxFiles?: number
+  useInUploadCrop?: boolean
   children?: React.ReactNode
 }
 
 const Upload: ForwardRefRenderFunction<typeof AntdUpload, UploadProps> = (props, ref) => {
-  const { fileList, maxFiles, children, beforeUpload, onChange, ...restProps } = props
+  const { fileList, maxFiles, children, useInUploadCrop, beforeUpload, onChange, onRemove, ...restProps } = props
   const { multiple = Number.isFinite(maxFiles) && maxFiles > 1, ...otherProps } = restProps
   const [cosUploadSignature, setCosUploadSignature] = useState<string>(undefined)
 
@@ -50,9 +52,9 @@ const Upload: ForwardRefRenderFunction<typeof AntdUpload, UploadProps> = (props,
     ({ file, fileList, event }) => {
       if (file.status === 'error') message.error(`${file.name}上传失败！`)
       if (file.status === 'done') message.success(`${file.name}上传成功！`)
-      if (onChange) onChange({ file, fileList: fileList.slice(0, formattedMaxFiles), event })
+      if (onChange && !useInUploadCrop) onChange({ file, fileList: fileList.slice(0, formattedMaxFiles), event })
     },
-    [formattedMaxFiles, onChange],
+    [formattedMaxFiles, useInUploadCrop, onChange],
   )
 
   const getFileKeyAndSignature = useCallback<(token: string) => Promise<{ fileKey: string; signature: string }>>(async (token) => {
@@ -105,18 +107,27 @@ const Upload: ForwardRefRenderFunction<typeof AntdUpload, UploadProps> = (props,
     [beforeUpload],
   )
 
+  const handleRemove = useCallback<AntdUploadProps['onRemove']>(
+    (file) => {
+      if (onRemove) return onRemove(file)
+      if (onChange) onChange({ file, fileList: fileList.filter(({ url }) => url !== file.url) })
+    },
+    [fileList, onRemove, onChange],
+  )
+
   return (
     <AntdUpload
-      onPreview={handlePreview}
-      {...otherProps}
       ref={ref}
       action={COS_URL}
       multiple={multiple}
+      fileList={fileList || []}
       data={getUploadParams}
       onChange={handleChange}
+      onRemove={handleRemove}
+      onPreview={handlePreview}
       onDownload={handleDownload}
       beforeUpload={handleBeforeUpload}
-      fileList={fileList?.map?.((file, index) => ({ ...file, uid: file.uid || `${index}` })) || []}
+      {...otherProps}
     >
       {(!Array.isArray(fileList) || fileList.length < formattedMaxFiles) &&
         (children || (
@@ -129,4 +140,8 @@ const Upload: ForwardRefRenderFunction<typeof AntdUpload, UploadProps> = (props,
   )
 }
 
-export default memo(forwardRef(Upload))
+const UploadForExport = Object.assign(memo(forwardRef(Upload)), {
+  Crop,
+})
+
+export default UploadForExport

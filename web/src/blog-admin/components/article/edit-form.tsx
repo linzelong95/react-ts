@@ -1,17 +1,15 @@
-import React, { memo, useCallback, useEffect, useMemo, useState, useRef } from 'react'
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import { Modal, Form, Input, Select, Cascader, Row, Col, message } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { useService } from '@common/hooks'
 import { Upload, RichEditor } from '@common/components'
 import { adminTagServices } from '@blog-admin/services/tag'
 import BraftEditor from 'braft-editor'
-import Cropper from 'react-cropper'
 import type { ArticleTypeCollection, TagTypeCollection, Sort } from '@blog-admin/types'
-import type { FC, ReactNode } from 'react'
+import type { FC } from 'react'
 import type { ModalProps } from 'antd/lib/modal'
 import type { CascaderProps } from 'antd/lib/cascader'
 import type { UploadProps } from 'antd/lib/upload'
-import type { ReactCropperProps, ReactCropperElement } from 'react-cropper'
 import type { ToggleEditorialPanel, SaveData, DetailItem } from '@blog-admin/containers/article'
 import 'cropperjs/dist/cropper.css'
 
@@ -29,9 +27,6 @@ const EditForm: FC<EditFormProps> = memo((props) => {
   const [form] = Form.useForm<FormDataWhenEdited>()
   const [sortIdsArr, setSortIdsArr] = useState<number[]>([])
   const [categoryOptions, setCategoryOptions] = useState<any[]>([])
-  const [croppingFileUrl, setCroppingFileUrl] = useState<string>(null)
-
-  const cropperRef = useRef<ReactCropperElement>(null)
 
   const getTagListParams = useMemo<TagTypeCollection['getListParamsByAdminRole']>(
     () => ({
@@ -43,18 +38,17 @@ const EditForm: FC<EditFormProps> = memo((props) => {
   )
   const [tagLoading, tagRes, tagErr] = useService(adminTagServices.getList, getTagListParams, !sortIdsArr?.length)
   const tagList = useMemo(() => {
-    if (!sortIdsArr?.length) return []
+    if (!sortIdsArr?.length || tagLoading) return []
     if (tagErr) {
       message.error(tagErr.message || '获取列表失败')
       return []
     }
     return tagRes?.data?.list || []
-  }, [sortIdsArr, tagRes, tagErr])
+  }, [sortIdsArr, tagLoading, tagRes, tagErr])
 
-  const formatFileList = useCallback<UploadProps['onChange']>(({ file, fileList }) => {
+  const formatFileList = useCallback<UploadProps['onChange']>(({ fileList }) => {
     const validFileList = fileList.filter((file) => file.url && ['uploading', 'done'].includes(file.status))
     if (validFileList.length < fileList.length) Modal.error({ title: '上传失败', okText: '知道了' })
-    if (file.status === 'done') setCroppingFileUrl(file.url)
     return validFileList
   }, [])
 
@@ -122,25 +116,6 @@ const EditForm: FC<EditFormProps> = memo((props) => {
       tags: tags?.map?.((tag) => ({ key: tag.id, label: tag.name })) || [],
     } as FormDataWhenEdited
   }, [initialValues])
-
-  const onCrop = useCallback<ReactCropperProps['crop']>(() => {
-    const cropper = cropperRef?.current?.cropper
-    console.log(cropper.getCroppedCanvas().toDataURL())
-  }, [])
-
-  const handleBeforeUpload = useCallback<UploadProps['beforeUpload']>((file) => {
-    console.log(file)
-    return true
-  }, [])
-
-  const CropperModalComponent = useMemo<ReactNode>(() => {
-    const flag = false
-    return (
-      <Modal title="裁剪" visible={flag} onOk={handleOk} maskClosable={false} keyboard={false}>
-        <Cropper src={croppingFileUrl} style={{ height: 400, width: '100%' }} initialAspectRatio={16 / 9} crop={onCrop} ref={cropperRef} />
-      </Modal>
-    )
-  }, [croppingFileUrl, handleOk, onCrop])
 
   return (
     <Modal
@@ -215,12 +190,12 @@ const EditForm: FC<EditFormProps> = memo((props) => {
           getValueFromEvent={formatFileList}
           rules={[{ required: true, message: '请上传封面' }]}
         >
-          <Upload maxFiles={1} listType="picture-card" accept="image/*" beforeUpload={handleBeforeUpload}>
+          <Upload.Crop maxFiles={1} listType="picture-card" accept="image/*">
             <div>
               <PlusOutlined />
               <div style={{ marginTop: 8 }}>Upload</div>
             </div>
-          </Upload>
+          </Upload.Crop>
         </Form.Item>
         <Form.Item label="摘要" name="abstract">
           <Input.TextArea rows={2} />
@@ -229,7 +204,6 @@ const EditForm: FC<EditFormProps> = memo((props) => {
           <RichEditor />
         </Form.Item>
       </Form>
-      {CropperModalComponent}
     </Modal>
   )
 })

@@ -1,7 +1,6 @@
 import React, { memo, useState, useCallback, useMemo, useEffect } from 'react'
 import { message, List, Avatar } from 'antd'
 import { PictureOutlined, EyeOutlined } from '@ant-design/icons'
-import moment from 'moment'
 import { v4 as uuid } from 'uuid'
 import { Upload } from '@common/components'
 import { useService, useLocalStorage } from '@common/hooks'
@@ -9,7 +8,7 @@ import { adminTagServices } from '@blog-admin/services/tag'
 import BraftEditor from 'braft-editor'
 import { ContentUtils } from 'braft-utils'
 import { Modifier, EditorState } from 'draft-js'
-import { upload } from '@common/utils'
+import { upload, getFileKeyAndUrl } from '@common/utils'
 import { COS_URL } from '@common/constants/cos'
 import { getCosSignature } from '@common/services/cos'
 import type { UploadProps } from 'antd/lib/upload'
@@ -43,8 +42,6 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
   const [mentionState, setMentionState] = useState<{ left: number; top: number; index: number }>()
   // 员工列表
   const [searchUserName, setSearchUserName] = useState<string>('')
-  // 富文本的editorState
-  const [editorState, setEditorState] = useState<IEditorState>(() => BraftEditor.createEditorState(null))
   // Upload fileList为[]
   const [fileList, setFileList] = useState<UploadFile[]>([])
   // 本地缓存的曾提及用户
@@ -84,10 +81,10 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
 
   const selectMentioningUser = useCallback<(index: number) => void>(
     (index) => {
-      const currentSelectionState = editorState.getSelection()
+      const currentSelectionState = value.getSelection()
       const end = currentSelectionState.getAnchorOffset()
       const anchorKey = currentSelectionState.getAnchorKey()
-      const currentContent = editorState.getCurrentContent()
+      const currentContent = value.getCurrentContent()
       const currentBlock = currentContent.getBlockForKey(anchorKey)
       const blockText = currentBlock.getText()
       const start = blockText.slice(0, end).lastIndexOf('@')
@@ -98,24 +95,17 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
       })
       const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
       const mentionTextSelection = currentSelectionState.merge({ anchorOffset: start, focusOffset: end })
-      const insertingContent = Modifier.replaceText(
-        editorState.getCurrentContent(),
-        mentionTextSelection,
-        `@${userInfo.name} `,
-        null,
-        entityKey,
-      )
-      const newEditorState = EditorState.push(editorState, insertingContent, 'insert-fragment')
-      setEditorState(EditorState.forceSelection(newEditorState, insertingContent.getSelectionAfter()))
+      const insertingContent = Modifier.replaceText(value.getCurrentContent(), mentionTextSelection, `@${userInfo.name} `, null, entityKey)
+      const newEditorState = EditorState.push(value, insertingContent, 'insert-fragment')
+      if (onChange) onChange(EditorState.forceSelection(newEditorState, insertingContent.getSelectionAfter()))
       updateLocalStoreMentions(userInfo)
       cancelMention()
     },
-    [editorState, userList, cancelMention, updateLocalStoreMentions],
+    [value, userList, onChange, cancelMention, updateLocalStoreMentions],
   )
 
   const richTextChange = useCallback<(editState: IEditorState) => void>(
     async (editState) => {
-      setEditorState(editState)
       if (onChange) onChange(editState)
       const selection = window.getSelection()
       if (!selection.rangeCount) return
@@ -171,20 +161,22 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
     [userList, mentionFlag, mentionState],
   )
 
-  const uploadHandler = useCallback<UploadProps['onChange']>(({ file, fileList }) => {
-    const { url, status } = file
-    if (status !== 'done') {
-      setFileList(fileList)
-    } else {
-      setFileList([])
-      setEditorState((prevValue) => ContentUtils.insertMedias(prevValue, [{ type: 'IMAGE', url }]))
-    }
-  }, [])
+  const uploadHandler = useCallback<UploadProps['onChange']>(
+    ({ file, fileList }) => {
+      const { url, status } = file
+      if (status !== 'done') {
+        setFileList(fileList)
+      } else {
+        setFileList([])
+        if (onChange) onChange(ContentUtils.insertMedias(value, [{ type: 'IMAGE', url }]))
+      }
+    },
+    [value, onChange],
+  )
 
   const myUploadFn = useCallback<MediaType['uploadFn']>(async (param) => {
     const { file, progress, success, error } = param
-    const key = `blog_system/${moment().format('YYYYMM')}/${uuid()}_${file.name}`
-    const url = `${COS_URL}/${key}`
+    const [key, url] = getFileKeyAndUrl(file)
     const cosUploadSignature = await getCosSignature()
     upload({
       method: 'POST',
@@ -266,15 +258,11 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
           </style>
         </head>
         <body>
-          <div class="container">${editorState.toHTML()}</div>
+          <div class="container">${value.toHTML()}</div>
         </body>
       </html>
     `)
     ;(window as any).previewWindow.document.close()
-  }, [editorState])
-
-  useEffect(() => {
-    setEditorState(value || BraftEditor.createEditorState(null))
   }, [value])
 
   useEffect(() => {
@@ -336,7 +324,7 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
   return (
     <div style={bordered ? { border: '1px solid lightgray' } : {}}>
       <BraftEditor
-        value={editorState}
+        value={value}
         language="en" // zh
         contentStyle={{ height: 200 }}
         controls={[

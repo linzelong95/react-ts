@@ -1,4 +1,15 @@
+import { COS_URL } from '@common/constants/cos'
+import moment from 'moment'
+import { v4 as uuid } from 'uuid'
+import type { RcFile, UploadFile } from 'antd/lib/upload/interface'
 import type { UploadRequestOption, UploadRequestError, UploadProgressEvent } from 'rc-upload/lib/interface'
+
+export function getFileKeyAndUrl(file: File | RcFile | UploadFile, dirName = 'blog_system'): [string, string] {
+  const key = `${dirName}/${moment().format('YYYYMM')}/${uuid()}_${file.name}`
+  const url = `${COS_URL}/${key}`
+  ;(file as UploadFile).url = url
+  return [key, url]
+}
 
 export function getFileType(fileKey: string): string {
   if (!fileKey) return undefined
@@ -69,8 +80,8 @@ export function upload(option: UploadRequestOption): { abort: () => void } {
     })
   }
   if (onError) {
-    xhr.addEventListener('error', (event) => {
-      onError(event)
+    xhr.addEventListener('error', (error) => {
+      onError(error)
     })
   }
   if (onSuccess) {
