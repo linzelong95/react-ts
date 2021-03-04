@@ -62,9 +62,9 @@ const MessageDrawer: FC<MessageDrawerProps> = memo((props) => {
 
   const prepareForReplying = useCallback<(item: MessageItem) => void>(
     (item) => {
-      const { from, id, parentId: pid, fromMail } = item
+      const { from, id, parentId: pid, fromMail = '博主' } = item
       const parentId = pid > 0 ? pid : id
-      const to = (from ? { label: from.nickName, key: from.id } : { label: fromMail, key: fromMail }) as Message['formDataWhenEdited']['to']
+      const to = { label: from.nickName || fromMail, key: from.id || fromMail } as Message['formDataWhenEdited']['to']
       form.setFieldsValue({ parentId, to })
       formRef?.current?.scrollIntoView?.({ behavior: 'smooth' })
     },
@@ -135,14 +135,8 @@ const MessageDrawer: FC<MessageDrawerProps> = memo((props) => {
 
   return (
     <Drawer visible={visible} title="留言" onClose={onToggleMessageDrawer} width={width || 400}>
-      <Form
-        form={form}
-        requiredMark={false}
-        labelCol={{ span: 4 }}
-        wrapperCol={{ span: 19 }}
-        initialValues={{ to: { key: '博主', label: '博主' } }}
-      >
-        <div ref={formRef} />
+      <div ref={formRef} />
+      <Form form={form} requiredMark={false} labelCol={{ span: 4 }} wrapperCol={{ span: 19 }}>
         <Form.Item label="对象" name="to">
           <Select labelInValue>
             <Select.Option value={'博主'}>博主</Select.Option>

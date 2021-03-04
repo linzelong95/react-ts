@@ -104,7 +104,7 @@ const CropImg: FC<CropImgProps> = memo((props) => {
         maskClosable={false}
         keyboard={false}
         closable={false}
-        zIndex={1000000}
+        zIndex={100001}
         footer={[
           <Button key="ok" onClick={handleOk}>
             确定
@@ -115,7 +115,7 @@ const CropImg: FC<CropImgProps> = memo((props) => {
           <Cropper
             ref={cropperRef}
             src={fileInfo?.dataUrL}
-            aspectRatio={16 / 9}
+            initialAspectRatio={16 / 9}
             crop={onCrop}
             style={{ height: '100%', width: '100%' }}
             {...cropperProps}

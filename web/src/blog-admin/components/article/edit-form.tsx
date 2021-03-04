@@ -190,7 +190,7 @@ const EditForm: FC<EditFormProps> = memo((props) => {
           getValueFromEvent={formatFileList}
           rules={[{ required: true, message: '请上传封面' }]}
         >
-          <Upload.Crop maxFiles={1} listType="picture-card" accept="image/*">
+          <Upload.Crop maxFiles={1} listType="picture-card" accept="image/*" cropperProps={{ aspectRatio: 23 / 16 }}>
             <div>
               <PlusOutlined />
               <div style={{ marginTop: 8 }}>Upload</div>

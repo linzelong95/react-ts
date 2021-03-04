@@ -1,11 +1,13 @@
 import React, { memo, useState, useCallback, useMemo, useEffect } from 'react'
 import { message, List, Avatar } from 'antd'
-import { PictureOutlined, EyeOutlined } from '@ant-design/icons'
+import { PictureOutlined, EyeOutlined, UserOutlined } from '@ant-design/icons'
+import { useTranslation } from 'react-i18next'
 import { v4 as uuid } from 'uuid'
 import { Upload } from '@common/components'
 import { useService, useLocalStorage } from '@common/hooks'
 import { adminTagServices } from '@blog-admin/services/tag'
 import BraftEditor from 'braft-editor'
+import Preview from './preview'
 import { ContentUtils } from 'braft-utils'
 import { Modifier, EditorState } from 'draft-js'
 import { upload, getFileKeyAndUrl } from '@common/utils'
@@ -47,6 +49,8 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
   // 本地缓存的曾提及用户
   const [usedMentions, setUsedMentions] = useLocalStorage<any[]>('__MENTIONED_USER_LIST__', [])
 
+  const { i18n } = useTranslation()
+
   const updateLocalStoreMentions = useCallback<(userInfo: any) => void>(
     (userInfo) => {
       const uniqueMentionList = usedMentions.filter((usedMention) => usedMention.id !== userInfo.id)
@@ -55,7 +59,7 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
     [usedMentions, setUsedMentions],
   )
 
-  const getTagListParams = useMemo<any>(
+  const getUserListParams = useMemo<any>(
     () => ({
       index: 1,
       size: 5,
@@ -64,7 +68,7 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
     [searchUserName],
   )
   // TODO：用户接口暂未实现，先随便给个链接
-  const [loadingUser, userRes, userErr] = useService(adminTagServices.getList, getTagListParams, !searchUserName)
+  const [loadingUser, userRes, userErr] = useService(adminTagServices.getList, getUserListParams, !searchUserName)
   const userList = useMemo<any[]>(() => {
     if (!searchUserName) return usedMentions
     if (userErr) {
@@ -312,7 +316,7 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
             }}
           >
             <List.Item.Meta
-              avatar={<Avatar size="small" src={`${__SERVER_ORIGIN__}/public/assets/images/default/avatar.jpeg`} />}
+              avatar={<Avatar size={124} icon={<UserOutlined />} src={`${__SERVER_ORIGIN__}/public/assets/images/default/avatar.jpeg`} />}
               title={<div style={{ marginLeft: -10, paddingTop: 2 }}>{item.name}</div>}
             />
           </List.Item>
@@ -325,7 +329,7 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
     <div style={bordered ? { border: '1px solid lightgray' } : {}}>
       <BraftEditor
         value={value}
-        language="en" // zh
+        language={i18n.language === 'zh-CN' ? 'zh' : 'en'}
         contentStyle={{ height: 200 }}
         controls={[
           'font-size',
@@ -386,4 +390,8 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
   )
 })
 
-export default RichEditor
+const RichEditorForExport = Object.assign(RichEditor, {
+  Preview,
+})
+
+export default RichEditorForExport

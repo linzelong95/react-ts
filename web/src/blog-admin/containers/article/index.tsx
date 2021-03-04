@@ -19,6 +19,7 @@ import {
   TagsOutlined,
 } from '@ant-design/icons'
 import EditForm from '@blog-admin/components/article/edit-form'
+import DetailDrawer from '@blog-admin/components/article/detail-drawer'
 import FilterModal, { FilterModalRef, TemporaryCondition } from '@blog-admin/components/article/filter-modal'
 import moment from 'moment'
 import { adminArticleServices } from '@blog-admin/services/article'
@@ -36,7 +37,7 @@ export type ToggleEditorialPanel = (record?: ListItem) => void
 export type SaveData = (params: ArticleTypeCollection['editParams'], callback?: () => void) => void
 export type HandleItems = (type: 'remove' | 'lock' | 'unlock' | 'top' | 'unTop', record?: ListItem, callback?: () => void) => void
 export type ConditionQuery = ArticleTypeCollection['getListParamsByAdminRole']['conditionQuery'] & TemporaryCondition
-type ReadArticle = (record: ListItem) => void
+type ToggleReadArticle = (record?: ListItem) => void
 export type DetailItem = ListItem & { content: string }
 
 const ArticleManagement: FC<RouteComponentProps> = memo(() => {
@@ -52,9 +53,6 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
   const [showSorterFlag, setShowSorterFlag] = useState<boolean>(false)
   const [allSortList, setAllSortList] = useState<Sort['getListResByAdminRole']['list']>([])
   const [oneDetail, setOneDetail] = useState<DetailItem>(null)
-  const [detailDrawerVisible, setDetailDrawerVisible] = useState<boolean>(false)
-
-  console.log(oneDetail, detailDrawerVisible)
 
   const getListParams = useMemo<ArticleTypeCollection['getListParamsByAdminRole']>(() => {
     const neededConditionQuery = { ...conditionQuery, commonFilterArr: undefined, articleArr: undefined, filteredSortArr: undefined }
@@ -195,14 +193,17 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
     [selectedItems, pagination, dataSource, forceRequest],
   )
 
-  const readArticle = useCallback<ReadArticle>(async (record) => {
+  const toggleReadArticle = useCallback<ToggleReadArticle>(async (record?) => {
+    if (!record) {
+      setOneDetail(null)
+      return
+    }
     const [contentRes, contentErr] = await adminArticleServices.getContent({ articleId: record.id })
     if (contentErr) {
       message.error('获取内容详情失败')
       return
     }
     setOneDetail({ ...record, content: contentRes.data })
-    setDetailDrawerVisible(true)
   }, [])
 
   useEffect(() => {
@@ -443,7 +444,7 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
                 >
                   {item.isEnable === 1 ? '禁用' : '启用'}
                 </Button>,
-                <Button key="detail" size="small" type="primary" onClick={() => readArticle(item)}>
+                <Button key="detail" size="small" type="primary" onClick={() => toggleReadArticle(item)}>
                   详情
                 </Button>,
               ]}
@@ -514,7 +515,18 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
         )}
       />
     )
-  }, [loading, dataSource, total, pagination, selectedItems, readArticle, pageChange, toggleSelectOne, handleItems, toggleEditorialPanel])
+  }, [
+    loading,
+    dataSource,
+    total,
+    pagination,
+    selectedItems,
+    toggleReadArticle,
+    pageChange,
+    toggleSelectOne,
+    handleItems,
+    toggleEditorialPanel,
+  ])
 
   const filterModalComponent = useMemo(() => {
     return (
@@ -542,12 +554,17 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
     )
   }, [editFormVisible, editFormData, allSortList, toggleEditorialPanel, saveData])
 
+  const detailDrawerComponent = useMemo<ReactNode>(() => {
+    return oneDetail && <DetailDrawer detailItem={oneDetail} visible={Boolean(oneDetail)} onClose={() => toggleReadArticle()} />
+  }, [oneDetail, toggleReadArticle])
+
   return (
     <WrappedContainer>
       {actionBarComponent}
       {contentListComponent}
       {editFormComponent}
       {filterModalComponent}
+      {detailDrawerComponent}
     </WrappedContainer>
   )
 })

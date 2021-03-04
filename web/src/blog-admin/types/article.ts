@@ -1,4 +1,5 @@
 import type { Category, TagTypeCollection } from '@blog-admin/types'
+import type { UserTypeCollection } from '@common/types'
 import type { UploadProps } from 'antd/lib/upload'
 import type { EditorState } from 'braft-editor'
 
@@ -14,6 +15,7 @@ export default interface Article {
     title: string
     tags: TagTypeCollection['listItemByAdminRole'][]
     category: Category['listItemByAdminRole']
+    user: UserTypeCollection['listItem']
   }
   getListResByAdminRole: {
     list: Article['listItemByAdminRole'][]
