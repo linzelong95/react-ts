@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, memo } from 'react'
 import { Tooltip, message } from 'antd'
 import { DownloadOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons'
 import PreviewModal from '../file-show/modal'
-import { getCosSignature } from '@common/services/cos'
+import { cosServices } from '@common/services'
 import { COS_URL } from '@common/constants/cos'
 import { isPreviewSupported } from '@common/utils'
 import type { FC, ReactNode, CSSProperties, AnchorHTMLAttributes } from 'react'
@@ -53,7 +53,8 @@ const Download: FC<DownloadProps> = memo((props) => {
 
   useEffect(() => {
     if (!cosFileKey) return
-    getCosSignature(cosFileKey)
+    cosServices
+      .getCosSignature(cosFileKey)
       .then((cosUploadSignature) => {
         setCosUploadSignature(cosUploadSignature)
       })

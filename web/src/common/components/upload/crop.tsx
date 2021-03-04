@@ -4,7 +4,7 @@ import { Upload } from '@common/components'
 import { Modal, Button, message } from 'antd'
 import { upload, getFileKeyAndUrl } from '@common/utils'
 import { COS_URL } from '@common/constants/cos'
-import { getCosSignature } from '@common/services/cos'
+import { cosServices } from '@common/services'
 import type { FC } from 'react'
 import type { UploadProps } from '../upload'
 import type { ButtonProps } from 'antd/lib/button'
@@ -65,7 +65,7 @@ const CropImg: FC<CropImgProps> = memo((props) => {
   const handleOk = useCallback<ButtonProps['onClick']>(async () => {
     message.loading({ content: '正在上传...', key: 'upload', duration: 0 })
     const [key, url] = getFileKeyAndUrl(formattedFile)
-    const cosUploadSignature = await getCosSignature()
+    const cosUploadSignature = await cosServices.getCosSignature()
     upload({
       method: 'POST',
       action: COS_URL,

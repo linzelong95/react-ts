@@ -24,6 +24,9 @@ export class User {
   @Column()
   nickName: string
 
+  @Column({ default: '/public/assets/images/default/avatar.jpeg' })
+  avatar: string
+
   @OneToMany(() => Article, (article) => article.user)
   articles: Article[]
 

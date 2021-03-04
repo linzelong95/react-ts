@@ -12,7 +12,7 @@ import { ContentUtils } from 'braft-utils'
 import { Modifier, EditorState } from 'draft-js'
 import { upload, getFileKeyAndUrl } from '@common/utils'
 import { COS_URL } from '@common/constants/cos'
-import { getCosSignature } from '@common/services/cos'
+import { cosServices } from '@common/services'
 import type { UploadProps } from 'antd/lib/upload'
 import type { UploadFile } from 'antd/lib/upload/interface'
 import type { UploadRequestOption } from 'rc-upload/lib/interface'
@@ -181,7 +181,7 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
   const myUploadFn = useCallback<MediaType['uploadFn']>(async (param) => {
     const { file, progress, success, error } = param
     const [key, url] = getFileKeyAndUrl(file)
-    const cosUploadSignature = await getCosSignature()
+    const cosUploadSignature = await cosServices.getCosSignature()
     upload({
       method: 'POST',
       action: COS_URL,
@@ -316,7 +316,7 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
             }}
           >
             <List.Item.Meta
-              avatar={<Avatar size={124} icon={<UserOutlined />} src={`${__SERVER_ORIGIN__}/public/assets/images/default/avatar.jpeg`} />}
+              avatar={<Avatar size="small" icon={<UserOutlined />} src={`${__SERVER_ORIGIN__}/public/assets/images/default/avatar.jpeg`} />}
               title={<div style={{ marginLeft: -10, paddingTop: 2 }}>{item.name}</div>}
             />
           </List.Item>

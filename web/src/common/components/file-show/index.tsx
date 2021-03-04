@@ -2,7 +2,7 @@ import React, { useMemo, useEffect, useState, memo } from 'react'
 import { Spin } from 'antd'
 import ImagePreview from './image'
 import PDFPreview from './pdf'
-import { getCosSignature } from '@common/services/cos'
+import { cosServices } from '@common/services'
 import { getFileType } from '@common/utils'
 import type { FC, CSSProperties } from 'react'
 
@@ -55,7 +55,8 @@ const Preview: FC<PreviewProps> = memo((props) => {
       setLoading(false)
       return
     }
-    getCosSignature(parsedToken.fileKey)
+    cosServices
+      .getCosSignature(parsedToken.fileKey)
       .then((auth) => {
         setCosSignature(encodeURIComponent(auth))
         setLoading(false)

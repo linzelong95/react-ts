@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, forwardRef, useMemo, memo } fr
 import { Upload as AntdUpload, message, Modal, Button } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
 import { COS_URL } from '@common/constants/cos'
-import { getCosSignature } from '@common/services/cos'
+import { cosServices } from '@common/services'
 import Crop from './crop'
 import moment from 'moment'
 import { v4 as uuid } from 'uuid'
@@ -26,7 +26,8 @@ const Upload: ForwardRefRenderFunction<typeof AntdUpload, UploadProps> = (props,
   }, [maxFiles, multiple])
 
   useEffect(() => {
-    getCosSignature()
+    cosServices
+      .getCosSignature()
       .then((auth) => {
         setCosUploadSignature(auth)
       })
@@ -66,7 +67,7 @@ const Upload: ForwardRefRenderFunction<typeof AntdUpload, UploadProps> = (props,
       fileKeyAndSignatureMap.fileKey = fileKey
     }
     try {
-      fileKeyAndSignatureMap.signature = await getCosSignature(fileKeyAndSignatureMap.fileKey)
+      fileKeyAndSignatureMap.signature = await cosServices.getCosSignature(fileKeyAndSignatureMap.fileKey)
     } catch {}
     return fileKeyAndSignatureMap
   }, [])

@@ -4,5 +4,6 @@ export default interface User {
     account: string
     nickName: string
     roleName: 'admin' | 'user'
+    avatar?: string
   }
 }

@@ -2,11 +2,11 @@ import React, { useCallback, memo, useState, useEffect } from 'react'
 import { Form, Input, Checkbox, Modal, message, Row, Col } from 'antd'
 import { UserOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
-import { loginServices } from '@common/services/user'
+import { loginServices } from '@common/services'
 import { useLocalStorage } from '@common/hooks'
 import type { FC } from 'react'
 import type { ModalProps } from 'antd/es/modal'
-import type { LoginParams } from '@common/services/user/login'
+import type { LoginParams } from '@common/services/login'
 
 const layout = {
   labelCol: { span: 6 },

@@ -132,7 +132,7 @@ module.exports = {
 
     // 约定全局常量
     new webpack.DefinePlugin({
-      __SERVER_ORIGIN__: JSON.stringify(isDevelopment ? 'http:127.0.0.1:7001' : ''),
+      __SERVER_ORIGIN__: JSON.stringify(isDevelopment ? 'http://127.0.0.1:7001' : ''),
       __IS_DEV_MODE__: JSON.stringify(process.env.NODE_ENV === 'development'),
     }),
 
