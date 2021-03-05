@@ -1,4 +1,5 @@
 import { Controller } from 'egg'
+import { StatusCode } from '@constant/status'
 
 export default class UserArticleController extends Controller {
   async list(): Promise<void> {
@@ -16,6 +17,7 @@ export default class UserArticleController extends Controller {
     const { ctx } = this
     const { articleId } = ctx.request.body
     const res = await this.service.userService.article.content({ articleId })
-    ctx.body = { code: 0, data: res?.content }
+    if (!res?.content) ctx.throw(StatusCode.NOT_FOUND, '不存在')
+    ctx.body = { code: 0, data: ctx.helper.shtml(res!.content) }
   }
 }

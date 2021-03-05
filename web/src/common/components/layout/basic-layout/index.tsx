@@ -78,7 +78,7 @@ const BasicLayout: FC<BasicLayoutProps> = memo((props) => {
     }
     ;(async () => {
       const [loginRes] = await loginServices.login({ autoLogin: true })
-      if (!loginRes?.data) {
+      if (!loginRes?.data?.account) {
         redirectToLoginPage()
         return
       }
@@ -113,7 +113,7 @@ const BasicLayout: FC<BasicLayoutProps> = memo((props) => {
           </Layout>
         </>
       ) : (
-        <div className="mt20">
+        <div className="mt20 text-center">
           <Spin size="large" />
         </div>
       )}

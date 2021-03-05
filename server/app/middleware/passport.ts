@@ -65,7 +65,9 @@ module.exports = (options, app: Application) => {
   app.use(passport.session())
   ;(app as any).passport = passport
   return async (ctx: Context, next: any) => {
-    const { originalUrl } = ctx
+    const { originalUrl, request } = ctx
+    const { referer = '', host = '' } = request.header || {}
+    const [, protocol, originalHost] = (referer as string).match(/(https?:)\/\/([^/]*).*/) || []
     if (!isApi.test(originalUrl)) return await next()
     if (authUserUrlRegexList.some((regex) => regex.test(originalUrl))) {
       if (ctx.isAuthenticated()) return await next()
@@ -74,9 +76,12 @@ module.exports = (options, app: Application) => {
     }
     if (adminUrlRegexList.some((regex) => regex.test(originalUrl))) {
       if (!ctx.isAuthenticated()) {
-        // TODO
-        // ctx.body = { message: '管理员未登录!', needRedirect: true }
-        ctx.body = { code: StatusCode.NOT_LOGGED_FOR_ADMIN, message: '管理员未登录' }
+        // ctx.body = { code: StatusCode.NOT_LOGGED_FOR_ADMIN, message: '管理员未登录' }
+        if (originalHost === host) {
+          ctx.redirect('/user/login')
+        } else {
+          ctx.redirect(`${protocol}//${originalHost}/user/login?redirect=${referer}`)
+        }
         return
       }
       if (ctx.isAuthenticated() && ctx.state.user.roleName !== 'admin') {

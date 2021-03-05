@@ -111,19 +111,14 @@ export default (appInfo: EggAppInfo) => {
   }
 
   config.security = {
-    domainWhiteList: [
-      'http://localhost:8000',
-      'http://localhost:8080',
-      'http://localhost:80',
-      'http://127.0.0.1:8000',
-      'http://127.0.0.1:8080',
-      'http://127.0.0.1:80',
-      'http://120.78.139.146:80',
-      'http://120.78.139.146',
-    ],
+    // 允许ctx.redirect跳转的非本域名链接，当domainWhiteList为空数组则等同于使用ctx.unsafeRedirect，此时跳转任意链接都放行
+    domainWhiteList: ['127.0.0.1', '120.78.139.146', 'baidu.com'],
     csrf: {
       enable: false,
     },
+    // xframe:{
+    //   enable:true,// 该配置旨在阻止非本域名页面以iframe嵌套本页面，默认开启，无需配置
+    // }
   }
 
   config.cors = {
