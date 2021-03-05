@@ -5,4 +5,6 @@ export default {
   ADMIN_DELETE: '/api/admin/article/delete',
   ADMIN_LOCK: '/api/admin/article/lock',
   ADMIN_UNLOCK: '/api/admin/article/unlock',
+  ADMIN_TOP: '/api/admin/article/top',
+  ADMIN_UNTOP: '/api/admin/article/unTop',
 }

@@ -200,8 +200,8 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
             id: (param as any).id || uuid(),
             title: 'image',
             alt: 'image',
-            loop: true, // 指定音视频是否循环播放
-            autoPlay: true, // 指定音视频是否自动播放
+            loop: false, // 指定音视频是否循环播放
+            autoPlay: false, // 指定音视频是否自动播放
             controls: true, // 指定音视频是否显示控制栏
             poster: `${__SERVER_ORIGIN__}/public/assets/images/default/poster.jpeg`, // 指定视频播放器的封面
           },

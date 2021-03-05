@@ -28,3 +28,11 @@ export function lock(params: ArticleTypeCollection['lockParams']): ServiceResult
 export function unlock(params: ArticleTypeCollection['unlockParams']): ServiceResult {
   return post<never, typeof params>(articleApis.ADMIN_UNLOCK, params)
 }
+
+export function top(params: ArticleTypeCollection['topParams']): ServiceResult {
+  return post<never, typeof params>(articleApis.ADMIN_TOP, params)
+}
+
+export function unTop(params: ArticleTypeCollection['unTopParams']): ServiceResult {
+  return post<never, typeof params>(articleApis.ADMIN_UNTOP, params)
+}

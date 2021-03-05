@@ -1,7 +1,7 @@
 import React, { memo, useMemo, useState, useCallback, useRef, useEffect } from 'react'
 import { WrappedContainer, Ellipsis } from '@common/components'
 import { useService } from '@common/hooks'
-import { message, Row, Col, Button, List, Card, Tag, Input, Tooltip, Badge } from 'antd'
+import { message, Row, Col, Button, List, Card, Tag, Input, Tooltip, Badge, Checkbox } from 'antd'
 import {
   EyeOutlined,
   DeleteOutlined,
@@ -37,7 +37,7 @@ export type ToggleEditorialPanel = (record?: ListItem) => void
 export type SaveData = (params: ArticleTypeCollection['editParams'], callback?: () => void) => void
 export type HandleItems = (type: 'remove' | 'lock' | 'unlock' | 'top' | 'unTop', record?: ListItem, callback?: () => void) => void
 export type ConditionQuery = ArticleTypeCollection['getListParamsByAdminRole']['conditionQuery'] & TemporaryCondition
-type ToggleReadArticle = (event?: React.MouseEvent<HTMLElement, MouseEvent>, record?: ListItem) => void
+type ToggleReadArticle = (record?: ListItem) => void
 export type DetailItem = ListItem & { content: string }
 
 const ArticleManagement: FC<RouteComponentProps> = memo(() => {
@@ -55,7 +55,7 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
   const [oneDetail, setOneDetail] = useState<DetailItem>(null)
 
   const getListParams = useMemo<ArticleTypeCollection['getListParamsByAdminRole']>(() => {
-    const neededConditionQuery = { ...conditionQuery, commonFilterArr: undefined, articleArr: undefined, filteredSortArr: undefined }
+    const neededConditionQuery = { ...conditionQuery, tagIdsArr: undefined, filteredSortArr: undefined }
     return {
       index: pagination.current,
       size: pagination.pageSize,
@@ -193,8 +193,7 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
     [selectedItems, pagination, dataSource, forceRequest],
   )
 
-  const toggleReadArticle = useCallback<ToggleReadArticle>(async (event, record?) => {
-    if (event) event.stopPropagation()
+  const toggleReadArticle = useCallback<ToggleReadArticle>(async (record?) => {
     if (!record) {
       setOneDetail(null)
       return
@@ -424,6 +423,7 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
         renderItem={(item) => (
           <List.Item style={{ background: 'lightgray', borderRadius: 5 }}>
             <Card
+              size="small"
               cover={<img alt="cover" src={item.imageUrl || `${__SERVER_ORIGIN__ || ''}/public/assets/images/default/article.jpeg`} />}
               actions={[
                 <Button key="form" size="small" type="primary" onClick={() => toggleEditorialPanel(item)}>
@@ -433,7 +433,7 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
                   删除
                 </Button>,
                 <Button key="whetherTop" size="small" type="primary" onClick={() => handleItems(item.isTop === 1 ? 'unTop' : 'top', item)}>
-                  {item.isTop === 1 ? '置顶' : '取置'}
+                  {item.isTop === 1 ? '取置' : '置顶'}
                 </Button>,
                 <Button
                   key="whetherLock"
@@ -443,21 +443,24 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
                 >
                   {item.isEnable === 1 ? '禁用' : '启用'}
                 </Button>,
-                <Button key="detail" size="small" type="primary" onClick={(event) => toggleReadArticle(event, item)}>
-                  详情
-                </Button>,
+                <div key="select" style={{ width: '100%', height: '100%' }} onClick={() => toggleSelectOne(item)}>
+                  <Checkbox checked={selectedItems.some(({ id }) => id === item.id)} />,
+                </div>,
               ]}
               style={{
-                cursor: 'pointer',
                 position: 'relative',
                 overflow: 'hidden',
-                background:
-                  (selectedItems.some((selectedItem) => selectedItem.id === item.id) && '#FFFFE0') || (!item.isEnable && '#fafafa'),
+                background: (selectedItems.some(({ id }) => id === item.id) && '#FFFFE0') || (!item.isEnable && '#fafafa'),
               }}
-              onClick={() => toggleSelectOne(item)}
             >
               <Card.Meta
-                title={<Tooltip title={item.title}>{item.title}</Tooltip>}
+                title={
+                  <Tooltip title={item.title}>
+                    <div style={{ cursor: 'pointer' }} onClick={() => toggleReadArticle(item)}>
+                      {item.title}
+                    </div>
+                  </Tooltip>
+                }
                 description={
                   <>
                     <div style={{ marginBottom: 5, fontSize: 12 }}>

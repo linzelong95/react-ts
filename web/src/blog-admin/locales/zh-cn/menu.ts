@@ -3,4 +3,5 @@ export default {
   message: '留言',
   tag: '标签',
   reply: '评论',
+  article: '文章',
 }

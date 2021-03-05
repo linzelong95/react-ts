@@ -46,7 +46,7 @@ const DetailDrawer: FC<DetailDrawerProps> = memo((props) => {
     return {
       index: 1,
       size: 9999,
-      replyConditionQuery: replyConditionQuery,
+      conditionQuery: replyConditionQuery,
     }
   }, [replyConditionQuery])
 
@@ -223,20 +223,28 @@ const DetailDrawer: FC<DetailDrawerProps> = memo((props) => {
             </h2>
             <Divider style={{ marginTop: -5 }} />
             {replyBoxVisible && (
-              <Form form={form} requiredMark={false} labelCol={{ span: 4 }} wrapperCol={{ span: 19 }}>
+              <Form
+                form={form}
+                requiredMark={false}
+                labelCol={{ span: 4 }}
+                wrapperCol={{ span: 19 }}
+                initialValues={{
+                  to: { label: '博主', key: detailItem.user.id },
+                }}
+              >
                 <Form.Item label="对象" name="to">
                   <Select labelInValue>
                     <Select.Option value={detailItem.user.id}>博主</Select.Option>
                   </Select>
                 </Form.Item>
-                <Form.Item label="回复" name="message" rules={[{ required: true, message: '请输入回复内容!' }]}>
+                <Form.Item label="回复" name="reply" rules={[{ required: true, message: '请输入回复内容!' }]}>
                   <Input.TextArea rows={2} />
                 </Form.Item>
                 <Form.Item hidden name="parentId">
                   <InputNumber />
                 </Form.Item>
                 <Form.Item wrapperCol={{ span: 23 }}>
-                  <div style={{ float: 'right', marginTop: 10 }}>
+                  <div style={{ float: 'right' }}>
                     <Button size="small" style={{ marginRight: 10 }} onClick={() => form.resetFields()}>
                       重置
                     </Button>
@@ -250,8 +258,8 @@ const DetailDrawer: FC<DetailDrawerProps> = memo((props) => {
           </div>
           <div>
             <h2>
-              <span style={{ marginLeft: 10, marginRight: 10 }}>评论({replyTotal || 0})</span>
-              <ReloadOutlined style={{ color: '#1890FF' }} onClick={forceRequest} />
+              <span>评论({replyTotal || 0})</span>
+              <ReloadOutlined style={{ color: '#1890FF', marginLeft: 10 }} onClick={forceRequest} />
               <Tag color="magenta" id="createDate" style={{ marginLeft: 10 }} onClick={replySort}>
                 时间
                 {replyConditionQuery?.orderBy?.name === 'createDate' && replyConditionQuery?.orderBy?.by === 'ASC' ? (

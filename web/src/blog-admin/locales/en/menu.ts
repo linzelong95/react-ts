@@ -3,4 +3,5 @@ export default {
   message: 'Message',
   tag: 'Tag',
   reply: 'Reply',
+  article: 'Article',
 }

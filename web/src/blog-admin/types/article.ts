@@ -61,4 +61,8 @@ export default interface Article {
   lockParams: { items: { id: number; name?: string }[] }
   // 解锁service函数的入参ts
   unlockParams: { items: { id: number; name?: string }[] }
+  // 置顶service函数的入参ts
+  topParams: { items: { id: number; name?: string }[] }
+  // 取置service函数的入参ts
+  unTopParams: { items: { id: number; name?: string }[] }
 }
