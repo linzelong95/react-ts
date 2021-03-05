@@ -117,7 +117,7 @@ const MessageDrawer: FC<MessageDrawerProps> = memo((props) => {
               )}
             </span>
           }
-          avatar="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+          avatar={from?.avatar || `${__SERVER_ORIGIN__ || ''}/public/assets/images/default/avatar.jpeg`}
           content={
             isApproved || roleName === 'admin' ? (
               <span style={{ color: isApproved === 0 ? 'lightgray' : '' }}>{message}</span>

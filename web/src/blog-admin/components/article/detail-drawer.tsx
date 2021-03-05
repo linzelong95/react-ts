@@ -125,27 +125,27 @@ const DetailDrawer: FC<DetailDrawerProps> = memo((props) => {
           key={id}
           actions={[
             <span key="createDate">{moment(new Date(createDate)).format('YYYY-MM-DD')}</span>,
-            <a key="reply" onClick={() => prepareForReplying(item)}>
+            <a key="reply" onClick={() => prepareForReplying(item)} style={{ fontSize: 12 }}>
               回复
             </a>,
             roleName === 'admin' && (
-              <a onClick={() => handleReplyItems('remove', item)} style={{ color: 'red' }}>
+              <a onClick={() => handleReplyItems('remove', item)} style={{ color: 'red', marginLeft: 10, fontSize: 12 }}>
                 删除
               </a>
             ),
             roleName === 'admin' && isApproved === 0 && (
-              <a onClick={() => handleReplyItems('approve', item)} style={{ color: '#66CD00' }}>
+              <a onClick={() => handleReplyItems('approve', item)} style={{ color: '#66CD00', marginLeft: 10, fontSize: 12 }}>
                 展示
               </a>
             ),
             roleName === 'admin' && isApproved === 1 && (
-              <a onClick={() => handleReplyItems('disapprove', item)} style={{ color: '#BF3EFF' }}>
+              <a onClick={() => handleReplyItems('disapprove', item)} style={{ color: '#BF3EFF', marginLeft: 10, fontSize: 12 }}>
                 隐藏
               </a>
             ),
           ]}
           author={`${from.nickName}${parentId ? `回复@ ${to.nickName}` : ''}`}
-          avatar="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+          avatar={from?.avatar || `${__SERVER_ORIGIN__ || ''}/public/assets/images/default/avatar.jpeg`}
           content={<span style={{ color: isApproved === 0 ? 'lightgray' : '' }}>{reply}</span>}
         >
           {children?.map?.((item) => getCommentComponent(item))}
@@ -181,21 +181,11 @@ const DetailDrawer: FC<DetailDrawerProps> = memo((props) => {
       <Row justify="center" gutter={24}>
         <Col span={16} style={{ maxHeight: clientHeight - 170, overflow: 'auto' }}>
           <div style={{ paddingRight: 15 }}>
-            <div style={{ marginBottom: 10, fontSize: 12, textAlign: 'center' }}>
-              <span>
-                <ClockCircleOutlined />
-                {moment(new Date(detailItem.createDate)).format('YYYY-MM-DD')}
-              </span>
-              <span style={{ marginLeft: 20 }}>
-                <EditOutlined />
-                {moment(new Date(detailItem.updateDate)).format('YYYY-MM-DD')}
-              </span>
-            </div>
             {detailItem?.tags?.length > 0 && (
               <p style={{ textIndent: '2em' }}>
                 <b>标签：</b>
                 {detailItem.tags.map((tag) => (
-                  <Tag color="volcano" style={{ textIndent: '0em' }} key={tag.id}>
+                  <Tag style={{ textIndent: '0em' }} key={tag.id}>
                     {tag.name}
                   </Tag>
                 ))}
@@ -207,11 +197,22 @@ const DetailDrawer: FC<DetailDrawerProps> = memo((props) => {
                 {detailItem.abstract}
               </p>
             )}
+            <img src={detailItem.imageUrl || `${__SERVER_ORIGIN__ || ''}/public/assets/images/default/article.jpeg`} width="100%" />
             <RichEditor.Preview value={detailItem.content} />
+            <div style={{ marginBottom: 10, fontSize: 12, textAlign: 'center' }}>
+              <span>
+                <ClockCircleOutlined style={{ marginRight: 10 }} />
+                {moment(new Date(detailItem.createDate)).format('YYYY-MM-DD')}
+              </span>
+              <span style={{ marginLeft: 20 }}>
+                <EditOutlined style={{ marginRight: 10 }} />
+                {moment(new Date(detailItem.updateDate)).format('YYYY-MM-DD')}
+              </span>
+            </div>
           </div>
         </Col>
         <Col span={8}>
-          <div ref={formRef} style={{ marginBottom: '30px' }}>
+          <div ref={formRef} style={{ marginBottom: 30 }}>
             <h2>
               <span style={{ marginRight: 10 }}>回复区</span>
               {replyBoxVisible ? (
@@ -249,8 +250,7 @@ const DetailDrawer: FC<DetailDrawerProps> = memo((props) => {
           </div>
           <div>
             <h2>
-              {replyTotal || 0}
-              <span style={{ marginLeft: 10, marginRight: 10 }}>条评论</span>
+              <span style={{ marginLeft: 10, marginRight: 10 }}>评论({replyTotal || 0})</span>
               <ReloadOutlined style={{ color: '#1890FF' }} onClick={forceRequest} />
               <Tag color="magenta" id="createDate" style={{ marginLeft: 10 }} onClick={replySort}>
                 时间

@@ -37,7 +37,7 @@ export type ToggleEditorialPanel = (record?: ListItem) => void
 export type SaveData = (params: ArticleTypeCollection['editParams'], callback?: () => void) => void
 export type HandleItems = (type: 'remove' | 'lock' | 'unlock' | 'top' | 'unTop', record?: ListItem, callback?: () => void) => void
 export type ConditionQuery = ArticleTypeCollection['getListParamsByAdminRole']['conditionQuery'] & TemporaryCondition
-type ToggleReadArticle = (record?: ListItem) => void
+type ToggleReadArticle = (event?: React.MouseEvent<HTMLElement, MouseEvent>, record?: ListItem) => void
 export type DetailItem = ListItem & { content: string }
 
 const ArticleManagement: FC<RouteComponentProps> = memo(() => {
@@ -193,7 +193,8 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
     [selectedItems, pagination, dataSource, forceRequest],
   )
 
-  const toggleReadArticle = useCallback<ToggleReadArticle>(async (record?) => {
+  const toggleReadArticle = useCallback<ToggleReadArticle>(async (event, record?) => {
+    if (event) event.stopPropagation()
     if (!record) {
       setOneDetail(null)
       return
@@ -237,9 +238,7 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
             <Button
               icon={<FilterOutlined />}
               type="primary"
-              danger={Boolean(
-                conditionQuery?.filteredSortArr?.length || conditionQuery?.articleArr?.length || conditionQuery?.commonFilterArr?.length,
-              )}
+              danger={Boolean(conditionQuery?.filteredSortArr?.length || conditionQuery?.tagIdsArr?.length)}
               size="small"
               onClick={() => {
                 setFilterModalVisible(true)
@@ -411,7 +410,7 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
       <List
         loading={loading}
         dataSource={dataSource}
-        grid={{ gutter: 16, sm: 1, md: 2, xl: 3 }}
+        grid={{ gutter: 16, xs: 1, sm: 1, md: 2, lg: 2, xl: 3, xxl: 3 }}
         pagination={{
           showQuickJumper: true,
           showSizeChanger: true,
@@ -425,7 +424,7 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
         renderItem={(item) => (
           <List.Item style={{ background: 'lightgray', borderRadius: 5 }}>
             <Card
-              cover={<img alt="cover" src={item.imageUrl || 'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png'} />}
+              cover={<img alt="cover" src={item.imageUrl || `${__SERVER_ORIGIN__ || ''}/public/assets/images/default/article.jpeg`} />}
               actions={[
                 <Button key="form" size="small" type="primary" onClick={() => toggleEditorialPanel(item)}>
                   编辑
@@ -444,7 +443,7 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
                 >
                   {item.isEnable === 1 ? '禁用' : '启用'}
                 </Button>,
-                <Button key="detail" size="small" type="primary" onClick={() => toggleReadArticle(item)}>
+                <Button key="detail" size="small" type="primary" onClick={(event) => toggleReadArticle(event, item)}>
                   详情
                 </Button>,
               ]}
@@ -458,25 +457,13 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
               onClick={() => toggleSelectOne(item)}
             >
               <Card.Meta
-                title={
-                  <Tooltip title={item.title}>
-                    <span>{item.title}</span>
-                  </Tooltip>
-                }
+                title={<Tooltip title={item.title}>{item.title}</Tooltip>}
                 description={
                   <>
                     <div style={{ marginBottom: 5, fontSize: 12 }}>
                       <Ellipsis lines={1}>
                         标签：
-                        {item?.tags?.length > 0 ? (
-                          item.tags.map((i) => (
-                            <Tag color="volcano" key={i.id}>
-                              {i.name}
-                            </Tag>
-                          ))
-                        ) : (
-                          <Tag color="volcano">无</Tag>
-                        )}
+                        {item?.tags?.length > 0 ? item.tags.map((tag) => <Tag key={tag.id}>{tag.name}</Tag>) : '无'}
                       </Ellipsis>
                     </div>
                     <Ellipsis lines={2} style={{ height: 40 }}>
@@ -528,7 +515,7 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
     toggleEditorialPanel,
   ])
 
-  const filterModalComponent = useMemo(() => {
+  const filterModalComponent = useMemo<ReactNode>(() => {
     return (
       <FilterModal
         ref={filterModalRef}

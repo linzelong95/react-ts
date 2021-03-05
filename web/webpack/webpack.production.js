@@ -38,14 +38,14 @@ const productionConfig = {
     minimize: true,
     minimizer: [
       new TerserPlugin({
-        sourceMap: true,
+        parallel: true,
+        extractComments: false,
         terserOptions: {
           format: {
             comments: false,
           },
           compress: { pure_funcs: ['console.log'] },
         },
-        extractComments: false,
       }),
       new CssMinimizerPlugin(),
     ],

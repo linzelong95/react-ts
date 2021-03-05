@@ -1,3 +1,5 @@
+import type { UserTypeCollection } from '@common/types'
+
 export default interface Reply {
   listItemByAdminRole: {
     id: number
@@ -16,13 +18,8 @@ export default interface Reply {
       updateDate: string
       isTop: 0 | 1
     }
-    from: {
-      id: number
-      account: string
-      nickName?: string
-      roleName: string
-    }
-    to: Reply['listItemByAdminRole']['from']
+    from: UserTypeCollection['listItem']
+    to: UserTypeCollection['listItem']
   }
   getListResByAdminRole: {
     list: Reply['listItemByAdminRole'][]

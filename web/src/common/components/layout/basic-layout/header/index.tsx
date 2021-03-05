@@ -165,7 +165,7 @@ const Header: FC<HeaderProps> = memo((props) => {
                     </Menu>
                   }
                 >
-                  <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
+                  <Avatar src={userInfo?.avatar || `${__SERVER_ORIGIN__ || ''}/public/assets/images/default/avatar.jpeg`} />
                 </Dropdown>
               ) : (
                 <>

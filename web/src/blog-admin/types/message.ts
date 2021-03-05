@@ -1,3 +1,5 @@
+import type { UserTypeCollection } from '@common/types'
+
 export default interface Message {
   listItemByAdminRole: {
     id: number
@@ -8,14 +10,9 @@ export default interface Message {
     parentId?: number
     blog?: string
     fromMail: string
-    from: {
-      id: number
-      account: string
-      nickName?: string
-      roleName: string
-    }
     toMail: string
-    to: Message['listItemByAdminRole']['from']
+    from: UserTypeCollection['listItem']
+    to: UserTypeCollection['listItem']
   }
   getListResByAdminRole: {
     list: Message['listItemByAdminRole'][]

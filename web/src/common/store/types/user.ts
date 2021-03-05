@@ -8,6 +8,7 @@ export interface UserState {
   account: string
   nickName: string
   roleName: 'admin' | 'user'
+  avatar: string
 }
 
 export interface UserAction {

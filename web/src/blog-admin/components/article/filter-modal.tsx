@@ -1,13 +1,12 @@
 import React, { memo, useCallback, useState, useEffect, useMemo, useImperativeHandle, forwardRef } from 'react'
-import { Modal, Button, Checkbox, Divider, Select, Radio, Badge, Alert, Tree, message } from 'antd'
+import { Modal, Button, Row, Col, Tag, Radio, Badge, Alert, Tree, message } from 'antd'
 import { useService } from '@common/hooks'
 import { adminSortServices } from '@blog-admin/services/sort'
-import { adminArticleServices } from '@blog-admin/services/article'
+import { adminTagServices } from '@blog-admin/services/tag'
 import type { SetStateAction, Dispatch, ForwardRefRenderFunction } from 'react'
 import type { ModalProps } from 'antd/lib/modal'
-import type { SelectValue } from 'antd/lib/select'
 import type { ConditionQuery } from '@blog-admin/containers/article'
-import type { Sort, ArticleTypeCollection } from '@blog-admin/types'
+import type { Sort, TagTypeCollection } from '@blog-admin/types'
 
 type FilterRequest = (type: 'ok' | 'exit' | 'clear') => void
 
@@ -18,9 +17,8 @@ interface FilterModalProps extends ModalProps {
 }
 
 export type TemporaryCondition = {
-  commonFilterArr?: ['isTop'?, 'isApproved'?, 'isParent'?, 'isSon'?]
   filteredSortArr?: string[]
-  articleArr?: { key: number; label: string }[]
+  tagIdsArr?: number[]
   filterFlag?: boolean
 }
 
@@ -29,27 +27,27 @@ export type FilterModalRef = { clear: () => void }
 const FilterModal: ForwardRefRenderFunction<FilterModalRef, FilterModalProps> = (props, ref) => {
   const { visible, conditionQuery, onSetFilterModalVisible, onSetConditionQuery } = props
 
-  const [filterType, setFilterType] = useState<'catalog' | 'article'>('catalog')
+  const [filterType, setFilterType] = useState<'catalog' | 'tag'>('catalog')
   const [allSortList, setAllSortList] = useState<Sort['getListResByAdminRole']['list']>([])
   const [temporaryCondition, setTemporaryCondition] = useState<TemporaryCondition>({})
-  const [articleSearch, setArticleSearch] = useState<string>(undefined)
 
-  const getListParams = useMemo<ArticleTypeCollection['getListParamsByAdminRole']>(
+  const getListParams = useMemo<TagTypeCollection['getListParamsByAdminRole']>(
     () => ({
       index: 1,
-      size: 10,
-      conditionQuery: { title: articleSearch?.trim() },
+      size: 999,
+      conditionQuery: {},
     }),
-    [articleSearch],
+    [],
   )
-  const [articleLoading, articleRes, articleErr] = useService(adminArticleServices.getList, getListParams)
-  const articleList = useMemo(() => {
-    if (articleErr) {
-      message.error(articleErr.message || '获取列表失败')
+
+  const [, tagRes, tagErr] = useService(adminTagServices.getList, getListParams)
+  const tagList = useMemo(() => {
+    if (tagErr) {
+      message.error(tagErr.message || '获取列表失败')
       return []
     }
-    return articleRes?.data?.list || []
-  }, [articleRes, articleErr])
+    return tagRes?.data?.list || []
+  }, [tagRes, tagErr])
 
   useImperativeHandle(
     ref,
@@ -69,21 +67,12 @@ const FilterModal: ForwardRefRenderFunction<FilterModalRef, FilterModalProps> = 
       if (type === 'exit') {
         setTemporaryCondition((prevValue) => ({
           ...prevValue,
-          commonFilterArr: conditionQuery?.commonFilterArr || [],
           filteredSortArr: conditionQuery?.filteredSortArr || [],
-          articleArr: conditionQuery?.articleArr || [],
+          tagIdsArr: conditionQuery?.tagIdsArr || [],
         }))
         return
       }
-      const { filteredSortArr = [], articleArr = [], commonFilterArr = [] } = temporaryCondition
-      const isApproved = commonFilterArr.includes?.('isApproved') ? 0 : undefined
-      const isTop = commonFilterArr.includes?.('isTop') ? 1 : undefined
-      const isRoot = (() => {
-        if (commonFilterArr.includes('isParent') && !commonFilterArr.includes('isSon')) return 1
-        if (!commonFilterArr.includes('isParent') && commonFilterArr.includes('isSon')) return 0
-        return undefined
-      })()
-      const articleIdsArr = articleArr.map((article) => article.key)
+      const { filteredSortArr = [], tagIdsArr = [] } = temporaryCondition
       const category = { sortIdsArr: [], cateIdsArr: [] }
       filteredSortArr.forEach((item) => {
         const arr = item.split('-')
@@ -95,18 +84,21 @@ const FilterModal: ForwardRefRenderFunction<FilterModalRef, FilterModalProps> = 
       })
       onSetConditionQuery((oldValue) => ({
         ...oldValue,
-        isApproved,
-        isTop,
-        isRoot,
-        commonFilterArr,
         filteredSortArr,
-        articleArr,
-        articleIdsArr,
+        tagIdsArr,
         category,
       }))
     },
     [conditionQuery, temporaryCondition, onSetFilterModalVisible, onSetConditionQuery],
   )
+
+  const handleTagSelect = useCallback((id, checked) => {
+    setTemporaryCondition((prevValue) => {
+      const { tagIdsArr = [] } = prevValue
+      const newTagIds = checked ? [...tagIdsArr, id] : tagIdsArr.filter((tagId) => tagId !== id)
+      return { ...prevValue, tagIdsArr: newTagIds }
+    })
+  }, [])
 
   useEffect(() => {
     ;(async () => {
@@ -134,30 +126,15 @@ const FilterModal: ForwardRefRenderFunction<FilterModalRef, FilterModalProps> = 
       ]}
     >
       <div style={{ textAlign: 'center' }}>
-        <Checkbox.Group
-          options={[
-            { label: '置顶', value: 'isTop' },
-            { label: '待审', value: 'isApproved' },
-            { label: '父留言', value: 'isParent' },
-            { label: '子留言', value: 'isSon' },
-          ]}
-          value={temporaryCondition?.commonFilterArr || []}
-          onChange={(value) => {
-            setTemporaryCondition((prevValue) => ({ ...prevValue, commonFilterArr: value } as TemporaryCondition))
-          }}
-        />
-      </div>
-      <Divider />
-      <div style={{ textAlign: 'center' }}>
         <Radio.Group size="small" value={filterType} buttonStyle="solid" onChange={({ target }) => setFilterType(target.value)}>
           <Radio.Button value="catalog">
             <Badge dot={temporaryCondition?.filteredSortArr?.length > 0}>
               <span style={{ marginLeft: 10, marginRight: 10 }}>按分类</span>
             </Badge>
           </Radio.Button>
-          <Radio.Button value="article">
-            <Badge dot={temporaryCondition?.articleArr?.length > 0}>
-              <span style={{ marginLeft: 10, marginRight: 10 }}>按文章</span>
+          <Radio.Button value="tag">
+            <Badge dot={temporaryCondition?.tagIdsArr?.length > 0}>
+              <span style={{ marginLeft: 10, marginRight: 10 }}>按标签</span>
             </Badge>
           </Radio.Button>
         </Radio.Group>
@@ -185,30 +162,24 @@ const FilterModal: ForwardRefRenderFunction<FilterModalRef, FilterModalProps> = 
           ))}
         </Tree>
       )}
-      {filterType === 'article' && (
-        <div style={{ textAlign: 'center' }}>
-          <span>文章：</span>
-          <Select
-            labelInValue
-            showSearch
-            mode="multiple"
-            notFoundContent={null}
-            loading={articleLoading}
-            filterOption={false}
-            onChange={(value) =>
-              setTemporaryCondition((prevValue) => ({ ...prevValue, articleArr: (value as unknown) as TemporaryCondition['articleArr'] }))
-            }
-            onSearch={setArticleSearch}
-            value={(temporaryCondition.articleArr as unknown) as SelectValue}
-            style={{ width: 350 }}
-          >
-            {articleList.map((article) => (
-              <Select.Option value={article.id} key={article.id}>
-                {article.title}
-              </Select.Option>
+      {filterType === 'tag' && (
+        <Row>
+          <Col span={3} className="mt5">
+            请选择：
+          </Col>
+          <Col span={21}>
+            {tagList.map((item) => (
+              <Tag.CheckableTag
+                key={item.id}
+                checked={temporaryCondition?.tagIdsArr?.includes?.(item.id)}
+                onChange={(checked) => handleTagSelect(item.id, checked)}
+                className="mt5"
+              >
+                {item.name}
+              </Tag.CheckableTag>
             ))}
-          </Select>
-        </div>
+          </Col>
+        </Row>
       )}
     </Modal>
   )
