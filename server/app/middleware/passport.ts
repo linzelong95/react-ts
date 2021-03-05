@@ -67,7 +67,7 @@ module.exports = (options, app: Application) => {
   return async (ctx: Context, next: any) => {
     const { originalUrl, request } = ctx
     const { referer = '', host = '' } = request.header || {}
-    const [, protocol, originalHost] = (referer as string).match(/(https?:)\/\/([^/]*).*/) || []
+    const [, , originalHost] = (referer as string).match(/(https?:)\/\/([^/]*).*/) || []
     if (!isApi.test(originalUrl)) return await next()
     if (authUserUrlRegexList.some((regex) => regex.test(originalUrl))) {
       if (ctx.isAuthenticated()) return await next()
@@ -76,11 +76,11 @@ module.exports = (options, app: Application) => {
     }
     if (adminUrlRegexList.some((regex) => regex.test(originalUrl))) {
       if (!ctx.isAuthenticated()) {
-        // ctx.body = { code: StatusCode.NOT_LOGGED_FOR_ADMIN, message: '管理员未登录' }
         if (originalHost === host) {
-          ctx.redirect('/user/login')
+          ctx.redirect(`/user/login?redirect=${referer}`)
         } else {
-          ctx.redirect(`${protocol}//${originalHost}/user/login?redirect=${referer}`)
+          // ctx.redirect(`${protocol}//${originalHost}/user/login?redirect=${referer}`)
+          ctx.body = { code: StatusCode.NOT_LOGGED_FOR_ADMIN, message: '管理员未登录' }
         }
         return
       }

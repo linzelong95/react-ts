@@ -32,20 +32,28 @@ interface RenderData {
     }
   }
 }
+
+const authAssets = ['blog-admin']
+
 export default class HomeController extends Controller {
   public async index() {
     const { ctx, config } = this
     const { sentry, env } = config
-    let currentUrl = ctx.path
-    if (/^\/(public|api)/.test(currentUrl)) return
-    const moduleName = currentUrl.split('/')[1]
+    const { originalUrl, request, state, path } = ctx
+    if (/^\/(public|api)/.test(path)) return
+    const [, moduleName] = path.split('/')
+    const { referer } = request?.header || {}
+    if (authAssets.includes(moduleName) && !state?.user) {
+      ctx.redirect(`/user/login?redirect=${referer || originalUrl}`)
+      return
+    }
     const moduleStatics = getModuleStatics(moduleName)
     if (!moduleStatics?.js?.path) return
     const baseStatics = getModuleStatics('base')
     const renderData: RenderData = {
       jsList: [moduleStatics.js.path],
       cssList: moduleStatics?.css?.path ? [moduleStatics.css.path] : [],
-      initialState: { user: ctx.state.user || {}, sentry, release: moduleStatics.js.release, showWaterMark: false },
+      initialState: { user: state.user || {}, sentry, release: moduleStatics.js.release, showWaterMark: false },
       title: 'blog',
       keywords: 'blog',
       description: 'This is a blog',
