@@ -1,10 +1,14 @@
-import React, { memo, useCallback, useMemo, useState } from 'react'
+import React, { memo, useCallback, useMemo, useState, useEffect } from 'react'
 import { useLocation, useRouteMatch } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-import { Layout } from 'antd'
+import { useSelector, useDispatch } from 'react-redux'
+import * as Sentry from '@sentry/browser'
+import { Layout, Spin, message } from 'antd'
+import { LocalStorage } from '@common/constants'
+import { createLoginAction } from '@common/store/actions'
+import { loginServices } from '@common/services'
 import { Forbidden } from '@common/components'
 import { flatRoutes } from '@common/utils'
-import { useMobile } from '@common/hooks'
+import { useMobile, useLocalStorage } from '@common/hooks'
 import Header from './header'
 import Footer from './footer'
 import SideMenu from './side-menu'
@@ -22,11 +26,16 @@ interface BasicLayoutProps extends RouteComponentProps<Record<string, never>> {
 
 const BasicLayout: FC<BasicLayoutProps> = memo((props) => {
   const { routes, basename = '/', children } = props
+  const dispatch = useDispatch()
   const { pathname } = useLocation()
   const userInfo = useSelector<StoreState, StoreState['user']>((state) => state.user)
   const isSmallViewPort = useMobile({ includePad: true, includeTraditionalSmallViewPort: 767 })
   const isMobile = useMobile({ includeTraditionalSmallViewPort: true })
   const [menuDrawerVisible, setMenuDrawerVisible] = useState<DrawerProps['visible']>(false)
+
+  const [accountLocalStorage, setAccountLocalStorage] = useLocalStorage<{ autoLoginMark: boolean; autoLogin: boolean }>(
+    LocalStorage.BLOG_STORE_ACCOUNT,
+  )
 
   const getUserAuthPoints = useCallback<() => string[]>(() => {
     if (!userInfo?.roleName) return []
@@ -46,24 +55,68 @@ const BasicLayout: FC<BasicLayoutProps> = memo((props) => {
     return Boolean(match) && flattedAccessRoutes.every((route) => route.path !== pathname)
   }, [pathname, flattedAccessRoutes, match])
 
+  const redirectToLoginPage = useCallback(() => {
+    const { origin, href } = window.location
+    window.location.href = `${origin}/user/sign/login?redirect=${href}`
+  }, [])
+
+  const logout = useCallback<() => void>(async () => {
+    const [, err] = await loginServices.logout()
+    if (err) {
+      message.error('退出登录失败')
+      return
+    }
+    setAccountLocalStorage({ ...accountLocalStorage, autoLoginMark: false })
+    redirectToLoginPage()
+  }, [accountLocalStorage, setAccountLocalStorage, redirectToLoginPage])
+
+  useEffect(() => {
+    if (userInfo?.account) return
+    if (!accountLocalStorage?.autoLoginMark) {
+      redirectToLoginPage()
+      return
+    }
+    ;(async () => {
+      const [loginRes] = await loginServices.login({ autoLogin: true })
+      if (!loginRes?.data) {
+        redirectToLoginPage()
+        return
+      }
+      dispatch(createLoginAction(loginRes.data))
+    })()
+  }, [accountLocalStorage, userInfo, dispatch, redirectToLoginPage])
+
+  useEffect(() => {
+    if (__IS_DEV_MODE__) return
+    Sentry.setUser({ username: userInfo?.account })
+  }, [userInfo])
+
   return (
     <Layout className={styles['basic-layout']}>
-      <Header userInfo={userInfo} isMobile={isMobile} onToggleMenuDrawer={setMenuDrawerVisible} />
-      <Layout className={styles['body-area']}>
-        <SideMenu
-          routes={routes}
-          basename={basename}
-          flattedAccessRoutes={flattedAccessRoutes}
-          isMobile={isMobile}
-          isSmallViewPort={isSmallViewPort}
-          menuDrawerVisible={menuDrawerVisible}
-          onToggleMenuDrawer={setMenuDrawerVisible}
-        />
-        <Layout className={styles['body-right']}>
-          <Layout.Content className={styles['main-content']}>{isForbidden ? <Forbidden /> : children}</Layout.Content>
-          <Footer />
-        </Layout>
-      </Layout>
+      {userInfo?.account ? (
+        <>
+          <Header userInfo={userInfo} isMobile={isMobile} onLogout={logout} onToggleMenuDrawer={setMenuDrawerVisible} />
+          <Layout className={styles['body-area']}>
+            <SideMenu
+              routes={routes}
+              basename={basename}
+              flattedAccessRoutes={flattedAccessRoutes}
+              isMobile={isMobile}
+              isSmallViewPort={isSmallViewPort}
+              menuDrawerVisible={menuDrawerVisible}
+              onToggleMenuDrawer={setMenuDrawerVisible}
+            />
+            <Layout className={styles['body-right']}>
+              <Layout.Content className={styles['main-content']}>{isForbidden ? <Forbidden /> : children}</Layout.Content>
+              <Footer />
+            </Layout>
+          </Layout>
+        </>
+      ) : (
+        <div className="mt20">
+          <Spin size="large" />
+        </div>
+      )}
     </Layout>
   )
 })

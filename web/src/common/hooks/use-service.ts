@@ -3,7 +3,7 @@ import { CommonResponse, CommonError } from '@common/types'
 
 function useService<R extends unknown, D extends unknown>(
   service: (params: D) => Promise<[CommonResponse<R>, CommonError]>,
-  data: D,
+  data?: D,
   disabled?: boolean,
 ): [boolean, CommonResponse<R>, CommonError, () => void] {
   const [flag, setFlag] = useState<boolean>(false)

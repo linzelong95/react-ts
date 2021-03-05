@@ -15,7 +15,8 @@
     "paths": {
       "@src/*": ["src/*"],
       "@common/*": ["src/common/*"],
-      "@blog-admin/*": ["src/blog-admin/*"]
+      "@blog-admin/*": ["src/blog-admin/*"],
+      "@user/*": ["src/user/*"]
     }
   },
   "include": ["./src/**/*"],

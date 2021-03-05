@@ -1,12 +1,12 @@
-import React, { memo, useCallback, useEffect, useRef, useState } from 'react'
+import React, { memo, useCallback, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Layout, message, Avatar, Dropdown, Menu, Divider, Input } from 'antd'
 import { TranslationOutlined, SearchOutlined, BellOutlined, MenuUnfoldOutlined } from '@ant-design/icons'
-import * as Sentry from '@sentry/browser'
 import logoImg from '@blog-admin/public/images/logo.png'
 import { useTranslation } from 'react-i18next'
 import { loginServices } from '@common/services'
-import { createLogoutAction, createLoginAction } from '@common/store/actions'
+import { LocalStorage } from '@common/constants'
+import { createLoginAction } from '@common/store/actions'
 import LoginForm from './login-form'
 import { useLocalStorage } from '@common/hooks'
 import { rsa, serialize } from '@common/utils'
@@ -19,20 +19,19 @@ import styles from '../index.less'
 interface HeaderProps {
   userInfo: StoreState['user']
   isMobile: boolean
+  onLogout: () => void
   onToggleMenuDrawer: Dispatch<SetStateAction<DrawerProps['visible']>>
 }
 
 const Header: FC<HeaderProps> = memo((props) => {
-  const { userInfo, isMobile, onToggleMenuDrawer } = props
+  const { userInfo, isMobile, onLogout, onToggleMenuDrawer } = props
   const [loginFormVisible, setLoginFormVisible] = useState<boolean>(false)
   const [isForRegister, setIsForRegister] = useState<boolean>(false)
   const [searchBoxVisible, setSearchBoxVisible] = useState<boolean>(false)
   const searchBoxRef = useRef<Input>(null)
   const { t, i18n } = useTranslation()
   const dispatch = useDispatch()
-  const [accountLocalStorage, setAccountLocalStorage] = useLocalStorage<{ autoLoginMark: boolean; autoLogin: boolean }>(
-    'BLOG_STORE_ACCOUNT',
-  )
+  const [, setAccountLocalStorage] = useLocalStorage<{ autoLoginMark: boolean; autoLogin: boolean }>(LocalStorage.BLOG_STORE_ACCOUNT)
 
   const changeLang = useCallback<(event: React.MouseEvent<HTMLElement, MouseEvent>) => void>(() => {
     const nextLang = i18n.language === 'zh-CN' ? 'en' : 'zh-CN'
@@ -90,30 +89,6 @@ const Header: FC<HeaderProps> = memo((props) => {
     [login],
   )
 
-  const logout = useCallback<() => void>(async () => {
-    const [, err] = await loginServices.logout()
-    if (err) {
-      message.error('退出登录失败')
-      return
-    }
-    setAccountLocalStorage({ ...accountLocalStorage, autoLoginMark: false })
-    dispatch(createLogoutAction())
-  }, [accountLocalStorage, setAccountLocalStorage, dispatch])
-
-  useEffect(() => {
-    ;(async () => {
-      if (accountLocalStorage?.autoLoginMark && !userInfo?.account) {
-        const [loginRes] = await loginServices.login({ autoLogin: true })
-        if (loginRes?.data) dispatch(createLoginAction(loginRes.data))
-      }
-    })()
-  }, [accountLocalStorage, userInfo, dispatch])
-
-  useEffect(() => {
-    if (__IS_DEV_MODE__) return
-    Sentry.setUser({ username: userInfo?.account })
-  }, [userInfo])
-
   return (
     <Layout.Header className={styles['header-area']}>
       <div className={styles['header-left']}>
@@ -159,13 +134,18 @@ const Header: FC<HeaderProps> = memo((props) => {
             <li className={styles['login-info']}>
               {userInfo.account ? (
                 <Dropdown
+                  placement="bottomCenter"
                   overlay={
                     <Menu>
-                      <Menu.Item onClick={logout}>{t('common.logout')}</Menu.Item>
+                      <Menu.Item onClick={onLogout}>{t('common.logout')}</Menu.Item>
+                      <Menu.Item onClick={onLogout}>{t('common.myProfile')}</Menu.Item>
                     </Menu>
                   }
                 >
-                  <Avatar src={userInfo?.avatar || `${__SERVER_ORIGIN__ || ''}/public/assets/images/default/avatar.jpeg`} />
+                  <Avatar
+                    style={{ cursor: 'pointer' }}
+                    src={userInfo?.avatar || `${__SERVER_ORIGIN__ || ''}/public/assets/images/default/avatar.jpeg`}
+                  />
                 </Dropdown>
               ) : (
                 <>
