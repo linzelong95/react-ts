@@ -57,7 +57,7 @@ const BasicLayout: FC<BasicLayoutProps> = memo((props) => {
 
   const redirectToLoginPage = useCallback(() => {
     const { origin, href } = window.location
-    window.location.href = `${origin}/user/sign/login?redirect=${href}`
+    window.location.href = `${origin}/user/login?redirect=${href}`
   }, [])
 
   const logout = useCallback<() => void>(async () => {

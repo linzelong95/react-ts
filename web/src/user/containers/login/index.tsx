@@ -4,13 +4,14 @@ import { useLocalStorage, useService } from '@common/hooks'
 import { loginServices } from '@common/services'
 import { rsa, serialize } from '@common/utils'
 import { Card, Form, Input, Checkbox, Row, Col, Button, message } from 'antd'
+import { GithubOutlined } from '@ant-design/icons'
 import { parse } from 'qs'
 import { useDispatch } from 'react-redux'
 import { createLoginAction } from '@common/store/actions'
-import { useHistory } from 'react-router-dom'
+import { useHistory, Link } from 'react-router-dom'
 import type { FC } from 'react'
 import type { RouteComponentProps } from 'react-router'
-import type { LoginParams } from '@common/services/login'
+import type { AccountTypeCollection } from '@common/types'
 import type { ButtonProps } from 'antd/lib/button'
 
 const layout = {
@@ -21,11 +22,10 @@ const tailLayout = {
   wrapperCol: { offset: 5, span: 16 },
 }
 
-const Login: FC<RouteComponentProps<{ type: 'login' | 'register' }>> = memo((props) => {
-  const { type } = props.match.params
+const Login: FC<RouteComponentProps<never>> = memo(() => {
   const history = useHistory()
   const dispatch = useDispatch()
-  const [form] = Form.useForm<LoginParams>()
+  const [form] = Form.useForm<AccountTypeCollection['loginParams']>()
   const [accountLocalStorage, setAccountLocalStorage] = useLocalStorage<{ autoLoginMark: boolean; autoLogin: boolean }>(
     LocalStorage.BLOG_STORE_ACCOUNT,
   )
@@ -93,38 +93,41 @@ const Login: FC<RouteComponentProps<{ type: 'login' | 'register' }>> = memo((pro
           <Form.Item label="Password" name="password" rules={[{ required: true, message: 'Please input your password!' }]}>
             <Input.Password />
           </Form.Item>
-          {type === 'register' ? (
-            <Form.Item label="RePassword" name="repeatedPassword" rules={[{ required: true, message: 'Please input your password!' }]}>
-              <Input.Password />
-            </Form.Item>
-          ) : (
-            <>
-              <Form.Item label="Captcha">
-                <Row gutter={8}>
-                  <Col span={18}>
-                    <Form.Item noStyle name="captcha" rules={[{ required: true, message: 'Please input captcha!' }]}>
-                      <Input placeholder="captcha" />
-                    </Form.Item>
-                  </Col>
-                  <Col span={6}>
-                    <img
-                      alt="验证码"
-                      src={captchaRes?.data?.item && `data:image/png;base64,${captchaRes.data.item}`}
-                      style={{ height: 31, width: '100%', border: '1px solid gray', padding: 3, cursor: 'pointer' }}
-                      onClick={forceRequest}
-                    />
-                  </Col>
-                </Row>
-              </Form.Item>
-              <Form.Item {...tailLayout} name="autoLogin" valuePropName="checked">
-                <Checkbox>Remember me</Checkbox>
-              </Form.Item>
-            </>
-          )}
+          <Form.Item label="Captcha">
+            <Row gutter={8}>
+              <Col span={18}>
+                <Form.Item noStyle name="captcha" rules={[{ required: true, message: 'Please input captcha!' }]}>
+                  <Input placeholder="captcha" />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <img
+                  alt="验证码"
+                  src={captchaRes?.data?.item && `data:image/png;base64,${captchaRes.data.item}`}
+                  style={{ height: 31, width: '100%', border: '1px solid gray', padding: 3, cursor: 'pointer' }}
+                  onClick={forceRequest}
+                />
+              </Col>
+            </Row>
+          </Form.Item>
+          <Form.Item {...tailLayout} name="autoLogin" valuePropName="checked">
+            <Checkbox>Remember me</Checkbox>
+          </Form.Item>
           <Form.Item {...tailLayout}>
             <Button block type="primary" onClick={handleLogin}>
               登录
             </Button>
+          </Form.Item>
+          <Form.Item {...tailLayout}>
+            <Row>
+              <Col span={14}>
+                其他方式
+                <GithubOutlined className="font24 ml10 pointer" />
+              </Col>
+              <Col span={10} className="text-right">
+                <Link to="/register">注册账户</Link>
+              </Col>
+            </Row>
           </Form.Item>
         </Form>
       </Card>

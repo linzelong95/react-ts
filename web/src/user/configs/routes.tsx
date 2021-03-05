@@ -5,13 +5,19 @@ const routes: RouteConfig[] = [
   {
     path: '/',
     menuKey: 'user',
-    redirect: '/sign/login',
+    redirect: '/login',
     routes: [
       {
-        path: '/sign/:type',
-        menuKey: 'sign',
+        path: '/login',
+        menuKey: 'login',
         exact: true,
         component: lazy(() => import(/* webpackPrefetch: true */ '@user/containers/login')),
+      },
+      {
+        path: '/register',
+        menuKey: 'register',
+        exact: true,
+        component: lazy(() => import(/* webpackPrefetch: true */ '@user/containers/register')),
       },
     ],
   },

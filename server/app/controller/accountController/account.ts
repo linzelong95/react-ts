@@ -52,7 +52,7 @@ export default class AccountController extends Controller {
 
   async register(): Promise<void> {
     const { ctx } = this
-    const { mail: account, password } = ctx.request.body
+    const { account, password } = ctx.request.body
     const hasExistedOne = await getRepository(User).createQueryBuilder('user').where('user.account=:account', { account }).getOne()
     if (hasExistedOne) ctx.throw(StatusCode.FORBIDDEN, '该用户已存在')
     const user = await getRepository(User).create({

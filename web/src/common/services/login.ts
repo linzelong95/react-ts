@@ -1,16 +1,9 @@
 import { post, get } from '@common/utils'
 import { loginApis } from '@common/services/apis'
-import type { ServiceResult } from '@common/types'
+import type { ServiceResult, AccountTypeCollection } from '@common/types'
 import type { UserState } from '@common/store/types'
 
-export interface LoginParams {
-  account?: string
-  password?: string
-  captcha?: string
-  autoLogin: boolean
-}
-
-export function login(params: LoginParams): ServiceResult<UserState> {
+export function login(params: AccountTypeCollection['loginParams']): ServiceResult<UserState> {
   return post<UserState, typeof params>(`${loginApis.LOGIN}?t=${Date.now()}`, params)
 }
 
@@ -18,8 +11,8 @@ export function logout(): ServiceResult {
   return post<never>(loginApis.LOGOUT)
 }
 
-export function register(params: LoginParams): ServiceResult<UserState> {
-  return post<UserState, LoginParams>(loginApis.REGISTER, params)
+export function register(params: AccountTypeCollection['registerParams']): ServiceResult<UserState> {
+  return post<UserState, typeof params>(loginApis.REGISTER, params)
 }
 
 export function getPublicKey(): ServiceResult<{ item: string }> {

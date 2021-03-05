@@ -6,7 +6,7 @@ import { loginServices } from '@common/services'
 import { useLocalStorage } from '@common/hooks'
 import type { FC } from 'react'
 import type { ModalProps } from 'antd/es/modal'
-import type { LoginParams } from '@common/services/login'
+import type { AccountTypeCollection } from '@common/types'
 
 const layout = {
   labelCol: { span: 6 },
@@ -18,7 +18,7 @@ const tailLayout = {
 
 interface LoginFormProps extends Omit<ModalProps, 'title' | 'okText' | 'onCancel'> {
   isForRegister: boolean
-  onLogin: (params: LoginParams) => void
+  onLogin: (params: AccountTypeCollection['loginParams']) => void
   onRegister: (params: any) => void
   onClose: () => void
 }
@@ -26,7 +26,7 @@ interface LoginFormProps extends Omit<ModalProps, 'title' | 'okText' | 'onCancel
 const LoginForm: FC<LoginFormProps> = memo((props) => {
   const { isForRegister, visible, onLogin, onRegister, onClose, ...restProps } = props
   const [captcha, setCaptcha] = useState<string>('')
-  const [form] = Form.useForm<LoginParams>()
+  const [form] = Form.useForm<AccountTypeCollection['loginParams']>()
   const { t } = useTranslation()
   const [accountLocalStorage] = useLocalStorage<{ autoLoginMark: boolean; autoLogin: boolean }>('BLOG_STORE_ACCOUNT')
 
