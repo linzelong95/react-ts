@@ -113,13 +113,56 @@ export default (appInfo: EggAppInfo) => {
   config.security = {
     // 允许ctx.redirect跳转的非本域名链接，当domainWhiteList为空数组则等同于使用ctx.unsafeRedirect，此时跳转任意链接都放行
     domainWhiteList: ['127.0.0.1', '120.78.139.146', 'baidu.com'],
+    // Cross Site Request Forgery，跨站域请求伪造,验证referer字段/通过token值校验
     csrf: {
       enable: false,
     },
     // xframe:{
-    //   enable:true,// 该配置旨在阻止非本域名页面以iframe嵌套本页面，默认开启，无需配置
+    //   enable:true,// 该配置旨在阻止非本域名页面以iframe嵌套本页面
     // }
+    // Http Strict Transport Security，是响应头的信息，它告诉浏览器只能通过HTTPS访问当前资源，而不是HTTP
+    // 开启hsts，在站点的响应头中设置Strict-Transport-Security,浏览器会将这个域名加入Hsts列表，下次用户早使用http访问这个网站，浏览器会自动发送https请求（但第一次访问还是http），而不是先发送http再重定向到https，避免302重定向url被篡改，进一步提高通信的安全性。
+    // hsts: {
+    //   enable: false,
+    //   maxAge: 365 * 24 * 3600,
+    //   includeSubdomains: false, //可以添加子域名，保证所有子域名都使用 HTTPS 访问。
+    // },
+    // CSP（Content Security Policy）指定资源可信任来源(脚本、图片、iframe、fton、style等等可能的远程的资源)，减少跨站脚本攻击
+    // csp: {
+    //   enable: true,
+    //   policy: {
+    //     'default-src': 'self',
+    //   },
+    // },
+    // SSRF漏洞：（服务端请求伪造）是一种由攻击者构造形成由服务端发起请求的一个安全漏洞。一般情况下，SSRF攻击的目标是从外网无法访问的内部系统。（正是因为它是由服务端发起的，所以它能够请求到与它相连而与外网隔离的内部系统）。SSRF 形成的原因大都是由于服务端提供了从其他服务器应用获取数据的功能且没有对目标地址做过滤与限制。比如从指定URL地址获取网页文本内容，加载指定地址的图片，下载等等。利用的是服务端的请求伪造。ssrf是利用存在缺陷的web应用作为代理攻击远程和本地的服务器。
+    // 框架在 ctx, app 和 agent 上都提供了 safeCurl 方法，在发起网络请求的同时会对指定的内网 IP 地址过滤，除此之外，该方法和框架提供的 curl 方法一致
+    // ctx.safeCurl(url, options)
+    // app.safeCurl(url, options)
+    // agent.safeCurl(url, options)
+    //     ssrf: {
+    //       ipBlackList: [// 黑名单
+    //         '10.0.0.0/8', // 支持 IP 网段
+    //         '0.0.0.0/32',
+    //         '127.0.0.1',  // 支持指定 IP 地址
+    //       ],
+    //       // 配置了 checkAddress 时，ipBlackList 不会生效
+    //       checkAddress(ip) {
+    //         return ip !== '127.0.0.1';
+    //       },
+    //     },
   }
+
+  // 富文本等中的 href src允许全部域名
+  config.helper = {
+    shtml: {
+      domainWhiteList: ['*'],
+    },
+  }
+
+  // 当网站需要直接输出用户输入的结果时，请务必使用 ctx.helper.escape() 包裹起来
+  // 网站输出的内容会提供给 JavaScript 来使用。这个时候需要使用 helper.sjs() 来进行过滤
+  // 需要在 JavaScript 中输出 json ，这个时候需要使用  helper.sjson() 来进行转义
+  // 框架提供了 helper.shtml() 方法对字符串进行 XSS 过滤。将富文本（包含 HTML 代码的文本）当成变量直接在模版里面输出时，需要用到 shtml 来处理
 
   config.cors = {
     origin: (ctx) => ctx.get('Origin'),
