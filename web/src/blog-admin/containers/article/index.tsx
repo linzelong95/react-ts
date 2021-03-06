@@ -63,15 +63,15 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
     }
   }, [pagination, conditionQuery])
 
-  const [loading, replyRes, replyErr, forceRequest] = useService(adminArticleServices.getList, getListParams)
+  const [loading, articleRes, articleErr, forceRequest] = useService(adminArticleServices.getList, getListParams)
 
   const [total, dataSource] = useMemo(() => {
-    if (replyErr) {
-      message.error(replyErr.message || '获取列表失败')
+    if (articleErr) {
+      message.error(articleErr.message || '获取列表失败')
       return [0, []]
     }
-    return [replyRes?.data?.total || 0, replyRes?.data?.list || []]
-  }, [replyRes, replyErr])
+    return [articleRes?.data?.total || 0, articleRes?.data?.list || []]
+  }, [articleRes, articleErr])
 
   const showDataByDefaultWay = useCallback<(event: React.MouseEvent<HTMLElement, MouseEvent>) => void>(() => {
     setConditionQuery({})

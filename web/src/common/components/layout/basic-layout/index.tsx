@@ -55,11 +55,6 @@ const BasicLayout: FC<BasicLayoutProps> = memo((props) => {
     return Boolean(match) && flattedAccessRoutes.every((route) => route.path !== pathname)
   }, [pathname, flattedAccessRoutes, match])
 
-  const redirectToLoginPage = useCallback(() => {
-    const { origin, href } = window.location
-    window.location.href = `${origin}/user/login?redirect=${href}`
-  }, [])
-
   const logout = useCallback<() => void>(async () => {
     const [, err] = await loginServices.logout()
     if (err) {
@@ -67,24 +62,20 @@ const BasicLayout: FC<BasicLayoutProps> = memo((props) => {
       return
     }
     setAccountLocalStorage({ ...accountLocalStorage, autoLoginMark: false })
-    redirectToLoginPage()
-  }, [accountLocalStorage, setAccountLocalStorage, redirectToLoginPage])
+    window.location.href = `/user/login?redirect=${window.location.href}`
+  }, [accountLocalStorage, setAccountLocalStorage])
 
   useEffect(() => {
     if (userInfo?.account) return
-    if (!accountLocalStorage?.autoLoginMark) {
-      redirectToLoginPage()
-      return
-    }
     ;(async () => {
       const [loginRes] = await loginServices.login({ autoLogin: true })
       if (!loginRes?.data?.account) {
-        redirectToLoginPage()
+        window.location.href = `/user/login?redirect=${window.location.href}`
         return
       }
       dispatch(createLoginAction(loginRes.data))
     })()
-  }, [accountLocalStorage, userInfo, dispatch, redirectToLoginPage])
+  }, [userInfo, dispatch])
 
   useEffect(() => {
     if (__IS_DEV_MODE__) return

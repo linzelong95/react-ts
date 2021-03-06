@@ -1,4 +1,4 @@
-import React, { memo, useCallback } from 'react'
+import React, { memo, useCallback, useEffect } from 'react'
 import { LocalStorage } from '@common/constants'
 import { useLocalStorage, useService } from '@common/hooks'
 import { loginServices } from '@common/services'
@@ -6,11 +6,12 @@ import { rsa, serialize } from '@common/utils'
 import { Card, Form, Input, Checkbox, Row, Col, Button, message } from 'antd'
 import { GithubOutlined } from '@ant-design/icons'
 import { parse } from 'qs'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { createLoginAction } from '@common/store/actions'
 import { useHistory, Link } from 'react-router-dom'
 import type { FC } from 'react'
 import type { RouteComponentProps } from 'react-router'
+import type { StoreState } from '@common/store/types'
 import type { AccountTypeCollection } from '@common/types'
 import type { ButtonProps } from 'antd/lib/button'
 
@@ -26,11 +27,31 @@ const Login: FC<RouteComponentProps<never>> = memo(() => {
   const history = useHistory()
   const dispatch = useDispatch()
   const [form] = Form.useForm<AccountTypeCollection['loginParams']>()
+  const userInfo = useSelector<StoreState, StoreState['user']>((state) => state.user)
   const [accountLocalStorage, setAccountLocalStorage] = useLocalStorage<{ autoLoginMark: boolean; autoLogin: boolean }>(
     LocalStorage.BLOG_STORE_ACCOUNT,
   )
 
   const [, captchaRes, , forceRequest] = useService(loginServices.getWebpageCaptcha)
+
+  const goToPage = useCallback<() => void>(() => {
+    const { redirect } = parse(location.search, { ignoreQueryPrefix: true })
+    if (redirect) {
+      window.location.href = redirect
+      // const urlParams = new URL(window.location.href)
+      // const redirectUrlParams = new URL(redirect)
+      // if (redirectUrlParams.origin !== urlParams.origin) {
+      //   window.location.href = '/blog-admin'
+      //   return
+      // }
+      // redirect = redirect.slice(urlParams.origin.length)
+      // if (redirect.match(/^\/.*#/)) {
+      //   redirect = redirect.slice(redirect.indexOf('#') + 1)
+      // }
+    } else {
+      history.replace('/center')
+    }
+  }, [history])
 
   const handleLogin = useCallback<ButtonProps['onClick']>(() => {
     form
@@ -56,28 +77,23 @@ const Login: FC<RouteComponentProps<never>> = memo(() => {
         }
         message.success({ content: '登录成功', key: 'login' })
         setAccountLocalStorage({ autoLogin, autoLoginMark: autoLogin })
-        const { redirect } = parse(location.search, { ignoreQueryPrefix: true })
         dispatch(createLoginAction(loginRes.data))
-        if (!redirect) {
-          history.replace('/center')
-          return
-        }
-        window.location.href = redirect
-        // const urlParams = new URL(window.location.href)
-        // const redirectUrlParams = new URL(redirect)
-        // if (redirectUrlParams.origin !== urlParams.origin) {
-        //   window.location.href = '/blog-admin'
-        //   return
-        // }
-        // redirect = redirect.slice(urlParams.origin.length)
-        // if (redirect.match(/^\/.*#/)) {
-        //   redirect = redirect.slice(redirect.indexOf('#') + 1)
-        // }
+        goToPage()
       })
       .catch(() => {
         message.error('请检查表单是否填写无误')
       })
-  }, [form, history, dispatch, setAccountLocalStorage])
+  }, [form, dispatch, goToPage, setAccountLocalStorage])
+
+  useEffect(() => {
+    if (userInfo?.account) return goToPage()
+    ;(async () => {
+      const [loginRes] = await loginServices.login({ autoLogin: true })
+      if (!loginRes?.data?.account) return
+      dispatch(createLoginAction(loginRes.data))
+      goToPage()
+    })()
+  }, [userInfo, dispatch, goToPage])
 
   return (
     <div style={{ minHeight: '100vh', background: '#f0f2f5', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
