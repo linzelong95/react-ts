@@ -3,10 +3,11 @@ import { connect } from 'react-redux'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Layout, Input, Avatar, Menu, Dropdown } from 'antd'
-import { GithubOutlined, UserOutlined } from '@ant-design/icons'
+import { UserOutlined, CopyrightOutlined } from '@ant-design/icons'
 import { Container } from '@client/common/components'
 import { logout } from '@client/common/store/action/user'
 import type { FC } from 'react'
+import type { MenuItemProps } from 'antd/lib/menu'
 
 const { Header, Footer, Content } = Layout
 
@@ -23,36 +24,35 @@ const PageLayout: FC<PageLayoutProps> = memo((props) => {
     console.log(111)
   }, [])
 
-  const handleLogout = (e) => {
-    e.preventDefault()
+  const handleLogout = useCallback<MenuItemProps['onClick']>(() => {
     onLogout()
-  }
+  }, [])
 
   return (
     <Layout>
       <Header>
         <Container renderer={<div className="header-wrap"></div>}>
           <div className="header-left">
-            <Link href="/">
-              <GithubOutlined className="github-icon" />
+            <Link href="/blog">
+              <img className="logo" alt="logo" src="/public/assets/images/logo/blog.png" />
             </Link>
             <Input.Search placeholder="input search text" onSearch={onSearch} style={{ width: 300 }} />
           </div>
           <div className="header-right">
-            {user && user.id ? (
+            {user?.id ? (
               <Dropdown
                 overlay={
                   <Menu>
-                    <Menu.Item key="logout">
-                      <a onClick={handleLogout}>登出</a>
+                    <Menu.Item key="logout" onClick={handleLogout}>
+                      登出
                     </Menu.Item>
                   </Menu>
                 }
               >
-                <Avatar size={40} src={user.avatar_url} className="avatar-icon" />
+                <Avatar size={40} src={user.avatar || '/public/assets/images/default/avatar.jpeg'} className="avatar-icon" />
               </Dropdown>
             ) : (
-              <a href={`/prepare-auth?url=${router.asPath}`}>
+              <a href={`/user/login?redirect=${router.asPath}`}>
                 <Avatar size={40} icon={<UserOutlined />} className="avatar-icon" />
               </a>
             )}
@@ -62,7 +62,11 @@ const PageLayout: FC<PageLayoutProps> = memo((props) => {
       <Content>
         <Container>{children}</Container>
       </Content>
-      <Footer style={{ textAlign: 'center' }}>Footer</Footer>
+      <Footer className="footer">
+        briefNull
+        <CopyrightOutlined className="copyright-icon" />
+        2021 All Rights Reserved
+      </Footer>
       <style jsx global>{`
         #__next {
           height: 100%;
@@ -86,14 +90,21 @@ const PageLayout: FC<PageLayoutProps> = memo((props) => {
           justify-content: flex-start;
           align-items: center;
         }
-        .github-icon {
-          color: white;
-          font-size: 40px;
-          margin-right: 16px;
+        .logo {
+          width: 45px;
+          height: 45px;
+          border-radius: 50%;
+          margin-right: 10px;
           cursor: pointer;
         }
         .avatar-icon {
           cursor: pointer;
+        }
+        .footer {
+          text-align: center;
+        }
+        .copyright-icon {
+          margin: 0 8px;
         }
       `}</style>
     </Layout>

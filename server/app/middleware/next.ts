@@ -18,12 +18,13 @@ module.exports = (options, app: Application) => async (ctx: Context, next) => {
   const { isNextAppAsset } = options || {}
   const { path, method } = ctx
   const nextHandle = (app as any).nextServer.getRequestHandler()
-  if (isNextAppAsset.test(path) && method.toLowerCase() === 'get') {
+  const isGetMethod = method.toLowerCase() === 'get'
+  if (isNextAppAsset.test(path) && isGetMethod) {
     await nextRender(nextHandle, ctx)
     return
   }
   await next()
-  if (ctx.status === 404 && method.toLowerCase() === 'get') {
+  if (ctx.status === 404 && isGetMethod) {
     await nextRender(nextHandle, ctx)
   }
 }

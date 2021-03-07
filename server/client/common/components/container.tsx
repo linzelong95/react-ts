@@ -3,7 +3,7 @@ import type { FC, CSSProperties, ReactElement } from 'react'
 
 const containerStyle: CSSProperties = {
   width: '100%',
-  maxWidth: 800,
+  maxWidth: 1300,
   marginLeft: 'auto',
   marginRight: 'auto',
   paddingRight: 16,

@@ -46,7 +46,6 @@ const Article: NextPage<ArticleProps, ArticleProps['user']> = memo(({ user }) =>
 })
 
 // Article.getInitialProps = async ({ ctx, reduxStore }: any) => {
-//   console.log(888, ctx)
 //   const { user } = reduxStore.getState()
 //   return { user }
 // }

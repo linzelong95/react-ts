@@ -4,7 +4,7 @@ import axios from 'axios'
 import { message as antMessage } from 'antd'
 import { tryCatch, isClient } from './util'
 import type { AxiosError, AxiosResponse, AxiosRequestConfig } from 'axios'
-import type { CommonResponse, CommonError, ServiceResult } from '@common/types'
+import type { CommonResponse, CommonError, ServiceResult } from '@client/common/types'
 
 export enum StatusCode {
   BAD_REQ = 400, // Bad Request 客户端请求的语法错误，服务器无法理解

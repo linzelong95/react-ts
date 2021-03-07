@@ -3,7 +3,7 @@ import APP, { AppContext } from 'next/app'
 import Router from 'next/router'
 import { Provider } from 'react-redux'
 import { withRedux, PageLoad, PageLayout } from '@client/common/components'
-import '@client/styles/globals.css'
+import '@client/common/styles/globals.css'
 import 'antd/dist/antd.css'
 
 interface MyAppProps {
@@ -29,7 +29,6 @@ class MyApp extends APP<MyAppProps, Record<string, never>, { loading: boolean }>
   }
 
   static async getInitialProps({ Component, ctx }: AppContext) {
-    console.log(111, 'from _app', ctx)
     const pageProps = Component.getInitialProps ? await Component.getInitialProps(ctx) : {}
     return { pageProps }
   }

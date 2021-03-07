@@ -9,6 +9,9 @@ module.exports = (options) => async (ctx: Context, next) => {
   ctx.seqId = seqId
 
   const { header, method, origin, href, path, query, params, ip, ips, request } = ctx
+  // 暂时不记录nextjs资源的请求
+  if (isNextAppAsset.test(path)) return await next()
+
   ctx.logger.info({
     event: LogEvent.CLIENT_REQUEST,
     href,
