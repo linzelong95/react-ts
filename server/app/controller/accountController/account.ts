@@ -4,7 +4,7 @@ import { User } from '@entity/User'
 import { StatusCode } from '@constant/status'
 import * as crypto from 'crypto'
 import * as constants from 'constants'
-import * as CaptchaPng from 'captchapng'
+const CaptchaPng = require('captchapng')
 
 export default class AccountController extends Controller {
   async info(): Promise<void> {

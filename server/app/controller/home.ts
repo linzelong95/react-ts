@@ -33,17 +33,15 @@ interface RenderData {
   }
 }
 
-const authAssets = ['blog-admin']
-
 export default class HomeController extends Controller {
   public async index() {
     const { ctx, config } = this
-    const { sentry, env } = config
+    const { sentry, env, backgroundSystemNames } = config
     const { originalUrl, request, state, path } = ctx
     if (/^\/(public|api)/.test(path)) return
     const [, moduleName] = path.split('/')
-    const { referer } = request?.header || {}
-    if (authAssets.includes(moduleName) && !state?.user) {
+    if (backgroundSystemNames.includes(moduleName) && !state?.user) {
+      const { referer } = request?.header || {}
       ctx.redirect(`/user/login?redirect=${referer || originalUrl}`)
       return
     }

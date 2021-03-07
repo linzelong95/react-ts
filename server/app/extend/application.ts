@@ -1,7 +1,12 @@
-import type { Context } from 'egg'
+const next = require('next')
 
-module.exports = {
-  succeedRes(ctx: Context, data?: Record<string, any>, message?: string) {
-    ctx.body = { code: 0, data, message }
+const NEXT = Symbol('Application#next')
+
+export default {
+  get nextServer() {
+    if (!this[NEXT]) {
+      this[NEXT] = next({ dev: (this as any).config.env !== 'prod' })
+    }
+    return this[NEXT]
   },
 }

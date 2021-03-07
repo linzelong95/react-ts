@@ -1,11 +1,13 @@
 import type { Context, Application } from 'egg'
 
 module.exports = (options, app: Application) => async (ctx: Context, next) => {
-  const { isApi } = options || {}
+  const { isApi, isNextAppAsset } = options || {}
   const { path, logger } = ctx
 
   try {
     await next()
+
+    if (isNextAppAsset.test(path)) return
 
     if (ctx.status === 404 && !ctx.body) {
       if (isApi?.test(path)) {
@@ -20,7 +22,7 @@ module.exports = (options, app: Application) => async (ctx: Context, next) => {
       })
     }
 
-    const isApplicationJson = /application\/json/.test((ctx.response?.header?.['content-type'] as string) || '')
+    const isApplicationJson = /application\/json/.test((ctx.response.header?.['content-type'] as string) || '')
 
     // 若有需要，在这里统一处理code和message
     if (ctx.body && isApi?.test(path) && isApplicationJson) {

@@ -1,4 +1,4 @@
-import * as passport from 'koa-passport'
+const passport = require('koa-passport')
 import * as passportLocal from 'passport-local'
 import * as crypto from 'crypto'
 import * as constants from 'constants'

@@ -3,7 +3,7 @@ import { v4 as uuid } from 'uuid'
 import type { Context } from 'egg'
 
 module.exports = (options) => async (ctx: Context, next) => {
-  const { ignoredUrls } = options || {}
+  const { ignoredUrls, isNextAppAsset } = options || {}
 
   const seqId = ctx.headers['x-seq-id'] || `blog-node-${uuid()}`
   ctx.seqId = seqId
@@ -25,12 +25,16 @@ module.exports = (options) => async (ctx: Context, next) => {
 
   await next()
 
+  // nextjs应用，忽略（理论上在这之前，中间件执行已被中间，所以可以不需要判断）
+  if (isNextAppAsset.test(path)) return
+
   // 返回头带上 seq id
   ctx.set('X-Seq-Id', seqId)
 
   const isApplicationJson = /application\/json/.test((ctx.response?.header?.['content-type'] as string) || '')
 
-  if (isApplicationJson) ctx.body.seqId = seqId
+  // 响应体带上 seq id
+  if (isApplicationJson && ctx.body) ctx.body.seqId = seqId
 
   // 不打印日志
   if (ignoredUrls.some((url) => url.test(path)) || !isApplicationJson) return
