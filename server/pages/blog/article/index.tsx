@@ -89,7 +89,7 @@ const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
                 actions={[
                   <span>{moment(new Date(item.createDate)).format('YYYY-MM-DD')}</span>,
                   <span>
-                    {item.tags.map(({ id, name }) => (
+                    {item.tags?.map?.(({ id, name }) => (
                       <Tag key={id}>{name}</Tag>
                     ))}
                   </span>,
@@ -152,8 +152,8 @@ const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
               const colorArr = ['magenta', 'red', 'volcano', 'orange', 'gold', 'lime', 'green', 'cyan', 'blue', 'geekblue', 'purple']
               const color = colorArr[Math.floor(Math.random() * (colorArr.length - 1))]
               return (
-                <FilterLink {...router.query} page={name}>
-                  <Tag color={color} key={id} style={{ margin: 4 }}>
+                <FilterLink {...router.query} page={name} key={id}>
+                  <Tag color={color} style={{ margin: 4 }}>
                     {name}
                   </Tag>
                 </FilterLink>
@@ -168,7 +168,7 @@ const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
               renderItem={(sort) => {
                 if (!sort.categories?.length) return null
                 return (
-                  <List.Item>
+                  <List.Item key={sort.id}>
                     <Row style={{ width: '100%' }}>
                       <Col span={7}>
                         <b>{sort.name} : </b>

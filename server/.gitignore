@@ -15,8 +15,12 @@ app/**/*.map
 test/**/*.map
 config/**/*.map
 
+#dll文件忽略
+app/public/dll/*
+
 #开发阶段暂不提交打包文件
 app/**/*.js
+
 
 
 # 来自next==================

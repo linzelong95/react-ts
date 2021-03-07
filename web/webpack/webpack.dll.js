@@ -1,6 +1,8 @@
 const webpack = require('webpack')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
-const { WEB_ROOT } = require('./constants')
+const { WEB_ROOT, PUBLIC_ROOT } = require('./constants')
+
+const __BASIC_CORE__ = 'basic_core'
 
 const generatedCompiler = (entry, dependOnReact, callback) => {
   return webpack(
@@ -15,7 +17,7 @@ const generatedCompiler = (entry, dependOnReact, callback) => {
       context: WEB_ROOT,
       entry,
       output: {
-        path: `${WEB_ROOT}/dist/dll`,
+        path: `${PUBLIC_ROOT}/dll`,
         filename: '[name]_dll.js',
         library: 'dll_[name]_[fullhash]', // library必须和后面dllPlugin中的name一致
       },
@@ -26,19 +28,17 @@ const generatedCompiler = (entry, dependOnReact, callback) => {
           new CleanWebpackPlugin({
             dry: false,
             dangerouslyAllowCleanPatternsOutsideProject: true,
-            cleanOnceBeforeBuildPatterns: [`${WEB_ROOT}/dist/dll/**/*`],
+            cleanOnceBeforeBuildPatterns: [`${PUBLIC_ROOT}/dll/**/*`],
           }),
         new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /zh-cn/),
         new webpack.DllPlugin({
-          context: WEB_ROOT,
-          path: `${WEB_ROOT}/dist/dll/[name]_manifest.json`,
+          path: `${PUBLIC_ROOT}/dll/[name]_manifest.json`,
           name: 'dll_[name]_[fullhash]',
           format: true,
         }),
         dependOnReact &&
           new webpack.DllReferencePlugin({
-            context: WEB_ROOT,
-            manifest: require(`${WEB_ROOT}/dist/dll/react_core_manifest.json`),
+            manifest: require(`${PUBLIC_ROOT}/dll/${__BASIC_CORE__}_manifest.json`),
           }),
       ].filter(Boolean),
       performance: {
@@ -49,9 +49,8 @@ const generatedCompiler = (entry, dependOnReact, callback) => {
   )
 }
 
-generatedCompiler({ react_core: ['react', 'react-dom'] }, false, (error) => {
+generatedCompiler({ [__BASIC_CORE__]: ['react', 'react-dom'] }, false, (error) => {
   if (error) throw error
-  console.log('react_core success')
   generatedCompiler(
     {
       react_lib: ['react-router', 'react-router-dom', 'redux', 'react-redux'],
@@ -70,6 +69,6 @@ generatedCompiler({ react_core: ['react', 'react-dom'] }, false, (error) => {
     true,
   ).run((error) => {
     if (error) throw error
-    console.log('react_lib、react_tool_lib success')
+    console.log('npm run dll successfully ~~~')
   })
 })

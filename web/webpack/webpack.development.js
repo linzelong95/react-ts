@@ -100,9 +100,8 @@ module.exports = merge(commonConfig, {
   },
 
   plugins: [
-    ...glob.sync(`${WEB_ROOT}/dist/dll/*.json`, { nodir: true }).map((path) => {
+    ...glob.sync(`${PUBLIC_ROOT}/dll/*.json`, { nodir: true }).map((path) => {
       return new webpack.DllReferencePlugin({
-        context: WEB_ROOT,
         manifest: require(path),
       })
     }),
@@ -110,7 +109,7 @@ module.exports = merge(commonConfig, {
     new CopyWebpackPlugin({
       patterns: [
         { from: `${PUBLIC_ROOT}/base`, to: '/base' },
-        ...glob.sync(`${WEB_ROOT}/dist/dll/*.js`, { nodir: true }).map((from) => {
+        ...glob.sync(`${PUBLIC_ROOT}/dll/*.js`, { nodir: true }).map((from) => {
           return { from, to: '/dll' }
         }),
       ],
@@ -128,8 +127,8 @@ module.exports = merge(commonConfig, {
           cssList: glob.sync(`${PUBLIC_ROOT}/base/**/*.css`, { nodir: true }).map(
             (path) => `/${path.split('/').slice(-3).join('/')}`, // '/base/css/xxx.css'
           ),
-          jsList: glob.sync(`${WEB_ROOT}/dist/dll/*.js`, { nodir: true }).map(
-            (path) => `/${path.split('/').slice(-2).join('/')}`, // '/dll/xxx.js'
+          jsList: glob.sync(`${PUBLIC_ROOT}/dll/*.js`, { nodir: true }).map(
+            (path) => `/${path.split('/').slice(-2).join('/')}`, // '/dll/xxx.js', TODO:确保react、react-dom在最前面
           ),
         },
         minify: isDevelopment
