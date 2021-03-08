@@ -1,12 +1,42 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
+logs/
+npm-debug.log
 node_modules/
+coverage/
+.idea/
+run/
+logs/
+.DS_Store
+.vscode
+*.swp
+*.lock
+!.autod.conf.js
+
+app/**/*.map
+test/**/*.map
+config/**/*.map
+
+#dll文件忽略
+app/public/dll/*
+
+#开发阶段暂不提交打包文件
+app/**/*.js
+
+
+
+# 来自next==================
+# dependencies
+/node_modules
 /.pnp
 .pnp.js
 
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
 # production
-dist/
 /build
 
 # misc
@@ -24,3 +54,5 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
+# vercel
+.vercel
