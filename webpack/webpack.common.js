@@ -6,7 +6,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const ProgressBarPlugin = require('progress-bar-webpack-plugin')
 const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
-const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin')
+// const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin')
 // const HardSourceWebpackPlugin = require('hard-source-webpack-plugin')
 const { PROJECT_PATH, WEB_ROOT, BUILD_MODULES, MANIFEST_ROOT, RELEASE_TAG } = require('./constants')
 
@@ -140,12 +140,13 @@ module.exports = {
     // TS 类型检查
     new ForkTsCheckerWebpackPlugin({
       eslint: {
-        files: './spa/**/*.{ts,tsx}',
+        enabled: true,
+        files: ['**/spa/**/*.{ts,tsx}'],
       },
     }),
 
     // 优化错误展示，与webpack 5暂不兼容？
-    new FriendlyErrorsWebpackPlugin(),
+    // new FriendlyErrorsWebpackPlugin(),
 
     // 带名称导出模块,webpack 5 改为optimization.moduleIds: 'named'
     // new webpack.NamedModulesPlugin(),

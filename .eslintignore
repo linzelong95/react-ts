@@ -30,4 +30,4 @@ node_modules/
 **/*.gif
 
 # TODO:先忽略服务端的ts校验
-/app/**
+server/app/**

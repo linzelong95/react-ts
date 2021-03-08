@@ -4,7 +4,6 @@ node_modules/
 coverage/
 .idea/
 run/
-logs/
 .DS_Store
 .vscode
 *.swp
@@ -16,21 +15,18 @@ test/**/*.map
 config/**/*.map
 
 #dll文件忽略
-app/public/dll/*
+server/app/public/dll/*
 
 #开发阶段暂不提交打包文件
-app/**/*.js
+server/app/**/*.js
+server/app/**/*.js.map
 
 
 
 # 来自next==================
 # dependencies
-/node_modules
 /.pnp
 .pnp.js
-
-# testing
-/coverage
 
 # next.js
 /.next/
@@ -40,7 +36,6 @@ app/**/*.js
 /build
 
 # misc
-.DS_Store
 *.pem
 
 # debug

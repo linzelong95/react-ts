@@ -34,9 +34,9 @@ interface RenderData {
 }
 
 export default class HomeController extends Controller {
-  public async index(): Promise<void> {
+  public async index(): Promise<unknown> {
     const { ctx, config } = this
-    const { sentry, env, backgroundSystemNames, cluster } = config
+    const { sentry, env, backgroundSystemNames, cluster = {} } = config
     const { originalUrl, request, state, path } = ctx
     if (/^\/(public|api)/.test(path)) return
     const { referer, host } = request?.header || {}
@@ -57,7 +57,7 @@ export default class HomeController extends Controller {
       description: 'This is a blog',
       favicon: '',
     }
-    const isSameHost = host.endsWith(String(cluster?.listen?.port))
+    const isSameHost = host.endsWith(String(cluster?.listen?.port || ''))
     if (env !== 'prod' && moduleStatics.js.path.startsWith('http') && isSameHost) {
       // TODO:确保react、react-dom在最前面
       glob.sync(`${PUBLIC_ROOT}/dll/*.js`, { nodir: true }).forEach((path) => {

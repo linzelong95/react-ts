@@ -6,7 +6,7 @@ const path = require('path')
 const PROJECT_PATH = path.resolve(__dirname, '../')
 
 // 服务端根目录
-const SERVER_ROOT = PROJECT_PATH
+const SERVER_ROOT = path.resolve(PROJECT_PATH, 'server')
 // 服务端静态文件路径
 const PUBLIC_ROOT = path.resolve(SERVER_ROOT, 'app/public')
 // manifest 路径

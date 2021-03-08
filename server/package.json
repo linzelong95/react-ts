@@ -1,0 +1,82 @@
+{
+  "name": "blog",
+  "version": "1.0.0",
+  "description": "a blog where we can study together.",
+  "egg": {
+    "typescript": true,
+    "declarations": true
+  },
+  "scripts": {
+    "start": "egg-scripts start --daemon --title=blog",
+    "stop": "egg-scripts stop --title=blog",
+    "dev": "egg-bin dev",
+    "debug": "egg-bin debug",
+    "test-local": "egg-bin test",
+    "test": "npm run lint -- --fix && npm run test-local",
+    "cov": "egg-bin cov",
+    "tsc": "ets && tsc -p tsconfig.json",
+    "ci": "npm run lint && npm run cov && npm run tsc",
+    "autod": "autod",
+    "lint": "eslint . --ext .ts",
+    "clean": "ets clean"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/linzelong95/react-ts"
+  },
+  "keywords": [
+    "blog",
+    "react-project",
+    "typescript-project",
+    "react-typescript"
+  ],
+  "author": {
+    "name": "linzelong95",
+    "url": "http://120.78.139.146",
+    "email": "linzelong95@163.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/linzelong95/react-ts/issues"
+  },
+  "homepage": "https://github.com/linzelong95/react-ts#readme",
+  "dependencies": {
+    "await-stream-ready": "^1.0.1",
+    "captchapng": "0.0.1",
+    "egg": "^2.6.1",
+    "egg-cors": "^2.2.3",
+    "egg-router-plus": "^1.3.1",
+    "egg-scripts": "^2.6.0",
+    "egg-view-ejs": "^2.0.1",
+    "glob": "^7.1.6",
+    "ip": "^1.1.5",
+    "koa-passport": "^4.1.3",
+    "lru-cache": "^6.0.0",
+    "moment": "^2.29.1",
+    "mysql": "^2.18.1",
+    "next": "^10.0.8",
+    "passport-local": "^1.0.0",
+    "reflect-metadata": "^0.1.13",
+    "stream-wormhole": "^1.1.0",
+    "typeorm": "^0.2.31",
+    "uuid": "^3.4.0"
+  },
+  "devDependencies": {
+    "@types/mocha": "^2.2.40",
+    "@types/node": "^7.0.12",
+    "@types/supertest": "^2.0.0",
+    "autod": "^3.0.1",
+    "autod-egg": "^1.1.0",
+    "egg-bin": "^4.11.0",
+    "egg-ci": "^1.8.0",
+    "egg-mock": "^3.16.0",
+    "eslint": "^6.7.2",
+    "eslint-config-egg": "^8.0.0",
+    "tsconfig-paths": "^3.9.0",
+    "tslib": "^1.9.0",
+    "typescript": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=8.9.0"
+  }
+}
