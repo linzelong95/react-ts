@@ -117,8 +117,6 @@ const EditForm: FC<EditFormProps> = memo((props) => {
     } as FormDataWhenEdited
   }, [initialValues])
 
-  console.log(888, editingFormData)
-
   return (
     <Modal
       destroyOnClose

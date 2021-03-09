@@ -1,6 +1,6 @@
 import { EggAppConfig, EggAppInfo, PowerPartial } from 'egg'
 
-export const rsaPrivateKey: string = `
+export const rsaPrivateKey = `
 -----BEGIN RSA PRIVATE KEY-----
 MIICXQIBAAKBgQC/8YDeYSsOqS65mhjQIp0c0RgBi+Po+ECONRs6GIh4H2h5f4WG
 5a8y/PcvhC9Bg06xHC+Zn9wj9OmYZ9cJl0cklhkngA018Azuv+aul53KJxEfD9eq
@@ -18,7 +18,7 @@ ZpGpnitzadqqKRVJEO8s+W/E7gZZv9MWC/h6wzlScX3/
 -----END RSA PRIVATE KEY-----
 `
 
-export const rsaPublicKey: string = `
+export const rsaPublicKey = `
 -----BEGIN PUBLIC KEY-----
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC/8YDeYSsOqS65mhjQIp0c0RgB
 i+Po+ECONRs6GIh4H2h5f4WG5a8y/PcvhC9Bg06xHC+Zn9wj9OmYZ9cJl0cklhkn
@@ -96,7 +96,8 @@ export default (appInfo: EggAppInfo) => {
   }
 
   // 中间件
-  config.middleware = ['request', 'response', 'passport', 'next']
+  // config.middleware = ['request', 'response', 'passport', 'next']
+  config.middleware = ['request', 'response', 'passport']
 
   config.next = {
     isNextAppAsset,

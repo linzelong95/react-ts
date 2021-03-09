@@ -1,43 +1,25 @@
 {
-  "compileOnSave": true,
   "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
+    "sourceMap": true,
     "strict": false,
     "noImplicitAny": false,
+    "module": "commonjs",
+    "target": "es5",
+    "jsx": "react",
+    "lib": ["es5", "es6", "dom", "es2019"],
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "charset": "utf8",
-    "allowJs": false,
-    "pretty": true,
-    "noEmitOnError": false,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "allowUnreachableCode": false,
-    "allowUnusedLabels": false,
-    "strictPropertyInitialization": false,
-    "noFallthroughCasesInSwitch": true,
-    "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
-    "inlineSourceMap": true,
+    "downlevelIteration": true,
     "baseUrl": ".",
-    "paths": {
-      "@common/*": ["common/*"],
-      "@ssr/*": ["ssr/*"],
-      "@spa/*": ["spa/*"],
-      "@blog-admin/*": ["spa/blog-admin/*"]
-    },
-    "lib": ["es5", "es6", "dom", "es2019", "dom.iterable", "esnext"],
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "downlevelIteration": true
+    "paths": {
+      "@common/*": ["common/*"],
+      // "@ssr/*": ["ssr/*"],
+      "@spa/*": ["spa/*"],
+      "@blog-admin/*": ["spa/blog-admin/*"]
+    }
   },
   "include": ["next-env.d.ts", "global.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", "server", "app/public", "app/views"]
+  "exclude": ["node_modules", "ssr", "server", "app/public", "app/views"]
 }
