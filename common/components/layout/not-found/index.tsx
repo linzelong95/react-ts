@@ -1,10 +1,20 @@
 import React from 'react'
 import { Result, Button } from 'antd'
-import styles from './index.less'
+import type { CSSProperties } from 'react'
 
-export function NotFound(): JSX.Element {
+const style: CSSProperties = {
+  width: '100%',
+  height: '100%',
+  maxWidth: '100vw',
+  maxHeight: '100vh',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}
+
+function NotFound(): JSX.Element {
   return (
-    <div className={styles['not-found-layout']}>
+    <div style={style}>
       <Result
         status="404"
         title="404"
@@ -14,3 +24,5 @@ export function NotFound(): JSX.Element {
     </div>
   )
 }
+
+export default NotFound

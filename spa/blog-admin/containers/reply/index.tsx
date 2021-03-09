@@ -1,5 +1,5 @@
 import React, { memo, useMemo, useState, useCallback, useRef, useEffect } from 'react'
-import { WrappedContainer } from '@common/components'
+import { WrappedContainer } from '@spa/common/components'
 import { useService } from '@common/hooks'
 import { message, Row, Col, Button, List, Checkbox, Avatar, Tag, Input, Tooltip, Badge } from 'antd'
 import {

@@ -8,7 +8,7 @@ import 'antd/dist/antd.css'
 
 interface MyAppProps {
   pageProps: Record<string, any>
-  reduxStore: any
+  store: any
 }
 
 class MyApp extends APP<MyAppProps, Record<string, never>, { loading: boolean }> {
@@ -41,12 +41,12 @@ class MyApp extends APP<MyAppProps, Record<string, never>, { loading: boolean }>
 
   render() {
     const { loading } = this.state
-    const { Component, pageProps, reduxStore } = this.props
+    const { Component, pageProps, store } = this.props
     return (
-      <Provider store={reduxStore}>
+      <Provider store={store}>
         {loading && <PageLoad />}
         <PageLayout>
-          <Component {...pageProps} reduxStore={reduxStore} />
+          <Component {...pageProps} store={store} />
         </PageLayout>
       </Provider>
     )

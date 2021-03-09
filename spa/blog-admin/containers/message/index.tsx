@@ -1,5 +1,5 @@
 import React, { memo, useMemo, useState, useCallback, useRef, useEffect } from 'react'
-import { WrappedContainer } from '@common/components'
+import { WrappedContainer } from '@spa/common/components'
 import { message, Row, Col, Button, List, Checkbox, Avatar, Tag, Input, Tooltip, Badge, Modal } from 'antd'
 import {
   EyeOutlined,
@@ -28,7 +28,6 @@ import type { ButtonProps } from 'antd/lib/button'
 import type { PaginationProps } from 'antd/lib/pagination'
 import type { SearchProps } from 'antd/lib/input/Search'
 import type { TagProps } from 'antd/lib/tag'
-import styles from './index.less'
 
 export type ListItem = Message['listItemByAdminRole']
 export type ToggleEditorialPanel = (record?: ListItem) => void
@@ -428,7 +427,6 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
         renderItem={(item) => (
           <List.Item
             style={{ background: selectedItems.map((i) => i.id).includes(item.id) && '#FFFFE0' }}
-            className={styles.eachChild}
             key={item.id}
             actions={[
               <span key="createDate">{moment(new Date(item.createDate)).format('YYYY-MM-DD')}</span>,

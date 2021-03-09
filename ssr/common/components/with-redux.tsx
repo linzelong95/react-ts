@@ -1,16 +1,8 @@
 import React from 'react'
-import creatStore from '@ssr/common/store'
+import getStore from '@ssr/common/store'
 import type { IAppContext } from '@ssr/common/types'
 
 const isServer = typeof window === 'undefined'
-
-const __NEXT_REDUX_STORE__ = '__NEXT_REDUX_STORE__'
-
-function getOrCreatStore(initialState = {}) {
-  if (isServer) return creatStore(initialState)
-  if (!window[__NEXT_REDUX_STORE__]) window[__NEXT_REDUX_STORE__] = creatStore(initialState)
-  return window[__NEXT_REDUX_STORE__]
-}
 
 interface WithReduxAppProps extends IAppContext {
   initialReduxState: Record<string, any>
@@ -20,33 +12,33 @@ interface WithReduxAppProps extends IAppContext {
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export default function withRedux(Comp: any): React.Component {
   class WithReduxApp extends React.Component<WithReduxAppProps> {
-    reduxStore: any
+    store: any
 
     constructor(props) {
       super(props)
       const { initialReduxState } = props
-      this.reduxStore = getOrCreatStore(initialReduxState)
+      this.store = getStore(initialReduxState)
     }
 
     static async getInitialProps(appContext: IAppContext) {
-      let reduxStore
+      let store
       if (isServer) {
         const { req } = appContext.ctx
-        const user = req?.userInfo
-        reduxStore = getOrCreatStore(user ? { user } : {})
+        const user = req?.userInfo || {}
+        store = getStore({ user })
       } else {
-        reduxStore = getOrCreatStore()
+        store = getStore()
       }
-      // appContext.reduxStore = reduxStore 给全局appContext注入属性，其他组件可以直接读取
+      // appContext.store = store 给全局appContext注入属性，其他组件可以直接读取
       const appProps: { pageProps?: Record<string, any> } = Comp.getInitialProps ? await Comp.getInitialProps(appContext as any) : {}
       return {
         ...appProps,
-        initialReduxState: reduxStore.getState(),
+        initialReduxState: store.getState(),
       }
     }
 
     render() {
-      return <Comp {...this.props} reduxStore={this.reduxStore} />
+      return <Comp {...this.props} store={this.store} />
     }
   }
   return (WithReduxApp as unknown) as React.Component

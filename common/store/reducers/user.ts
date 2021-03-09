@@ -1,6 +1,7 @@
 import { UserState, UserAction, UserActionType } from '../types'
 
-export const initialUserState = ((window as any).__INITIAL_STATE__?.user || {}) as UserState | Record<string, never>
+// 注意ssr渲染，window不存在
+export const initialUserState = ((window as any)?.__INITIAL_STATE__?.user || {}) as UserState | Record<string, never>
 
 function reducer(state = initialUserState, action: UserAction): UserState | Record<string, never> {
   switch (action.type) {

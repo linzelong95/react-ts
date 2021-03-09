@@ -1,10 +1,20 @@
 import React from 'react'
 import { Result, Button } from 'antd'
-import styles from './index.less'
+import type { CSSProperties } from 'react'
 
-export function Forbidden(): JSX.Element {
+const style: CSSProperties = {
+  width: '100%',
+  height: '100%',
+  maxWidth: '100vw',
+  maxHeight: '100vh',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}
+
+function Forbidden(): JSX.Element {
   return (
-    <div className={styles['forbidden-layout']}>
+    <div style={style}>
       <Result
         status="403"
         title="403"
@@ -14,3 +24,5 @@ export function Forbidden(): JSX.Element {
     </div>
   )
 }
+
+export default Forbidden

@@ -1,30 +1,47 @@
 import React, { useCallback, memo } from 'react'
-import { connect } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Layout, Input, Avatar, Menu, Dropdown } from 'antd'
-import { UserOutlined, CopyrightOutlined } from '@ant-design/icons'
+import { Layout, Avatar, Menu, Dropdown, message } from 'antd'
+import { UserOutlined, CopyrightOutlined, CommentOutlined, HomeOutlined } from '@ant-design/icons'
+import { LocalStorage } from '@common/constants'
+import { useLocalStorage } from '@common/hooks'
+import { loginServices } from '@common/services'
 import { Container } from '@ssr/common/components'
+import { createLogoutAction } from '@common/store/actions'
+import type { StoreState } from '@common/store/types'
 import type { FC } from 'react'
+import type { MenuProps } from 'antd/lib/menu'
 
 const { Header, Footer, Content } = Layout
 
-interface PageLayoutProps {
-  user: any
-  onLogout: () => void
-}
-
-const PageLayout: FC<PageLayoutProps> = memo((props) => {
-  const { children, user, onLogout } = props
-
+const PageLayout: FC<unknown> = memo((props) => {
+  const { children } = props
   const router = useRouter()
-  const onSearch = useCallback(() => {
-    console.log(111)
-  }, [])
+  const dispatch = useDispatch()
+  const userInfo = useSelector<StoreState, StoreState['user']>((state) => state.user)
+  const [accountLocalStorage, setAccountLocalStorage] = useLocalStorage<{ autoLoginMark: boolean; autoLogin: boolean }>(
+    LocalStorage.BLOG_STORE_ACCOUNT,
+  )
 
-  const handleLogout = useCallback<() => void>(() => {
-    onLogout()
-  }, [onLogout])
+  console.log(888, router.pathname)
+
+  const navClick = useCallback<MenuProps['onClick']>(
+    ({ key }) => {
+      router.push(`/${key}`)
+    },
+    [router],
+  )
+
+  const logout = useCallback<() => void>(async () => {
+    const [, err] = await loginServices.logout()
+    if (err) {
+      message.error('退出登录失败')
+      return
+    }
+    setAccountLocalStorage({ ...accountLocalStorage, autoLoginMark: false })
+    dispatch(createLogoutAction())
+  }, [accountLocalStorage, setAccountLocalStorage, dispatch])
 
   return (
     <Layout>
@@ -34,20 +51,27 @@ const PageLayout: FC<PageLayoutProps> = memo((props) => {
             <Link href="/blog">
               <img className="logo" alt="logo" src="/public/assets/images/logo/blog.png" />
             </Link>
-            <Input.Search placeholder="input search text" onSearch={onSearch} style={{ width: 300 }} />
+            <Menu onClick={navClick} selectedKeys={['home']} mode="horizontal">
+              <Menu.Item key="home" icon={<HomeOutlined />}>
+                首页
+              </Menu.Item>
+              <Menu.Item key="message" icon={<CommentOutlined />}>
+                留言
+              </Menu.Item>
+            </Menu>
           </div>
           <div className="header-right">
-            {user?.id ? (
+            {userInfo?.account ? (
               <Dropdown
                 overlay={
                   <Menu>
-                    <Menu.Item key="logout" onClick={handleLogout}>
+                    <Menu.Item key="logout" onClick={logout}>
                       登出
                     </Menu.Item>
                   </Menu>
                 }
               >
-                <Avatar size={40} src={user.avatar || '/public/assets/images/default/avatar.jpeg'} className="avatar-icon" />
+                <Avatar size={40} src={userInfo.avatar || '/public/assets/images/default/avatar.jpeg'} className="avatar-icon" />
               </Dropdown>
             ) : (
               <a href={`/account/login?redirect=${router.asPath}`}>
@@ -109,11 +133,4 @@ const PageLayout: FC<PageLayoutProps> = memo((props) => {
   )
 })
 
-export default connect(
-  (state: any) => ({
-    user: state.user,
-  }),
-  (dispatch) => ({
-    onLogout: () => dispatch({ type: 'logout' }),
-  }),
-)(PageLayout)
+export default PageLayout

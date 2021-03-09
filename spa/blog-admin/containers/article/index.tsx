@@ -1,5 +1,6 @@
 import React, { memo, useMemo, useState, useCallback, useRef, useEffect } from 'react'
-import { WrappedContainer, Ellipsis } from '@common/components'
+import { Ellipsis } from '@common/components'
+import { WrappedContainer } from '@spa/common/components'
 import { useService } from '@common/hooks'
 import { message, Row, Col, Button, List, Card, Tag, Input, Tooltip, Badge, Checkbox } from 'antd'
 import {

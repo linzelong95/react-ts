@@ -1,5 +1,3 @@
-export * from './error-boundary'
-export * from './not-found'
-export * from './forbidden'
-export * from './basic-layout'
-export * from './wrapped-container'
+export { default as ErrorBoundary } from './error-boundary'
+export { default as NotFound } from './not-found'
+export { default as Forbidden } from './forbidden'

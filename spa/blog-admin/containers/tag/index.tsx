@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useState, useRef, useMemo, useEffect } from 'react'
-import { WrappedContainer } from '@common/components'
+import { WrappedContainer } from '@spa/common/components'
 import { useService } from '@common/hooks'
 import { message, Table, Button, Tag, Input, Row, Col, Tooltip, Badge } from 'antd'
 import { UnlockOutlined, LockOutlined, DeleteOutlined, HomeOutlined, ReloadOutlined, PlusOutlined } from '@ant-design/icons'

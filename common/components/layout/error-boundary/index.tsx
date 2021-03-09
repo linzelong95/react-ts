@@ -1,7 +1,15 @@
 import React from 'react'
 import { Result, Button } from 'antd'
-import styles from './index.less'
 import { captureException } from '@sentry/browser'
+import type { CSSProperties } from 'react'
+
+const style: CSSProperties = {
+  width: '100vw',
+  height: '100vh',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}
 
 interface ErrorBoundaryState {
   hasError: boolean
@@ -9,7 +17,7 @@ interface ErrorBoundaryState {
   componentStack: string
 }
 
-export class ErrorBoundary extends React.Component<unknown, ErrorBoundaryState> {
+class ErrorBoundary extends React.Component<unknown, ErrorBoundaryState> {
   state: ErrorBoundaryState = {
     hasError: false,
     errorMessage: '',
@@ -30,9 +38,11 @@ export class ErrorBoundary extends React.Component<unknown, ErrorBoundaryState> 
     const { children } = this.props
     if (!hasError) return children
     return (
-      <div className={styles['error-boundary']}>
+      <div style={style}>
         <Result status="500" title="500" subTitle="Sorry, something went wrong." extra={<Button type="primary">Back Home</Button>} />
       </div>
     )
   }
 }
+
+export default ErrorBoundary

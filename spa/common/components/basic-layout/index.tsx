@@ -112,4 +112,4 @@ const BasicLayout: FC<BasicLayoutProps> = memo((props) => {
   )
 })
 
-export { BasicLayout }
+export default BasicLayout
