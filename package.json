@@ -42,6 +42,7 @@
     "i18next-browser-languagedetector": "^6.0.1",
     "jsencrypt": "^3.0.0-rc.1",
     "moment": "^2.29.1",
+    "next": "^10.0.8",
     "qs": "^6.9.4",
     "react": "^17.0.1",
     "react-cropper": "^2.1.7",

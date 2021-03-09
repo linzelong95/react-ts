@@ -1,6 +1,12 @@
 {
+  "account.css": {
+    "path": "/public/account/css/account-1b8cce8b.css",
+    "editor": "briefNull",
+    "release": "briefNull-1615265180783"
+  },
   "account.js": {
-    "path": "http://127.0.0.1:7002/account/js/account.js",
-    "editor": "briefNull"
+    "path": "/public/account/js/account-c02144a0.js",
+    "editor": "briefNull",
+    "release": "briefNull-1615265180783"
   }
 }

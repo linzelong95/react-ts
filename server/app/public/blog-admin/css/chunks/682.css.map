@@ -1,0 +1,1 @@
+{"version":3,"sources":["webpack://blog/./spa/blog-admin/containers/message/index.less"],"names":[],"mappings":"AAAA,yBACE,cACF,CAAE,+BACE,4BACA,wBAEJ","file":"blog-admin/css/chunks/682.css","sourcesContent":[".eachChild {\n  cursor: pointer;\n  &:hover {\n    box-shadow: 5px 5px 3px #888888;\n    border: 1px solid #1890ff;\n  }\n}\n"],"sourceRoot":""}

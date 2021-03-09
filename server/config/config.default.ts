@@ -96,8 +96,7 @@ export default (appInfo: EggAppInfo) => {
   }
 
   // 中间件
-  // config.middleware = ['request', 'response', 'passport', 'next']
-  config.middleware = ['request', 'response', 'passport']
+  config.middleware = ['request', 'response', 'passport', 'next']
 
   config.next = {
     isNextAppAsset,

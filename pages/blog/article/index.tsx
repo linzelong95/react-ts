@@ -89,12 +89,14 @@ const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
                 key={item.id}
                 actions={[
                   <span key="date">{moment(new Date(item.createDate)).format('YYYY-MM-DD')}</span>,
-                  <span key="tag">
-                    {item.tags?.map?.(({ id, name }) => (
-                      <Tag key={id}>{name}</Tag>
-                    ))}
-                  </span>,
-                ]}
+                  item.tags?.length > 0 && (
+                    <span key="tag">
+                      {item.tags.map(({ id, name }) => (
+                        <Tag key={id}>{name}</Tag>
+                      ))}
+                    </span>
+                  ),
+                ].filter(Boolean)}
                 extra={<img width={184} alt="article cover" src={item.imageUrl || '/public/assets/images/default/article.jpeg'} />}
                 style={{ position: 'relative', overflow: 'hidden' }}
               >

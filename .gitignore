@@ -18,8 +18,8 @@ config/**/*.map
 server/app/public/dll/*
 
 #开发阶段暂不提交打包文件
-server/app/**/*.js
-server/app/**/*.js.map
+# server/app/**/*.js
+# server/app/**/*.js.map
 
 
 

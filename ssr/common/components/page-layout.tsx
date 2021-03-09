@@ -6,7 +6,6 @@ import { Layout, Input, Avatar, Menu, Dropdown } from 'antd'
 import { UserOutlined, CopyrightOutlined } from '@ant-design/icons'
 import { Container } from '@ssr/common/components'
 import type { FC } from 'react'
-import type { MenuItemProps } from 'antd/lib/menu'
 
 const { Header, Footer, Content } = Layout
 
@@ -23,7 +22,7 @@ const PageLayout: FC<PageLayoutProps> = memo((props) => {
     console.log(111)
   }, [])
 
-  const handleLogout = useCallback<MenuItemProps['onClick']>(() => {
+  const handleLogout = useCallback<() => void>(() => {
     onLogout()
   }, [onLogout])
 

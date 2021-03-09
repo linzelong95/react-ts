@@ -5,7 +5,7 @@
     "noImplicitAny": false,
     "module": "commonjs",
     "target": "es5",
-    "jsx": "react",
+    "jsx": "preserve",
     "lib": ["es5", "es6", "dom", "es2019"],
     "experimentalDecorators": true,
     "downlevelIteration": true,
@@ -15,10 +15,16 @@
     "allowSyntheticDefaultImports": true,
     "paths": {
       "@common/*": ["common/*"],
-      // "@ssr/*": ["ssr/*"],
+      "@ssr/*": ["ssr/*"],
       "@spa/*": ["spa/*"],
       "@blog-admin/*": ["spa/blog-admin/*"]
-    }
+    },
+    "allowJs": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true
   },
   "include": ["next-env.d.ts", "global.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules", "ssr", "server", "app/public", "app/views"]
