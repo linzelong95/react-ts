@@ -19,7 +19,8 @@ import zhCN from 'antd/lib/locale/zh_CN'
 import * as Sentry from '@sentry/browser'
 
 // 公共样式
-import '@common/styles/index.global.less'
+import '@common/styles/globals.scss'
+import 'antd/dist/antd.css'
 
 // 注入全局变量
 ;(window as any).React = React

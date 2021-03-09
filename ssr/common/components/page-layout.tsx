@@ -4,12 +4,12 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Layout, Avatar, Menu, Dropdown, message } from 'antd'
 import { UserOutlined, CopyrightOutlined, CommentOutlined, HomeOutlined } from '@ant-design/icons'
-import { LocalStorage } from '@common/constants'
-import { useLocalStorage } from '@common/hooks'
-import { loginServices } from '@common/services'
+import { LocalStorage } from '@ssr/common/constants'
+import { useLocalStorage } from '@ssr/common/hooks'
+import { loginServices } from '@ssr/common/services'
 import { Container } from '@ssr/common/components'
-import { createLogoutAction } from '@common/store/actions'
-import type { StoreState } from '@common/store/types'
+import { createLogoutAction } from '@ssr/common/store/actions'
+import type { StoreState } from '@ssr/common/store/types'
 import type { FC } from 'react'
 import type { MenuProps } from 'antd/lib/menu'
 
@@ -24,7 +24,7 @@ const PageLayout: FC<unknown> = memo((props) => {
     LocalStorage.BLOG_STORE_ACCOUNT,
   )
 
-  console.log(888, router.pathname)
+  console.log(888, router.asPath)
 
   const navClick = useCallback<MenuProps['onClick']>(
     ({ key }) => {
@@ -51,7 +51,7 @@ const PageLayout: FC<unknown> = memo((props) => {
             <Link href="/blog">
               <img className="logo" alt="logo" src="/public/assets/images/logo/blog.png" />
             </Link>
-            <Menu onClick={navClick} selectedKeys={['home']} mode="horizontal">
+            <Menu onClick={navClick} theme="dark" selectedKeys={['home']} mode="horizontal">
               <Menu.Item key="home" icon={<HomeOutlined />}>
                 首页
               </Menu.Item>
@@ -118,6 +118,10 @@ const PageLayout: FC<unknown> = memo((props) => {
           border-radius: 50%;
           margin-right: 10px;
           cursor: pointer;
+        }
+        .ant-menu.ant-menu-dark .ant-menu-item-selected,
+        .ant-menu-submenu-popup.ant-menu-dark .ant-menu-item-selected {
+          background: #555555;
         }
         .avatar-icon {
           cursor: pointer;

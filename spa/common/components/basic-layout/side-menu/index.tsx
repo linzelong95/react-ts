@@ -9,7 +9,7 @@ import type { TFunction } from 'react-i18next'
 import type { SiderProps } from 'antd/es/layout'
 import type { MenuProps } from 'antd/es/menu'
 import type { DrawerProps } from 'antd/es/drawer'
-import styles from '../index.less'
+import styles from '../index.module.scss'
 
 function getMenuItems(routes: RouteConfig[], flattedAccessRoutes: RouteConfig[], t: TFunction<string>): JSX.Element[] {
   return routes?.map((route) => {

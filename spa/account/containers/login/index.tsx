@@ -41,7 +41,7 @@ const Login: FC<RouteComponentProps<never>> = memo(() => {
       // const urlParams = new URL(window.location.href)
       // const redirectUrlParams = new URL(redirect)
       // if (redirectUrlParams.origin !== urlParams.origin) {
-      //   window.location.href = '/blog-admin'
+      //   window.location.href = '/b-blog'
       //   return
       // }
       // redirect = redirect.slice(urlParams.origin.length)

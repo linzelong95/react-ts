@@ -30,7 +30,7 @@ AuywA3t/EolsPMvFVQIDAQAB
 const isApi = /^\/api\//
 
 // next.js应用路径正则
-const isNextAppAsset = /^\/(blog|_next)\/.+/
+const isNextApp = /^\/(blog|_next)(\/)?.*/
 
 export default (appInfo: EggAppInfo) => {
   const config = {} as PowerPartial<EggAppConfig>
@@ -43,7 +43,7 @@ export default (appInfo: EggAppInfo) => {
 
   config.rsaPublicKey = rsaPublicKey
 
-  config.backgroundSystemNames = ['blog-admin']
+  config.backSysNames = ['b-blog']
 
   config.cos = {
     bucket: 'brief',
@@ -99,7 +99,7 @@ export default (appInfo: EggAppInfo) => {
   config.middleware = ['request', 'response', 'passport', 'next']
 
   config.next = {
-    isNextAppAsset,
+    isNextApp,
   }
 
   // 中间件passport的默认参数
@@ -111,14 +111,14 @@ export default (appInfo: EggAppInfo) => {
   }
 
   config.request = {
-    isNextAppAsset,
+    isNextApp,
     ignoredUrls: [/^\/watermark/, /^\/public\/(.+)\.map$/],
   }
 
   // 中间件response的默认配置
   config.response = {
     isApi,
-    isNextAppAsset,
+    isNextApp,
   }
 
   config.security = {

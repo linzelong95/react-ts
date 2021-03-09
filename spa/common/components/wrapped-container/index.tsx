@@ -1,5 +1,5 @@
 import React, { memo } from 'react'
-import styles from './index.less'
+import styles from './index.module.scss'
 import type { FC, CSSProperties } from 'react'
 
 const WrappedContainer: FC<{ style?: CSSProperties }> = memo((props) => {

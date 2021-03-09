@@ -36,12 +36,12 @@ interface RenderData {
 export default class HomeController extends Controller {
   public async index(): Promise<unknown> {
     const { ctx, config } = this
-    const { sentry, env, backgroundSystemNames, cluster = {} } = config
+    const { sentry, env, backSysNames, cluster = {} } = config
     const { originalUrl, request, state, path } = ctx
     if (/^\/(public|api)/.test(path)) return
     const { referer, host } = request?.header || {}
     const [, moduleName] = path.split('/')
-    if (backgroundSystemNames.includes(moduleName) && !state?.user) {
+    if (backSysNames.includes(moduleName) && !state?.user) {
       ctx.redirect(`/account/login?redirect=${referer || originalUrl}`)
       return
     }

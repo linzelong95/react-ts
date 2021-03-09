@@ -13,7 +13,7 @@ import type { StoreState } from '@common/store/types'
 import type { FC, Dispatch, SetStateAction } from 'react'
 import type { AccountTypeCollection } from '@common/types'
 import type { DrawerProps } from 'antd/es/drawer'
-import styles from '../index.less'
+import styles from '../index.module.scss'
 
 interface HeaderProps {
   userInfo: StoreState['user']

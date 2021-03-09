@@ -83,8 +83,8 @@ module.exports = {
         use: ['react-hot-loader/webpack'],
       },
       {
-        // 不符合.global.less命名的按照模块引入组件
-        test: new RegExp(`^(?!.*\\.global).*\\.less`),
+        // 加了module字样，按照模块引入组件
+        test: new RegExp(`^(.*\\.module).*\\.less`),
         use: [
           isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader,
           { loader: 'css-loader', options: { importLoaders: 1, modules: true } },
@@ -93,13 +93,33 @@ module.exports = {
         ],
       },
       {
-        // 符合.global.less命名的按照css引入文件
-        test: new RegExp(`^(.*\\.global).*\\.less`),
+        // 不包含module字样，全局引入
+        test: new RegExp(`^(?!.*\\.module).*\\.less`),
         use: [
           isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader,
           { loader: 'css-loader', options: { importLoaders: 1 } },
           { loader: 'postcss-loader', options: { postcssOptions: { plugins: [autoprefixer] } } },
           { loader: 'less-loader', options: { lessOptions: { javascriptEnabled: true } } },
+        ],
+      },
+      {
+        // 不包含module字样，全局引入
+        test: new RegExp(`^(?!.*\\.module).*\\.scss`),
+        use: [
+          isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader,
+          { loader: 'css-loader', options: { importLoaders: 1 } },
+          { loader: 'postcss-loader', options: { postcssOptions: { plugins: [autoprefixer] } } },
+          { loader: 'sass-loader', options: { sassOptions: { javascriptEnabled: true } } },
+        ],
+      },
+      {
+        // 加了module字样，按照模块引入组件
+        test: new RegExp(`^(.*\\.module).*\\.scss`),
+        use: [
+          isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader,
+          { loader: 'css-loader', options: { importLoaders: 1, modules: true } },
+          { loader: 'postcss-loader', options: { postcssOptions: { plugins: [autoprefixer] } } },
+          { loader: 'sass-loader', options: { sassOptions: { javascriptEnabled: true } } },
         ],
       },
       {

@@ -1,7 +1,7 @@
 import React, { memo } from 'react'
 import type { FC } from 'react'
 import 'braft-editor/dist/index.css'
-import styles from './style.less'
+import styles from './style.module.scss'
 
 const Preview: FC<{ value: string }> = memo((props) => {
   const { value } = props

@@ -1,4 +1,7 @@
+import { isClient } from './util'
+
 export function isMobile(includeIPad: boolean): boolean {
+  if (!isClient) return false
   const { userAgent } = navigator
   const regExps = [
     /iphone/i,

@@ -30,6 +30,8 @@ declare module '*.png' {
 
 declare module '*.css'
 declare module '*.less'
+declare module '*.scss'
+declare module '*.sass'
 
 declare module '*.json' {
   const content: Record<string, unknown>

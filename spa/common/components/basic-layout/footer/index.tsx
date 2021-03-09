@@ -2,7 +2,7 @@ import React, { memo } from 'react'
 import { Layout } from 'antd'
 import { CopyrightOutlined } from '@ant-design/icons'
 import type { FC } from 'react'
-import styles from '../index.less'
+import styles from '../index.module.scss'
 
 const Footer: FC = memo(() => {
   return (

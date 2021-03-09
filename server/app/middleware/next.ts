@@ -1,30 +1,22 @@
 import type { Context, Application } from 'egg'
 
-async function nextRender(nextHandle, ctx) {
-  const { path, state } = ctx
-  ctx.status = 200
-  if (/\.js$/.test(path)) {
-    ctx.set('Content-Type', 'application/javascript')
-  }
-  if (/\.css$/.test(path)) {
-    ctx.set('Content-Type', 'text/css')
-  }
-  // 将登录信息注入到ctx.req，供next.js应用读取
-  ctx.req.userInfo = state?.user
-  await nextHandle(ctx.req, ctx.res)
-}
-
 module.exports = (options, app: Application) => async (ctx: Context, next) => {
-  const { isNextAppAsset } = options || {}
-  const { path, method } = ctx
-  const nextHandle = (app as any).nextServer.getRequestHandler()
+  const { isNextApp } = options || {}
+  const { path, method, state } = ctx
   const isGetMethod = method.toLowerCase() === 'get'
-  if (isNextAppAsset.test(path) && isGetMethod) {
-    await nextRender(nextHandle, ctx)
+  if (isNextApp.test(path) && isGetMethod) {
+    ctx.status = 200
+    if (/\.js$/.test(path)) {
+      ctx.set('Content-Type', 'application/javascript')
+    }
+    if (/\.css$/.test(path)) {
+      ctx.set('Content-Type', 'text/css')
+    }
+    // 将登录信息注入到ctx.req，供next.js应用读取
+    ;(ctx.req as any).userInfo = state?.user
+    const nextHandle = (app as any).nextServer.getRequestHandler()
+    await nextHandle(ctx.req, ctx.res)
     return
   }
   await next()
-  if (ctx.status === 404 && isGetMethod) {
-    await nextRender(nextHandle, ctx)
-  }
 }

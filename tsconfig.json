@@ -17,7 +17,7 @@
       "@common/*": ["common/*"],
       "@ssr/*": ["ssr/*"],
       "@spa/*": ["spa/*"],
-      "@blog-admin/*": ["spa/blog-admin/*"]
+      "@b-blog/*": ["spa/b-blog/*"]
     },
     "allowJs": true,
     "skipLibCheck": true,

@@ -17,7 +17,7 @@ import type { RouteComponentProps } from 'react-router'
 import type { DrawerProps } from 'antd/es/drawer'
 import type { StoreState } from '@common/store/types'
 import type { RouteConfig } from '@common/types'
-import styles from './index.less'
+import styles from './index.module.scss'
 
 interface BasicLayoutProps extends RouteComponentProps<Record<string, never>> {
   routes?: RouteConfig[]
