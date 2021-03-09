@@ -34,15 +34,15 @@ interface RenderData {
 }
 
 export default class HomeController extends Controller {
-  public async index() {
+  public async index(): Promise<unknown> {
     const { ctx, config } = this
-    const { sentry, env, backgroundSystemNames, cluster } = config
+    const { sentry, env, backSysNames, cluster = {} } = config
     const { originalUrl, request, state, path } = ctx
     if (/^\/(public|api)/.test(path)) return
     const { referer, host } = request?.header || {}
     const [, moduleName] = path.split('/')
-    if (backgroundSystemNames.includes(moduleName) && !state?.user) {
-      ctx.redirect(`/user/login?redirect=${referer || originalUrl}`)
+    if (backSysNames.includes(moduleName) && !state?.user) {
+      ctx.redirect(`/account/login?redirect=${referer || originalUrl}`)
       return
     }
     const moduleStatics = getModuleStatics(moduleName)
@@ -57,16 +57,17 @@ export default class HomeController extends Controller {
       description: 'This is a blog',
       favicon: '',
     }
-    if (env !== 'prod') {
+    const isSameHost = host.endsWith(String(cluster?.listen?.port || ''))
+    if (env !== 'prod' && moduleStatics.js.path.startsWith('http') && isSameHost) {
       // TODO:确保react、react-dom在最前面
       glob.sync(`${PUBLIC_ROOT}/dll/*.js`, { nodir: true }).forEach((path) => {
-        const publicPath = host.endsWith(String(cluster?.listen?.port)) ? '/public' : ''
-        renderData.jsList.push(`${publicPath}/${path.split('/').slice(-2).join('/')}`) // '/dll/xxx.js'
+        renderData.jsList.push(`/public/${path.split('/').slice(-2).join('/')}`)
       })
+    } else {
+      if (baseStatics?.js?.path) renderData.jsList.unshift(baseStatics.js.path)
     }
     renderData.jsList.push(moduleStatics.js.path)
     if (baseStatics?.css?.path) renderData.cssList.unshift(baseStatics.css.path)
-    if (env === 'prod' && baseStatics?.js?.path) renderData.jsList.unshift(baseStatics.js.path)
-    return ctx.render('index.ejs', renderData) // don't forget 'return'
+    return ctx.render('index.ejs', renderData)
   }
 }

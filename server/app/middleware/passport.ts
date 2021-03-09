@@ -77,9 +77,9 @@ module.exports = (options, app: Application) => {
     if (adminUrlRegexList.some((regex) => regex.test(originalUrl))) {
       if (!ctx.isAuthenticated()) {
         if (originalHost === host) {
-          ctx.redirect(`/user/login?redirect=${referer}`)
+          ctx.redirect(`/account/login?redirect=${referer}`)
         } else {
-          // ctx.redirect(`${protocol}//${originalHost}/user/login?redirect=${referer}`)
+          // ctx.redirect(`${protocol}//${originalHost}/account/login?redirect=${referer}`)
           ctx.body = { code: StatusCode.NOT_LOGGED_FOR_ADMIN, message: '管理员未登录' }
         }
         return

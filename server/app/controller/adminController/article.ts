@@ -20,7 +20,7 @@ export default class AdminArticleController extends Controller {
     ctx.body = { code: 0, data: { list, total } }
   }
 
-  async content() {
+  async content(): Promise<void> {
     const { ctx } = this
     const { articleId } = ctx.request.body
     const res = await this.service.adminService.article.content({ articleId })

@@ -1,15 +1,16 @@
 import 'reflect-metadata'
 import { createConnection } from 'typeorm'
 import type { Application } from 'egg'
+import next from 'next'
 
 export default class AppBootHook {
-  app: Application & { nextServer: any }
+  public app: Application & { nextServer: ReturnType<typeof next> }
 
-  constructor(app) {
+  constructor(app: Application) {
     this.app = app
   }
 
-  async didReady() {
+  async willReady(): Promise<void> {
     const { config, nextServer } = this.app
     await createConnection({
       type: 'mysql',

@@ -3,14 +3,14 @@ import { v4 as uuid } from 'uuid'
 import type { Context } from 'egg'
 
 module.exports = (options) => async (ctx: Context, next) => {
-  const { ignoredUrls, isNextAppAsset } = options || {}
+  const { ignoredUrls, isNextApp } = options || {}
 
   const seqId = ctx.headers['x-seq-id'] || `blog-node-${uuid()}`
   ctx.seqId = seqId
 
   const { header, method, origin, href, path, query, params, ip, ips, request } = ctx
   // 暂时不记录nextjs资源的请求
-  if (isNextAppAsset.test(path)) return await next()
+  if (isNextApp.test(path)) return await next()
 
   ctx.logger.info({
     event: LogEvent.CLIENT_REQUEST,
@@ -29,7 +29,7 @@ module.exports = (options) => async (ctx: Context, next) => {
   await next()
 
   // nextjs应用，忽略（理论上在这之前，中间件执行已被中间，所以可以不需要判断）
-  if (isNextAppAsset.test(path)) return
+  if (isNextApp.test(path)) return
 
   // 返回头带上 seq id
   ctx.set('X-Seq-Id', seqId)

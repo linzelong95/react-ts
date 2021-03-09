@@ -1,15 +1,14 @@
 {
-  "name": "blog-server",
+  "name": "blog",
   "version": "1.0.0",
-  "description": "personal blog server",
-  "private": true,
+  "description": "a blog where we can study together.",
   "egg": {
     "typescript": true,
     "declarations": true
   },
   "scripts": {
-    "start": "egg-scripts start --daemon --title=egg-server-blog-server",
-    "stop": "egg-scripts stop --title=egg-server-blog-server",
+    "start": "egg-scripts start --daemon --title=blog",
+    "stop": "egg-scripts stop --title=blog",
     "dev": "egg-bin dev",
     "debug": "egg-bin debug",
     "test-local": "egg-bin test",
@@ -21,11 +20,28 @@
     "lint": "eslint . --ext .ts",
     "clean": "ets clean"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/linzelong95/react-ts"
+  },
+  "keywords": [
+    "blog",
+    "react-project",
+    "typescript-project",
+    "react-typescript"
+  ],
+  "author": {
+    "name": "linzelong95",
+    "url": "http://120.78.139.146",
+    "email": "linzelong95@163.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/linzelong95/react-ts/issues"
+  },
+  "homepage": "https://github.com/linzelong95/react-ts#readme",
   "dependencies": {
-    "antd": "^4.13.1",
     "await-stream-ready": "^1.0.1",
-    "axios": "^0.21.1",
-    "braft-editor": "^2.3.9",
     "captchapng": "0.0.1",
     "egg": "^2.6.1",
     "egg-cors": "^2.2.3",
@@ -38,14 +54,7 @@
     "lru-cache": "^6.0.0",
     "moment": "^2.29.1",
     "mysql": "^2.18.1",
-    "next": "^10.0.8",
     "passport-local": "^1.0.0",
-    "qs": "^6.9.6",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "react-redux": "^7.2.2",
-    "redux": "^4.0.5",
-    "redux-thunk": "^2.3.0",
     "reflect-metadata": "^0.1.13",
     "stream-wormhole": "^1.1.0",
     "typeorm": "^0.2.31",
@@ -54,8 +63,6 @@
   "devDependencies": {
     "@types/mocha": "^2.2.40",
     "@types/node": "^7.0.12",
-    "@types/react": "^17.0.2",
-    "@types/react-dom": "^17.0.1",
     "@types/supertest": "^2.0.0",
     "autod": "^3.0.1",
     "autod-egg": "^1.1.0",
@@ -66,21 +73,12 @@
     "eslint-config-egg": "^8.0.0",
     "tsconfig-paths": "^3.9.0",
     "tslib": "^1.9.0",
-    "typescript": "^4.2.3"
+    "typescript": "^3.0.0"
   },
   "engines": {
     "node": ">=8.9.0"
   },
   "ci": {
     "version": "8"
-  },
-  "repository": {
-    "type": "git",
-    "url": ""
-  },
-  "eslintIgnore": [
-    "coverage"
-  ],
-  "author": "briefNull",
-  "license": "MIT"
+  }
 }

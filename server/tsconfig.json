@@ -25,18 +25,8 @@
     "paths": {
       "@entity/*": ["app/entity/*"],
       "@constant/*": ["app/constant/*"],
-      "@lib/*": ["app/lib/*"],
-      "@client/*": ["client/*"]
-    },
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "esModuleInterop": true
+      "@lib/*": ["app/lib/*"]
+    }
   },
-  "exclude": ["app/public", "app/views", "node_modules*"],
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
+  "exclude": ["app/public", "app/views", "node_modules*"]
 }

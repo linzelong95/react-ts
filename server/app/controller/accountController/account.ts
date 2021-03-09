@@ -3,7 +3,7 @@ import { getRepository } from 'typeorm'
 import { User } from '@entity/User'
 import { StatusCode } from '@constant/status'
 import * as crypto from 'crypto'
-import * as constants from 'constants'
+const fs = require('fs')
 const CaptchaPng = require('captchapng')
 
 export default class AccountController extends Controller {
@@ -19,7 +19,7 @@ export default class AccountController extends Controller {
       return
     }
     const rsaPwd = Buffer.from(userInfo.split('&&')[1], 'base64')
-    const decrypted = crypto.privateDecrypt({ key: config.rsaPrivateKey, padding: constants.RSA_PKCS1_PADDING }, rsaPwd)
+    const decrypted = crypto.privateDecrypt({ key: config.rsaPrivateKey, padding: fs.constants.RSA_PKCS1_PADDING }, rsaPwd)
     const md5Pwd = decrypted.toString('utf8') // 解密完成
     const user = await getRepository(User)
       .createQueryBuilder('user')
@@ -64,19 +64,19 @@ export default class AccountController extends Controller {
     ctx.body = { code: 0, message: '注册成功' }
   }
 
-  async logout() {
+  async logout(): Promise<void> {
     const { ctx } = this
     ctx.cookies.set('userInfo', null)
     ctx.logout()
     ctx.body = { code: 0, message: '退出成功' }
   }
 
-  async getPublicKey() {
+  async getPublicKey(): Promise<void> {
     const { ctx, config } = this
     ctx.body = { code: 0, data: { item: config.rsaPublicKey } }
   }
 
-  async getCaptcha() {
+  async getCaptcha(): Promise<void> {
     const { ctx } = this
     const captchaNum: number = Math.floor(Math.random() * 9000 + 1000)
     const captchaPng = new CaptchaPng(80, 30, captchaNum)
@@ -88,7 +88,7 @@ export default class AccountController extends Controller {
     ctx.body = { code: 0, data: { item: base64 } }
   }
 
-  async verifyCaptcha() {
+  async verifyCaptcha(): Promise<void> {
     const { ctx } = this
     const { captcha } = ctx.request.body
     const { captchaNum } = ctx.session

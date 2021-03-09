@@ -1,8 +1,8 @@
-const LruCache = require('lru-cache')
 import * as ip from 'ip'
-const moment = require('moment')
-import Alarm from '@lib/Alarm'
+import Alarm from '@lib/alarm'
 import type { Agent } from 'egg'
+const moment = require('moment')
+const LruCache = require('lru-cache')
 
 const lruCache = new LruCache({
   max: 3000,

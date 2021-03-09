@@ -1,13 +1,13 @@
 import type { Context, Application } from 'egg'
 
 module.exports = (options, app: Application) => async (ctx: Context, next) => {
-  const { isApi, isNextAppAsset } = options || {}
+  const { isApi, isNextApp } = options || {}
   const { path, logger } = ctx
 
   try {
     await next()
 
-    if (isNextAppAsset.test(path)) return
+    if (isNextApp.test(path)) return
 
     if (ctx.status === 404 && !ctx.body) {
       if (isApi?.test(path)) {
