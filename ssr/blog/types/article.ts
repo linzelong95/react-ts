@@ -33,6 +33,8 @@ export default interface Article {
       id: number
     }>
   }
+  getDetailParams: { id: number | string }
+  getDetailRes: Article['listItem'] & { content: string }
   // 添加service函数的入参ts
   editParams: {
     id?: number

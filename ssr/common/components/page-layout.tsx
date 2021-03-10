@@ -2,7 +2,7 @@ import React, { useCallback, memo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Layout, Avatar, Menu, Dropdown, message } from 'antd'
+import { Layout, Avatar, Menu, Dropdown, message, Tag } from 'antd'
 import { UserOutlined, CopyrightOutlined, CommentOutlined, HomeOutlined } from '@ant-design/icons'
 import { LocalStorage } from '@ssr/common/constants'
 import { useLocalStorage } from '@ssr/common/hooks'
@@ -51,6 +51,9 @@ const PageLayout: FC<unknown> = memo((props) => {
             </Menu>
           </div>
           <div className="header-right">
+            <a href="/b-blog">
+              <Tag>管理端</Tag>
+            </a>
             {userInfo?.account ? (
               <Dropdown
                 overlay={

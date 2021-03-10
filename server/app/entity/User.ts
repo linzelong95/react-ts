@@ -27,6 +27,9 @@ export class User {
   @Column({ default: '/public/assets/images/default/avatar.jpeg' })
   avatar: string
 
+  @Column()
+  github: string
+
   @OneToMany(() => Article, (article) => article.user)
   articles: Article[]
 

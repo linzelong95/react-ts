@@ -18,11 +18,11 @@ export default class UserArticleController extends Controller {
     ctx.body = { code: 0, data: { list, total } }
   }
 
-  async content(): Promise<void> {
+  async detail(): Promise<void> {
     const { ctx } = this
-    const { articleId } = ctx.request.body
-    const res = await this.service.userService.article.content({ articleId })
-    if (!res?.content) ctx.throw(StatusCode.NOT_FOUND, '不存在')
-    ctx.body = { code: 0, data: ctx.helper.shtml(res!.content) }
+    const { id } = ctx.query
+    const [article, contentRes] = await this.service.userService.article.detail(id)
+    if (!article?.id) ctx.throw(StatusCode.NOT_FOUND, '不存在')
+    ctx.body = { code: 0, data: { ...article, content: ctx.helper.shtml(contentRes!.content) } }
   }
 }

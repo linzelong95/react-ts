@@ -41,8 +41,16 @@ export default class UserArticleService extends Service {
       .getManyAndCount()
   }
 
-  async content(options) {
-    const { articleId } = options
-    return await getRepository(Content).findOne({ article: articleId })
+  async detail(id) {
+    const article = await this.repository
+      .createQueryBuilder('article')
+      .innerJoinAndSelect('article.category', 'category')
+      .innerJoinAndSelect('article.user', 'user')
+      .innerJoinAndSelect('category.sort', 'sort')
+      .leftJoinAndSelect('article.tags', 'tag')
+      .where(`article.id=${id}`)
+      .getOne()
+    const articleContent = await getRepository(Content).findOne({ article: id })
+    return [article, articleContent]
   }
 }

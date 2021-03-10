@@ -5,5 +5,5 @@ export default (app: Application): void => {
   const newRouter = router.namespace('/api/user/article')
 
   newRouter.get('/list', controller.userController.article.list)
-  newRouter.get('/content', controller.userController.article.content)
+  newRouter.get('/detail', controller.userController.article.detail)
 }

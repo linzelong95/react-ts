@@ -4,7 +4,7 @@ import type { IArticle } from '@ssr/blog/types'
 
 enum ArticleApi {
   LIST = '/api/user/article/list',
-  CONTENT = '/api/user/article/content',
+  DETAIL = '/api/user/article/detail',
   SAVE = '/api/user/article/save',
 }
 
@@ -12,12 +12,8 @@ export function getList(params: Partial<IArticle['getListParams']> = {}): Servic
   return get<IArticle['getListRes']>(ArticleApi.LIST, params)
 }
 
-export function getList1(params: Partial<IArticle['getListParams']> = {}): ServiceResult<IArticle['getListRes']> {
-  return post<IArticle['getListRes'], typeof params>(ArticleApi.LIST, params)
-}
-
-export function getContent(params: { articleId: number }): ServiceResult<string> {
-  return post<string, typeof params>(ArticleApi.CONTENT, params)
+export function getDetail(params: IArticle['getDetailParams']): ServiceResult<IArticle['getDetailRes']> {
+  return get<IArticle['getDetailRes']>(ArticleApi.DETAIL, params)
 }
 
 export function save(params: IArticle['editParams']): ServiceResult {

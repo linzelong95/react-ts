@@ -5,5 +5,6 @@ export default interface User {
     nickName: string
     roleName: 'admin' | 'user'
     avatar?: string
+    github?: string
   }
 }

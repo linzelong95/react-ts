@@ -193,7 +193,7 @@ const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
                   avatar={<Avatar src={item.user?.avatar || '/public/assets/images/default/avatar.jpeg'} />}
                   style={{ marginBottom: 0 }}
                   title={
-                    <a href={`/blog/article/${item.id}`} target="_blank" rel="noreferrer noopener">
+                    <a href={`/blog/article/detail?id=${item.id}`} target="_blank" rel="noreferrer noopener">
                       <span className="mr10">{item.title}</span>
                       <Tag color="purple">
                         <TagsOutlined />
@@ -280,6 +280,7 @@ const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
           background: white;
           padding: 16px;
           flex: 1;
+          min-width: 0;
         }
         .list-filter .filter {
           background: white;
@@ -296,6 +297,7 @@ const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
         }
         .nav-search .tab {
           flex: 1;
+          min-width: 0;
           display: flex;
           justify-content: space-between;
           align-items: center;
@@ -306,7 +308,6 @@ const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
           background: white;
           padding: 8px 16px;
           width: 300px;
-          min-width: 0;
           flex-shrink: 0;
           margin-left: 16px;
         }
