@@ -1,41 +1,32 @@
-import type { UserTypeCollection } from '@common/types'
-import type { ArticleTypeCollection } from '@b-blog/types'
+import type { IUser } from '@ssr/common/types'
 
-export default interface Reply {
-  listItemByAdminRole: {
+export default interface IReply {
+  listItem: {
     id: number
     createDate: string
     isApproved: 0 | 1
     isTop: 0 | 1
     reply: string
     parentId?: number
-    article: ArticleTypeCollection['listItemByAdminRole']
-    from: UserTypeCollection['listItem']
-    to: UserTypeCollection['listItem']
+    from: IUser['listItem']
+    to: IUser['listItem']
+    children: IReply['listItem'][]
   }
-  getListResByAdminRole: {
-    list: Reply['listItemByAdminRole'][]
+  getListRes: {
+    list: IReply['listItem'][]
     total: number
   }
-  getListParamsByAdminRole: {
-    index?: number
+  getListParams: Partial<{
+    page?: number
     size?: number
-    conditionQuery?: Partial<{
-      prettyFormat: boolean
-      isTop: 0 | 1
-      isApproved: 0 | 1
-      isRoot: 0 | 1
-      reply: string
-      articleIdsArr: number[]
-      category: { sortIdsArr?: number[]; cateIdsArr?: number[] }
-      orderBy: { name: 'isApproved' | 'isTop' | 'createDate'; by: 'ASC' | 'DESC' }
-    }>
-  }
+    articleIds: number | string
+    orderName: 'isApproved' | 'isTop' | 'createDate'
+    orderBy: 'ASC' | 'DESC'
+  }>
   // 编辑service的入参ts
   editParams: {
     articleId: number
     reply: string
-    isTop?: 0 | 1
     toId?: number
     parentId?: number
   }
@@ -46,7 +37,6 @@ export default interface Reply {
       key: number
       label: string
     }
-    isTop: 0 | 1
     parentId: number
     article: {
       key: number

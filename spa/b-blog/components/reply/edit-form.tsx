@@ -49,8 +49,9 @@ const EditForm: FC<EditFormProps> = memo((props) => {
         const { id } = initialValues || {}
         const { to, isTop, reply, article } = values
         const parentId = initialValues?.parentId === 0 ? id : initialValues?.parentId
-        const toId = to?.key
         const articleId = article.key
+        const selectedArticle = articleList.find((article) => article.id === articleId)
+        const toId = to?.key || selectedArticle?.user?.id
         onSave({ toId, parentId, isTop, reply, articleId }, () => {
           form.resetFields()
           onToggleEditorialPanel()
@@ -59,12 +60,14 @@ const EditForm: FC<EditFormProps> = memo((props) => {
       .catch((error) => {
         message.error(error.message || '请检查表单填写是否正确')
       })
-  }, [form, initialValues, onSave, onToggleEditorialPanel])
+  }, [form, initialValues, articleList, onSave, onToggleEditorialPanel])
 
   const editingFormData = useMemo<FormDataWhenEdited>(() => {
     const { isTop = 0, from, article: prevArticle } = initialValues || {}
     const article = prevArticle && { key: prevArticle.id, label: prevArticle.title }
-    const to = from && { key: from.id, label: from.nickName }
+    const toKey = from?.id || prevArticle?.user?.id
+    const toLabel = from?.nickName || prevArticle?.user?.nickName
+    const to = toKey && { key: toKey, label: toLabel }
     return { isTop, to, article } as FormDataWhenEdited
   }, [initialValues])
 

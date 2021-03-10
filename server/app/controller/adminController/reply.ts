@@ -44,7 +44,7 @@ export default class AdminReplyController extends Controller {
     const {
       user: { id: userId },
     } = ctx.state
-    const { id, reply, parentId = 0, fromId = userId, toId = userId, articleId, isApproved = 1 } = ctx.request.body
+    const { id, reply, parentId = 0, fromId = userId, toId, articleId, isApproved = 1 } = ctx.request.body
     const flag = await this.service.adminService.reply.save({
       id,
       reply,

@@ -1,27 +1,36 @@
 .root {
   margin-top: 16px;
   display: flex;
-  .content-reply {
+  .article-reply {
     background: white;
     padding: 20px;
     flex: 1;
     min-width: 0;
-    .title {
-      font-size: 30px;
-      text-align: center;
+    .article {
+      .title {
+        font-size: 30px;
+        text-align: center;
+      }
+      .catalog {
+        font-weight: bold;
+        text-align: center;
+      }
+      .abstract {
+        color: #999999;
+        margin: 2em 5em;
+        text-indent: 2em;
+      }
+      .cover {
+        display: block;
+        max-width: 100%;
+      }
     }
-    .catalog {
-      font-weight: bold;
-      text-align: center;
-    }
-    .abstract {
-      color: #999999;
-      margin: 2em 5em;
-      text-indent: 2em;
-    }
-    .cover {
-      display: block;
-      max-width: 100%;
+    .reply {
+      margin-top: 20px;
+      .comment-btn {
+        text-align: right;
+        margin-top: 20px;
+      }
     }
     .rich-text-container {
       box-sizing: border-box;

@@ -5,43 +5,36 @@ import { Reply } from '@entity/Reply'
 export default class UserReplyController extends Controller {
   async list(): Promise<void> {
     const { ctx } = this
-    const { conditionQuery = {}, index = 1, size = 10 } = ctx.request.body
-    const { reply = '', orderBy = {}, category = {}, articleIdsArr = [], isTop, isApproved, isRoot, prettyFormat } = conditionQuery
+    const { orderName, orderBy = 'ASC', page = 1, size = 10, articleIds } = ctx.query
     const [list, total] = await this.service.userService.reply.list({
-      reply,
-      orderBy,
-      index,
+      orderBy: orderName ? { name: orderName, by: orderBy } : {},
+      page,
       size,
-      category,
-      articleIdsArr,
-      isTop,
-      isApproved,
-      isRoot,
+      articleIds, // '1,2,3'
     })
-    let newList = [...list]
-    if (prettyFormat) {
-      const parentArr: (Reply & { children: Reply[] })[] = []
-      const sonArr: (Reply & { children?: Reply[] })[] = []
-      list.forEach((item) => {
-        if (!item.parentId) {
-          parentArr.push({ ...item, children: [] })
-        } else {
-          sonArr.push(item)
-        }
+    const parentArr: (Reply & { children: Reply[] })[] = []
+    const sonArr: (Reply & { children?: Reply[] })[] = []
+    list.forEach((item) => {
+      if (!item.parentId) {
+        parentArr.push({ ...item, children: [] })
+      } else {
+        sonArr.push(item)
+      }
+    })
+    const newList = parentArr.map((parentItem) => {
+      sonArr.forEach((sonItem) => {
+        if (sonItem.parentId === parentItem.id) parentItem.children = [...parentItem.children, sonItem]
       })
-      newList = parentArr.map((parentItem) => {
-        sonArr.forEach((sonItem) => {
-          if (sonItem.parentId === parentItem.id) parentItem.children = [...parentItem.children, sonItem]
-        })
-        return parentItem
-      })
-    }
+      return parentItem
+    })
+
     ctx.body = { code: 0, data: { list: newList, total } }
   }
 
   async save(): Promise<void> {
     const { ctx } = this
-    const { id, reply, parentId = 0, fromId, toId, articleId, isApproved = 0 } = ctx.request.body
+    const { user } = ctx.state
+    const { id, reply, parentId = 0, fromId = user?.id, toId, articleId, isApproved = 0 } = ctx.request.body
     const flag = await this.service.userService.reply.save({
       id,
       reply,
@@ -58,7 +51,7 @@ export default class UserReplyController extends Controller {
   async delete(): Promise<void> {
     const { ctx } = this
     const { items } = ctx.request.body
-    const idsArr = items.map((i) => i.id)
+    const idsArr = items.map((item) => item.id)
     const parentIdsArr = items.reduce((parentIdsArr, item) => {
       if (!item.parentId) parentIdsArr.push(item.id)
       return parentIdsArr

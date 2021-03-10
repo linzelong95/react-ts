@@ -28,7 +28,7 @@ interface DetailDrawerProps extends DrawerProps {
 }
 
 type FormattedReplyItem = ReplyTypeCollection['listItemByAdminRole'] & { children?: ReplyTypeCollection['listItemByAdminRole'][] }
-export type HandleReplyItems = (type: 'remove' | 'approve' | 'disapprove' | 'top' | 'unTop', record?: FormattedReplyItem) => void
+export type HandleReplyItems = (type: 'remove' | 'approve' | 'disapprove' | 'top' | 'unTop', record: FormattedReplyItem) => void
 
 const DetailDrawer: FC<DetailDrawerProps> = memo((props) => {
   const { visible, detailItem, onClose } = props
@@ -129,17 +129,21 @@ const DetailDrawer: FC<DetailDrawerProps> = memo((props) => {
               回复
             </a>,
             roleName === 'admin' && (
-              <a onClick={() => handleReplyItems('remove', item)} style={{ color: 'red', marginLeft: 10, fontSize: 12 }}>
+              <a key="remove" onClick={() => handleReplyItems('remove', item)} style={{ color: 'red', marginLeft: 10, fontSize: 12 }}>
                 删除
               </a>
             ),
             roleName === 'admin' && isApproved === 0 && (
-              <a onClick={() => handleReplyItems('approve', item)} style={{ color: '#66CD00', marginLeft: 10, fontSize: 12 }}>
+              <a key="approve" onClick={() => handleReplyItems('approve', item)} style={{ color: '#66CD00', marginLeft: 10, fontSize: 12 }}>
                 展示
               </a>
             ),
             roleName === 'admin' && isApproved === 1 && (
-              <a onClick={() => handleReplyItems('disapprove', item)} style={{ color: '#BF3EFF', marginLeft: 10, fontSize: 12 }}>
+              <a
+                key="disapprove"
+                onClick={() => handleReplyItems('disapprove', item)}
+                style={{ color: '#BF3EFF', marginLeft: 10, fontSize: 12 }}
+              >
                 隐藏
               </a>
             ),
