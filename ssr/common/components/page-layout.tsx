@@ -11,7 +11,6 @@ import { Container } from '@ssr/common/components'
 import { createLogoutAction } from '@ssr/common/store/actions'
 import type { StoreState } from '@ssr/common/store/types'
 import type { FC } from 'react'
-import type { MenuProps } from 'antd/lib/menu'
 
 const { Header, Footer, Content } = Layout
 
@@ -22,15 +21,6 @@ const PageLayout: FC<unknown> = memo((props) => {
   const userInfo = useSelector<StoreState, StoreState['user']>((state) => state.user)
   const [accountLocalStorage, setAccountLocalStorage] = useLocalStorage<{ autoLoginMark: boolean; autoLogin: boolean }>(
     LocalStorage.BLOG_STORE_ACCOUNT,
-  )
-
-  console.log(888, router.asPath)
-
-  const navClick = useCallback<MenuProps['onClick']>(
-    ({ key }) => {
-      router.push(`/${key}`)
-    },
-    [router],
   )
 
   const logout = useCallback<() => void>(async () => {
@@ -51,12 +41,12 @@ const PageLayout: FC<unknown> = memo((props) => {
             <Link href="/blog">
               <img className="logo" alt="logo" src="/public/assets/images/logo/blog.png" />
             </Link>
-            <Menu onClick={navClick} theme="dark" selectedKeys={['home']} mode="horizontal">
+            <Menu theme="dark" selectedKeys={['home']} mode="horizontal">
               <Menu.Item key="home" icon={<HomeOutlined />}>
-                首页
+                <Link href="/blog">首页</Link>
               </Menu.Item>
               <Menu.Item key="message" icon={<CommentOutlined />}>
-                留言
+                <Link href="/blog/message">留言</Link>
               </Menu.Item>
             </Menu>
           </div>
@@ -66,7 +56,7 @@ const PageLayout: FC<unknown> = memo((props) => {
                 overlay={
                   <Menu>
                     <Menu.Item key="logout" onClick={logout}>
-                      登出
+                      退出登录
                     </Menu.Item>
                   </Menu>
                 }

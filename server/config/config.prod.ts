@@ -1,6 +1,6 @@
 import { EggAppConfig, PowerPartial } from 'egg'
 
-export default () => {
+export default (): PowerPartial<EggAppConfig> => {
   const config: PowerPartial<EggAppConfig> = {}
   config.security = {
     // ctx.redirect白名单

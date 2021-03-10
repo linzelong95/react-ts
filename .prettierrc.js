@@ -1,4 +1,5 @@
 module.exports = {
+  root: true,
   // 开启eslint支持
   eslintIntegration: true,
   // 一行最多 140 字符

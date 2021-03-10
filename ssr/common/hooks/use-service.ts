@@ -13,19 +13,13 @@ function useService<R extends unknown, D extends unknown>(
 
   useEffect(() => {
     if (disabled) return
-    let mounted = true
     setLoading(true)
     ;(async () => {
       const [res, err] = await service(data)
-      if (mounted) {
-        setRes(res)
-        setErr(err)
-        setLoading(false)
-      }
+      setRes(res)
+      setErr(err)
+      setLoading(false)
     })()
-    return () => {
-      mounted = false
-    }
   }, [disabled, flag, data, service])
 
   const forceRequest = useCallback<() => void>(() => {

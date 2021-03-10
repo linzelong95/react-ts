@@ -4,7 +4,7 @@ const glob = require('glob')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const commonConfig = require('./webpack.common')
-const { SERVER_ROOT, PUBLIC_ROOT, BUILD_MODULES, ALL_MODULES } = require('./constants')
+const { SERVER_ROOT, PUBLIC_ROOT, BUILD_MODULES } = require('./constants')
 
 // class MyInjectCustomScriptsPlugin {
 //   constructor(options) {
@@ -77,8 +77,7 @@ module.exports = merge(commonConfig, {
     watchOptions: {
       poll: true,
       aggregateTimeout: 100,
-      // TODO:监听common文件
-      ignored: ALL_MODULES.map((moduleName) => (BUILD_MODULES.includes(moduleName) ? null : `**/${moduleName}/**`)).filter(Boolean),
+      ignored: ['/pages/**/*', '/server/**/*', '/ssr/**/*'],
     },
     proxy: {
       '/api/': {

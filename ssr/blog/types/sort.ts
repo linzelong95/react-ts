@@ -14,15 +14,14 @@ export default interface Sort {
     list: Sort['listItem'][]
     total: number
   }
-  getListParams: {
-    index?: number
-    size?: number
-    conditionQuery?: {
-      isEnable?: 0 | 1
-      name?: string
-      orderBy?: { name: 'name' | 'isEnable' | 'createDate' | 'updateDate'; by: 'ASC' | 'DESC' }
-      sortIdsArr?: number[]
-      id?: number
-    }
-  }
+  getListParams: Partial<{
+    page: number
+    size: number
+    isEnable: 0 | 1
+    name: string
+    orderBy: 'ASC' | 'DESC'
+    orderName: 'name' | 'isEnable' | 'createDate' | 'updateDate'
+    sortIds: string
+    id: number
+  }>
 }

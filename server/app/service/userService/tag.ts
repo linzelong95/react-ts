@@ -6,7 +6,7 @@ export default class UserTagService extends Service {
   repository = getRepository(Tag)
 
   async list(options) {
-    const { index, size, name, isEnable, orderBy, sortIdsArr } = options
+    const { page, size, name, isEnable, orderBy, sortIdsArr } = options
     const orderByMap: Record<string, 'ASC' | 'DESC'> = {}
     if (orderBy.name && ['name', 'isEnable', 'sort', 'createDate', 'updateDate'].includes(orderBy.name))
       orderByMap[`tag.${orderBy.name}`] = orderBy.by
@@ -17,7 +17,7 @@ export default class UserTagService extends Service {
       .where('tag.name like :name', { name: `%${name}%` })
       .andWhere(isEnable !== undefined ? `tag.isEnable=${isEnable}` : '1=1')
       .orderBy(orderByMap)
-      .skip((index - 1) * size)
+      .skip((page - 1) * size)
       .take(size)
       .getManyAndCount()
   }

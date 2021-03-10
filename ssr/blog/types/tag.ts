@@ -15,14 +15,13 @@ export default interface ITag {
     total: number
   }
   getListParams: Partial<{
-    index: number
+    page: number
     size: number
-    conditionQuery: Partial<{
-      isEnable: 0 | 1
-      name: string
-      orderBy: { name: 'name' | 'isEnable' | 'createDate' | 'updateDate'; by: 'ASC' | 'DESC' }
-      sortIdsArr: number[]
-      id: number
-    }>
+    isEnable: 0 | 1
+    name: string
+    orderBy: 'ASC' | 'DESC'
+    orderName: 'name' | 'isEnable' | 'createDate' | 'updateDate'
+    sortIds: string
+    id: number
   }>
 }

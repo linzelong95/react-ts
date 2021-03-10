@@ -32,7 +32,7 @@ const isApi = /^\/api\//
 // next.js应用路径正则
 const isNextApp = /^\/(blog|_next)(\/)?.*/
 
-export default (appInfo: EggAppInfo) => {
+export default (appInfo: EggAppInfo): PowerPartial<EggAppConfig> => {
   const config = {} as PowerPartial<EggAppConfig>
 
   // 保密

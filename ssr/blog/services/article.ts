@@ -8,11 +8,11 @@ enum ArticleApi {
   SAVE = '/api/user/article/save',
 }
 
-export function getList1(params: Partial<IArticle['getListParams']> = {}): ServiceResult<IArticle['getListRes']> {
+export function getList(params: Partial<IArticle['getListParams']> = {}): ServiceResult<IArticle['getListRes']> {
   return get<IArticle['getListRes']>(ArticleApi.LIST, params)
 }
 
-export function getList(params: Partial<IArticle['getListParams']> = {}): ServiceResult<IArticle['getListRes']> {
+export function getList1(params: Partial<IArticle['getListParams']> = {}): ServiceResult<IArticle['getListRes']> {
   return post<IArticle['getListRes'], typeof params>(ArticleApi.LIST, params)
 }
 

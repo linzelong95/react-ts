@@ -1,4 +1,4 @@
-import { post } from '@ssr/common/utils'
+import { get } from '@ssr/common/utils'
 import type { ServiceResult } from '@ssr/common/types'
 import type { ITag } from '@ssr/blog/types'
 
@@ -7,5 +7,5 @@ enum TagApi {
 }
 
 export function getList(params: Partial<ITag['getListParams']> = {}): ServiceResult<ITag['getListRes']> {
-  return post<ITag['getListRes'], typeof params>(TagApi.LIST, params)
+  return get<ITag['getListRes']>(TagApi.LIST, params)
 }

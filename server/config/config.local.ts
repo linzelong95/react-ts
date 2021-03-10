@@ -9,7 +9,7 @@ AuywA3t/EolsPMvFVQIDAQAB
 -----END PUBLIC KEY-----
 `
 
-export default () => {
+export default (): PowerPartial<EggAppConfig> => {
   const config: PowerPartial<EggAppConfig> = {}
 
   config.rsaPublicKey = rsaPublicKey

@@ -1,5 +1,5 @@
 import { Controller } from 'egg'
-import { getAuthorization } from '@lib/cosAuth'
+import { getAuthorization } from '@lib/cos'
 
 export default class CosController extends Controller {
   auth(): void {

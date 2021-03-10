@@ -4,9 +4,17 @@ import { StatusCode } from '@constant/status'
 export default class UserArticleController extends Controller {
   async list(): Promise<void> {
     const { ctx } = this
-    const { conditionQuery = {}, index = 1, size = 10 } = ctx.request.body
-    const { title = '', orderBy = {}, category = {}, tagIdsArr = [], articleId } = conditionQuery
-    const [list, total] = await this.service.userService.article.list({ articleId, title, orderBy, index, size, category, tagIdsArr })
+    const { id, orderName, orderBy = 'ASC', page = 1, size = 10, search = '', categoryIds, tagIds } = ctx.query
+    const [list, total] = await this.service.userService.article.list({
+      id,
+      title: search,
+      orderBy: orderName ? { name: orderName, by: orderBy } : {},
+      page,
+      size,
+      tagIdsArr: tagIds ? tagIds.split(',') : [],
+      sortIdsArr: [],
+      cateIdsArr: categoryIds ? categoryIds.split(',') : [],
+    })
     ctx.body = { code: 0, data: { list, total } }
   }
 
