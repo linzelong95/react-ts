@@ -14,8 +14,8 @@ import {
 import { useService } from '@common/hooks'
 import { RichEditor } from '@common/components'
 import { useSelector } from 'react-redux'
-import { adminReplyServices } from '@b-blog/services/reply'
-import type { ReplyTypeCollection } from '@b-blog/types'
+import { replyServices } from '@b-blog/services'
+import type { IReply } from '@b-blog/types'
 import type { DrawerProps } from 'antd/lib/drawer'
 import type { TagProps } from 'antd/lib/tag'
 import type { ButtonProps } from 'antd/lib/button'
@@ -27,22 +27,22 @@ interface DetailDrawerProps extends DrawerProps {
   detailItem: DetailItem
 }
 
-type FormattedReplyItem = ReplyTypeCollection['listItemByAdminRole'] & { children?: ReplyTypeCollection['listItemByAdminRole'][] }
+type FormattedReplyItem = IReply['listItem'] & { children?: IReply['listItem'][] }
 export type HandleReplyItems = (type: 'remove' | 'approve' | 'disapprove' | 'top' | 'unTop', record: FormattedReplyItem) => void
 
 const DetailDrawer: FC<DetailDrawerProps> = memo((props) => {
   const { visible, detailItem, onClose } = props
   const formRef = useRef<HTMLDivElement>(null)
-  const [form] = Form.useForm<ReplyTypeCollection['formDataWhenEdited']>()
+  const [form] = Form.useForm<IReply['formDataWhenEdited']>()
   const [replyBoxVisible, setReplyBoxVisible] = useState<boolean>(false)
   const [clientHeight, setClientHeight] = useState<number>(document.documentElement.clientHeight)
-  const [replyConditionQuery, setReplyConditionQuery] = useState<ReplyTypeCollection['getListParamsByAdminRole']['conditionQuery']>({
+  const [replyConditionQuery, setReplyConditionQuery] = useState<IReply['getListParams']['conditionQuery']>({
     prettyFormat: true,
     articleIdsArr: [detailItem.id],
     orderBy: undefined,
   })
 
-  const getReplyListParams = useMemo<ReplyTypeCollection['getListParamsByAdminRole']>(() => {
+  const getReplyListParams = useMemo<IReply['getListParams']>(() => {
     return {
       index: 1,
       size: 9999,
@@ -50,7 +50,7 @@ const DetailDrawer: FC<DetailDrawerProps> = memo((props) => {
     }
   }, [replyConditionQuery])
 
-  const [loading, replyRes, replyErr, forceRequest] = useService(adminReplyServices.getList, getReplyListParams)
+  const [loading, replyRes, replyErr, forceRequest] = useService(replyServices.getList, getReplyListParams)
 
   const [replyTotal, replyList] = useMemo(() => {
     if (replyErr) {
@@ -63,7 +63,7 @@ const DetailDrawer: FC<DetailDrawerProps> = memo((props) => {
   const currentUser = useSelector<StoreState, StoreState['user']>((state) => state.user)
 
   const replySort = useCallback<TagProps['onClick']>(({ currentTarget }) => {
-    const name = currentTarget.id as ReplyTypeCollection['getListParamsByAdminRole']['conditionQuery']['orderBy']['name']
+    const name = currentTarget.id as IReply['getListParams']['conditionQuery']['orderBy']['name']
     setReplyConditionQuery((prevValue) => ({ ...prevValue, orderBy: { name, by: prevValue?.orderBy?.by === 'ASC' ? 'DESC' : 'ASC' } }))
   }, [])
 
@@ -88,7 +88,7 @@ const DetailDrawer: FC<DetailDrawerProps> = memo((props) => {
         const { parentId, to, reply } = values
         const toId = typeof to.key === 'number' ? to.key : undefined
         message.loading({ content: '正在提交...', key: 'saveData', duration: 0 })
-        const [, saveErr] = await adminReplyServices.save({ toId, parentId, reply, articleId: detailItem.id })
+        const [, saveErr] = await replyServices.save({ toId, parentId, reply, articleId: detailItem.id })
         if (saveErr) {
           message.error({ content: saveErr.message || '提交失败', key: 'saveData' })
           return
@@ -106,7 +106,7 @@ const DetailDrawer: FC<DetailDrawerProps> = memo((props) => {
   const handleReplyItems = useCallback<HandleReplyItems>(
     async (type, record) => {
       const handlingItems = [record].map((item) => ({ id: item.id, parentId: item.parentId }))
-      const [, err] = await adminReplyServices[type]({ items: handlingItems })
+      const [, err] = await replyServices[type]({ items: handlingItems })
       if (err) {
         message.error('操作失败')
         return

@@ -20,24 +20,24 @@ import {
 import EditForm from '@b-blog/components/message/edit-form'
 import MessageDrawer from '@b-blog/components/message/message-drawer'
 import moment from 'moment'
-import { adminMessageServices } from '@b-blog/services/message'
+import { messageServices } from '@b-blog/services'
 import type { FC, ReactNode } from 'react'
 import type { RouteComponentProps } from 'react-router'
-import type { Message } from '@b-blog/types'
+import type { IMessage } from '@b-blog/types'
 import type { ButtonProps } from 'antd/lib/button'
 import type { PaginationProps } from 'antd/lib/pagination'
 import type { SearchProps } from 'antd/lib/input/Search'
 import type { TagProps } from 'antd/lib/tag'
 
-export type ListItem = Message['listItemByAdminRole']
+export type ListItem = IMessage['listItem']
 export type ToggleEditorialPanel = (record?: ListItem) => void
-export type SaveData = (params: Message['editParams'], callback?: () => void) => void
+export type SaveData = (params: IMessage['editParams'], callback?: () => void) => void
 export type HandleItems = (type: 'remove' | 'approve' | 'disapprove' | 'top' | 'unTop', record?: ListItem, callback?: () => void) => void
 type FilterRequest = (type: 'ok' | 'exit' | 'clear') => void
 type TemporaryCondition = {
   commonFilterArr?: ['isTop'?, 'isApproved'?, 'isParent'?, 'isSon'?]
 }
-type ConditionQuery = Message['getListParamsByAdminRole']['conditionQuery'] & Pick<TemporaryCondition, 'commonFilterArr'>
+type ConditionQuery = IMessage['getListParams']['conditionQuery'] & Pick<TemporaryCondition, 'commonFilterArr'>
 
 const MessageManagement: FC<RouteComponentProps> = memo(() => {
   const inputSearchRef = useRef<Input>(null)
@@ -74,7 +74,7 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
 
   const saveData = useCallback<SaveData>(async (params, callback) => {
     message.loading({ content: '正在提交...', key: 'saveData', duration: 0 })
-    const [, saveErr] = await adminMessageServices.save(params)
+    const [, saveErr] = await messageServices.save(params)
     if (saveErr) {
       message.error({ content: saveErr.message || '提交失败', key: 'saveData' })
       return
@@ -144,7 +144,7 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
   const handleItems = useCallback<HandleItems>(
     async (type, record, callback) => {
       const handlingItems = (record ? [record] : selectedItems).map((item) => ({ id: item.id, parentId: item.parentId }))
-      const [, err] = await adminMessageServices[type]({ items: handlingItems })
+      const [, err] = await messageServices[type]({ items: handlingItems })
       if (err) {
         message.error('操作失败')
         return
@@ -195,7 +195,7 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
     const neededConditionQuery = { ...conditionQuery, commonFilterArr: undefined }
     const params = { index: pagination.current, size: pagination.pageSize, conditionQuery: neededConditionQuery }
     ;(async () => {
-      const [messageRes, messageErr] = await adminMessageServices.getList(params)
+      const [messageRes, messageErr] = await messageServices.getList(params)
       if (messageErr || !Array.isArray(messageRes?.data?.list)) {
         message.error(messageErr.message || '获取列表失败')
         return

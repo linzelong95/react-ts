@@ -1,9 +1,9 @@
 import { post, get } from '@common/utils'
 import { loginApis } from '@common/services/apis'
-import type { ServiceResult, AccountTypeCollection } from '@common/types'
+import type { ServiceResult, IAccount } from '@common/types'
 import type { UserState } from '@common/store/types'
 
-export function login(params: AccountTypeCollection['loginParams']): ServiceResult<UserState> {
+export function login(params: IAccount['loginParams']): ServiceResult<UserState> {
   return post<UserState, typeof params>(`${loginApis.LOGIN}?t=${Date.now()}`, params)
 }
 
@@ -11,7 +11,7 @@ export function logout(): ServiceResult {
   return post<never>(loginApis.LOGOUT)
 }
 
-export function register(params: AccountTypeCollection['registerParams']): ServiceResult<UserState> {
+export function register(params: IAccount['registerParams']): ServiceResult<UserState> {
   return post<UserState, typeof params>(loginApis.REGISTER, params)
 }
 

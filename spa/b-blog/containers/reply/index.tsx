@@ -20,20 +20,20 @@ import {
 import EditForm from '@b-blog/components/reply/edit-form'
 import FilterModal, { FilterModalRef, TemporaryCondition } from '@b-blog/components/reply/filter-modal'
 import moment from 'moment'
-import { adminReplyServices } from '@b-blog/services/reply'
+import { replyServices } from '@b-blog/services'
 import type { FC, ReactNode } from 'react'
 import type { RouteComponentProps } from 'react-router'
-import type { ReplyTypeCollection } from '@b-blog/types'
+import type { IReply } from '@b-blog/types'
 import type { ButtonProps } from 'antd/lib/button'
 import type { PaginationProps } from 'antd/lib/pagination'
 import type { SearchProps } from 'antd/lib/input/Search'
 import type { TagProps } from 'antd/lib/tag'
 
-export type ListItem = ReplyTypeCollection['listItemByAdminRole']
+export type ListItem = IReply['listItem']
 export type ToggleEditorialPanel = (record?: ListItem) => void
-export type SaveData = (params: ReplyTypeCollection['editParams'], callback?: () => void) => void
+export type SaveData = (params: IReply['editParams'], callback?: () => void) => void
 export type HandleItems = (type: 'remove' | 'approve' | 'disapprove' | 'top' | 'unTop', record?: ListItem, callback?: () => void) => void
-export type ConditionQuery = ReplyTypeCollection['getListParamsByAdminRole']['conditionQuery'] & TemporaryCondition
+export type ConditionQuery = IReply['getListParams']['conditionQuery'] & TemporaryCondition
 
 const MessageManagement: FC<RouteComponentProps> = memo(() => {
   const inputSearchRef = useRef<Input>(null)
@@ -47,7 +47,7 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
   const [filterModalVisible, setFilterModalVisible] = useState<boolean>(false)
   const [showSorterFlag, setShowSorterFlag] = useState<boolean>(false)
 
-  const getListParams = useMemo<ReplyTypeCollection['getListParamsByAdminRole']>(() => {
+  const getListParams = useMemo<IReply['getListParams']>(() => {
     const neededConditionQuery = { ...conditionQuery, commonFilterArr: undefined, articleArr: undefined, filteredSortArr: undefined }
     return {
       index: pagination.current,
@@ -56,7 +56,7 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
     }
   }, [pagination, conditionQuery])
 
-  const [loading, replyRes, replyErr, forceRequest] = useService(adminReplyServices.getList, getListParams)
+  const [loading, replyRes, replyErr, forceRequest] = useService(replyServices.getList, getListParams)
 
   const [total, dataSource] = useMemo(() => {
     if (replyErr) {
@@ -86,7 +86,7 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
   const saveData = useCallback<SaveData>(
     async (params, callback) => {
       message.loading({ content: '正在提交...', key: 'saveData', duration: 0 })
-      const [, saveErr] = await adminReplyServices.save(params)
+      const [, saveErr] = await replyServices.save(params)
       if (saveErr) {
         message.error({ content: saveErr.message || '提交失败', key: 'saveData' })
         return
@@ -159,7 +159,7 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
   const handleItems = useCallback<HandleItems>(
     async (type, record, callback) => {
       const handlingItems = (record ? [record] : selectedItems).map((item) => ({ id: item.id, parentId: item.parentId }))
-      const [, err] = await adminReplyServices[type]({ items: handlingItems })
+      const [, err] = await replyServices[type]({ items: handlingItems })
       if (err) {
         message.error('操作失败')
         return

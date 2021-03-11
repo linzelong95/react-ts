@@ -1,4 +1,4 @@
 export * from './http'
 export * from './route'
-export type { default as UserTypeCollection } from './user'
-export type { default as AccountTypeCollection } from './account'
+export type { default as IUser } from './user'
+export type { default as IAccount } from './account'

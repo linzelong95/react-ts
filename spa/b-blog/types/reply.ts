@@ -1,23 +1,23 @@
-import type { UserTypeCollection } from '@common/types'
-import type { ArticleTypeCollection } from '@b-blog/types'
+import type { IUser } from '@common/types'
+import type { IArticle } from '@b-blog/types'
 
 export default interface Reply {
-  listItemByAdminRole: {
+  listItem: {
     id: number
     createDate: string
     isApproved: 0 | 1
     isTop: 0 | 1
     reply: string
     parentId?: number
-    article: ArticleTypeCollection['listItemByAdminRole']
-    from: UserTypeCollection['listItem']
-    to: UserTypeCollection['listItem']
+    article: IArticle['listItem']
+    from: IUser['listItem']
+    to: IUser['listItem']
   }
-  getListResByAdminRole: {
-    list: Reply['listItemByAdminRole'][]
+  getListRes: {
+    list: Reply['listItem'][]
     total: number
   }
-  getListParamsByAdminRole: {
+  getListParams: {
     index?: number
     size?: number
     conditionQuery?: Partial<{

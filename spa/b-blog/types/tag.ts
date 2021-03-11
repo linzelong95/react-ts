@@ -1,20 +1,20 @@
-import type { Sort } from '@b-blog/types'
+import type { ISort } from '@b-blog/types'
 
 export default interface Tag {
-  listItemByAdminRole: {
+  listItem: {
     id: number
     createDate: string
     updateDate: string
     isEnable: 0 | 1
     isUsed: 0 | 1
     name: string
-    sort: Omit<Sort['listItemByAdminRole'], 'categories'>
+    sort: Omit<ISort['listItem'], 'categories'>
   }
-  getListResByAdminRole: {
-    list: Tag['listItemByAdminRole'][]
+  getListRes: {
+    list: Tag['listItem'][]
     total: number
   }
-  getListParamsByAdminRole: Partial<{
+  getListParams: Partial<{
     index: number
     size: number
     conditionQuery: Partial<{
@@ -26,7 +26,7 @@ export default interface Tag {
     }>
   }>
   // 添加函数的入参ts
-  editParams: Pick<Sort['listItemByAdminRole'], 'isEnable' | 'name'> & { id?: number; sortId: number }
+  editParams: Pick<ISort['listItem'], 'isEnable' | 'name'> & { id?: number; sortId: number }
   // 编辑时form的初始值
   formDataWhenEdited: {
     name: string

@@ -23,21 +23,20 @@ import EditForm from '@b-blog/components/article/edit-form'
 import DetailDrawer from '@b-blog/components/article/detail-drawer'
 import FilterModal, { FilterModalRef, TemporaryCondition } from '@b-blog/components/article/filter-modal'
 import moment from 'moment'
-import { adminArticleServices } from '@b-blog/services/article'
-import { adminSortServices } from '@b-blog/services/sort'
+import { sortServices, articleServices } from '@b-blog/services'
 import type { FC, ReactNode } from 'react'
 import type { RouteComponentProps } from 'react-router'
-import type { ArticleTypeCollection, Sort } from '@b-blog/types'
+import type { IArticle, ISort } from '@b-blog/types'
 import type { ButtonProps } from 'antd/lib/button'
 import type { PaginationProps } from 'antd/lib/pagination'
 import type { SearchProps } from 'antd/lib/input/Search'
 import type { TagProps } from 'antd/lib/tag'
 
-export type ListItem = ArticleTypeCollection['listItemByAdminRole']
+export type ListItem = IArticle['listItem']
 export type ToggleEditorialPanel = (record?: ListItem) => void
-export type SaveData = (params: ArticleTypeCollection['editParams'], callback?: () => void) => void
+export type SaveData = (params: IArticle['editParams'], callback?: () => void) => void
 export type HandleItems = (type: 'remove' | 'lock' | 'unlock' | 'top' | 'unTop', record?: ListItem, callback?: () => void) => void
-export type ConditionQuery = ArticleTypeCollection['getListParamsByAdminRole']['conditionQuery'] & TemporaryCondition
+export type ConditionQuery = IArticle['getListParams']['conditionQuery'] & TemporaryCondition
 type ToggleReadArticle = (record?: ListItem) => void
 export type DetailItem = ListItem & { content: string }
 
@@ -52,10 +51,10 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
   const [conditionQuery, setConditionQuery] = useState<ConditionQuery>({})
   const [filterModalVisible, setFilterModalVisible] = useState<boolean>(false)
   const [showSorterFlag, setShowSorterFlag] = useState<boolean>(false)
-  const [allSortList, setAllSortList] = useState<Sort['getListResByAdminRole']['list']>([])
+  const [allSortList, setAllSortList] = useState<ISort['getListRes']['list']>([])
   const [oneDetail, setOneDetail] = useState<DetailItem>(null)
 
-  const getListParams = useMemo<ArticleTypeCollection['getListParamsByAdminRole']>(() => {
+  const getListParams = useMemo<IArticle['getListParams']>(() => {
     const neededConditionQuery = { ...conditionQuery, tagIdsArr: undefined, filteredSortArr: undefined }
     return {
       index: pagination.current,
@@ -64,7 +63,7 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
     }
   }, [pagination, conditionQuery])
 
-  const [loading, articleRes, articleErr, forceRequest] = useService(adminArticleServices.getList, getListParams)
+  const [loading, articleRes, articleErr, forceRequest] = useService(articleServices.getList, getListParams)
 
   const [total, dataSource] = useMemo(() => {
     if (articleErr) {
@@ -91,7 +90,7 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
       setEditFormVisible((prevValue) => !prevValue)
       return
     }
-    const [contentRes, contentErr] = await adminArticleServices.getContent({ articleId: record.id })
+    const [contentRes, contentErr] = await articleServices.getContent({ articleId: record.id })
     if (contentErr) {
       message.error('获取内容详情失败')
       return
@@ -103,7 +102,7 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
   const saveData = useCallback<SaveData>(
     async (params, callback) => {
       message.loading({ content: '正在提交...', key: 'saveData', duration: 0 })
-      const [, saveErr] = await adminArticleServices.save(params)
+      const [, saveErr] = await articleServices.save(params)
       if (saveErr) {
         message.error({ content: saveErr.message || '提交失败', key: 'saveData' })
         return
@@ -176,7 +175,7 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
   const handleItems = useCallback<HandleItems>(
     async (type, record, callback) => {
       const handlingItems = (record ? [record] : selectedItems).map((item) => ({ id: item.id }))
-      const [, err] = await adminArticleServices[type]({ items: handlingItems })
+      const [, err] = await articleServices[type]({ items: handlingItems })
       if (err) {
         message.error('操作失败')
         return
@@ -199,7 +198,7 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
       setOneDetail(null)
       return
     }
-    const [contentRes, contentErr] = await adminArticleServices.getContent({ articleId: record.id })
+    const [contentRes, contentErr] = await articleServices.getContent({ articleId: record.id })
     if (contentErr) {
       message.error('获取内容详情失败')
       return
@@ -215,7 +214,7 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
 
   useEffect(() => {
     ;(async () => {
-      const [sortRes] = await adminSortServices.getList({ index: 1, size: 999 })
+      const [sortRes] = await sortServices.getList({ index: 1, size: 999 })
       setAllSortList(sortRes?.data?.list || [])
     })()
   }, [])

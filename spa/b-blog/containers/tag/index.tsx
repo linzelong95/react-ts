@@ -4,31 +4,30 @@ import { useService } from '@common/hooks'
 import { message, Table, Button, Tag, Input, Row, Col, Tooltip, Badge } from 'antd'
 import { UnlockOutlined, LockOutlined, DeleteOutlined, HomeOutlined, ReloadOutlined, PlusOutlined } from '@ant-design/icons'
 import moment from 'moment'
-import { adminSortServices } from '@b-blog/services/sort'
-import { adminTagServices } from '@b-blog/services/tag'
+import { tagServices, sortServices } from '@b-blog/services'
 import EditForm from '@b-blog/components/tag/edit-form'
 import type { FC, ReactNode } from 'react'
 import type { RouteComponentProps } from 'react-router'
-import type { TagTypeCollection, Sort } from '@b-blog/types'
+import type { ITag, ISort } from '@b-blog/types'
 import type { TableProps } from 'antd/lib/table'
 import type { SorterResult } from 'antd/lib/table/interface'
 import type { SearchProps } from 'antd/lib/input/Search'
 
-export type ListItem = TagTypeCollection['listItemByAdminRole']
+export type ListItem = ITag['listItem']
 export type ToggleEditorialPanel = (record?: ListItem) => void
-export type SaveData = (params: TagTypeCollection['editParams'], callback?: () => void) => void
+export type SaveData = (params: ITag['editParams'], callback?: () => void) => void
 type HandleItems = (type: 'remove' | 'lock' | 'unlock', record?: ListItem) => void
 
 const TagManagement: FC<RouteComponentProps> = memo(() => {
   const inputSearchRef = useRef<Input>(null)
   const [selectedItems, setSelectedItems] = useState<ListItem[]>([])
   const [pagination, setPagination] = useState<{ current: number; pageSize: number }>({ current: 1, pageSize: 10 })
-  const [allSortList, setAllSortList] = useState<Sort['getListResByAdminRole']['list']>([])
-  const [conditionQuery, setConditionQuery] = useState<TagTypeCollection['getListParamsByAdminRole']['conditionQuery']>({})
+  const [allSortList, setAllSortList] = useState<ISort['getListRes']['list']>([])
+  const [conditionQuery, setConditionQuery] = useState<ITag['getListParams']['conditionQuery']>({})
   const [filters, setFilters] = useState<Partial<{ sort: number[]; isEnable: number[] }>>({})
   const [editFormVisible, setEditFormVisible] = useState<boolean>(false)
   const [editFormData, setEditFormData] = useState<ListItem>(null)
-  const getListParams = useMemo<TagTypeCollection['getListParamsByAdminRole']>(
+  const getListParams = useMemo<ITag['getListParams']>(
     () => ({
       index: pagination.current,
       size: pagination.pageSize,
@@ -37,7 +36,7 @@ const TagManagement: FC<RouteComponentProps> = memo(() => {
     [pagination, conditionQuery],
   )
 
-  const [loading, tagRes, tagErr, forceRequest] = useService(adminTagServices.getList, getListParams)
+  const [loading, tagRes, tagErr, forceRequest] = useService(tagServices.getList, getListParams)
   const [total, dataSource] = useMemo(() => {
     if (tagErr) {
       message.error(tagErr.message || '获取列表失败')
@@ -86,7 +85,7 @@ const TagManagement: FC<RouteComponentProps> = memo(() => {
   const handleItems = useCallback<HandleItems>(
     async (type, record) => {
       const handlingItems = (record ? [record] : selectedItems).map((item) => ({ id: item.id, name: item.name }))
-      const [, err] = await adminTagServices[type]({ items: handlingItems })
+      const [, err] = await tagServices[type]({ items: handlingItems })
       if (err) {
         message.error('操作失败')
         return
@@ -111,7 +110,7 @@ const TagManagement: FC<RouteComponentProps> = memo(() => {
   const saveData = useCallback<SaveData>(
     async (params, callback) => {
       message.loading({ content: '正在提交...', key: 'saveData', duration: 0 })
-      const [, saveErr] = await adminTagServices.save(params)
+      const [, saveErr] = await tagServices.save(params)
       if (saveErr) {
         message.error({ content: saveErr.message || '提交失败', key: 'saveData' })
         return
@@ -130,7 +129,7 @@ const TagManagement: FC<RouteComponentProps> = memo(() => {
 
   useEffect(() => {
     ;(async () => {
-      const [sortRes] = await adminSortServices.getList({ index: 1, size: 999 })
+      const [sortRes] = await sortServices.getList({ index: 1, size: 999 })
       setAllSortList(sortRes?.data?.list || [])
     })()
   }, [])

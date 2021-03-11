@@ -1,10 +1,10 @@
-import type { Category, TagTypeCollection } from '@b-blog/types'
-import type { UserTypeCollection } from '@common/types'
+import type { ICategory, ITag } from '@b-blog/types'
+import type { IUser } from '@common/types'
 import type { UploadProps } from 'antd/lib/upload'
 import type { EditorState } from 'braft-editor'
 
 export default interface Article {
-  listItemByAdminRole: {
+  listItem: {
     id: number
     createDate: string
     updateDate: string
@@ -13,15 +13,15 @@ export default interface Article {
     abstract: string
     imageUrl: string
     title: string
-    tags: TagTypeCollection['listItemByAdminRole'][]
-    category: Category['listItemByAdminRole']
-    user: UserTypeCollection['listItem']
+    tags: ITag['listItem'][]
+    category: ICategory['listItem']
+    user: IUser['listItem']
   }
-  getListResByAdminRole: {
-    list: Article['listItemByAdminRole'][]
+  getListRes: {
+    list: Article['listItem'][]
     total: number
   }
-  getListParamsByAdminRole: {
+  getListParams: {
     index?: number
     size?: number
     conditionQuery?: Partial<{

@@ -3,20 +3,19 @@ import { WrappedContainer } from '@spa/common/components'
 import { message, Table, Tabs, Button, Tag, Input, Row, Col, Tooltip, Badge } from 'antd'
 import { UnlockOutlined, LockOutlined, DeleteOutlined, HomeOutlined, ReloadOutlined, PlusOutlined } from '@ant-design/icons'
 import moment from 'moment'
-import { adminCategoryServices } from '@b-blog/services/category'
-import { adminSortServices } from '@b-blog/services/sort'
+import { sortServices, categoryServices } from '@b-blog/services'
 import EditForm from '@b-blog/components/category/edit-form'
 import type { FC, ReactNode } from 'react'
 import type { RouteComponentProps } from 'react-router'
-import type { Sort, Category } from '@b-blog/types'
+import type { ISort, ICategory } from '@b-blog/types'
 import type { TableProps } from 'antd/lib/table'
 import type { SorterResult } from 'antd/lib/table/interface'
 import type { TabsProps } from 'antd/lib/tabs'
 import type { SearchProps } from 'antd/lib/input/Search'
 
-export type ListItem = (Sort | Category)['listItemByAdminRole']
+export type ListItem = (ISort | ICategory)['listItem']
 export type ToggleEditorialPanel = (editCateInSortPanel?: boolean, record?: ListItem) => void
-export type SaveData = (params: (Sort | Category)['editParams'], callback?: () => void) => void
+export type SaveData = (params: (ISort | ICategory)['editParams'], callback?: () => void) => void
 type TabKey = 'cate' | 'sort'
 type GetColumns = <T = unknown>(type: TabKey, excludes?: string[]) => TableProps<T>['columns']
 type HandleItems = (type: 'remove' | 'lock' | 'unlock', from?: TabKey, record?: ListItem) => void
@@ -29,8 +28,8 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
   const [tabKey, setTabKey] = useState<TabKey>('sort')
   const [loading, setLoading] = useState<boolean>(false)
   const [dataSource, setDataSource] = useState<ListItem[]>([])
-  const [allSortList, setAllSortList] = useState<Sort['getListResByAdminRole']['list']>([])
-  const [conditionQuery, setConditionQuery] = useState<Partial<(Sort | Category)['getListParamsByAdminRole']['conditionQuery']>>({})
+  const [allSortList, setAllSortList] = useState<ISort['getListRes']['list']>([])
+  const [conditionQuery, setConditionQuery] = useState<Partial<(ISort | ICategory)['getListParams']['conditionQuery']>>({})
   const [filters, setFilters] = useState<Partial<{ sort: number[]; isEnable: number[] }>>({})
   const [editFormVisible, setEditFormVisible] = useState<boolean>(false)
   const [editFormType, setEditFormType] = useState<TabKey>('sort')
@@ -49,7 +48,7 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
   }, [])
 
   const getAllSortList = useCallback<() => void>(async () => {
-    const [sortRes] = await adminSortServices.getList({ index: 1, size: 999 })
+    const [sortRes] = await sortServices.getList({ index: 1, size: 999 })
     setAllSortList(sortRes?.data?.list || [])
   }, [])
 
@@ -92,9 +91,9 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
   const handleItems = useCallback<HandleItems>(
     async (type, from = tabKey, record) => {
       const handlingItems = (record ? [record] : selectedItems).map((item) => ({ id: item.id, name: item.name }))
-      const specificServices = from === 'sort' ? adminSortServices : adminCategoryServices
+      const specificServices = from === 'sort' ? sortServices : categoryServices
       // const [, err] = await specificServices[type]({ items: handlingItems }) // 绕过ts检测，不推荐
-      let service: typeof adminSortServices.remove
+      let service: typeof sortServices.remove
       switch (type) {
         case 'remove':
           service = specificServices.remove
@@ -135,8 +134,8 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
       message.loading({ content: '正在提交...', key: 'saveData', duration: 0 })
       Promise.race(
         editFormType === 'sort'
-          ? [adminSortServices.save(params as Sort['editParams'])]
-          : [adminCategoryServices.save(params as Category['editParams'])],
+          ? [sortServices.save(params as ISort['editParams'])]
+          : [categoryServices.save(params as ICategory['editParams'])],
       )
         .then(([, err]) => {
           if (err) throw err
@@ -246,8 +245,8 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
     const params = { index: pagination.current, size: pagination.pageSize, conditionQuery }
     Promise.race(
       tabKey === 'sort'
-        ? [adminSortServices.getList(params as Partial<Sort['getListParamsByAdminRole']>)]
-        : [adminCategoryServices.getList(params as Partial<Category['getListParamsByAdminRole']>)],
+        ? [sortServices.getList(params as Partial<ISort['getListParams']>)]
+        : [categoryServices.getList(params as Partial<ICategory['getListParams']>)],
     )
       .then(([res, err]) => {
         if (err) throw err
@@ -381,13 +380,13 @@ const CategoryManagement: FC<RouteComponentProps> = memo(() => {
         }}
         expandable={
           tabKey === 'sort' && {
-            expandedRowRender: (record: Sort['listItemByAdminRole']) => {
+            expandedRowRender: (record: ISort['listItem']) => {
               const formativeDataSource = record?.categories?.map?.((category) => {
                 return { ...category, sort: { ...record, categories: undefined } }
               })
               return (
-                <Table<Category['listItemByAdminRole']>
-                  columns={getColumns<Category['listItemByAdminRole']>('cate', ['sort'])}
+                <Table<ICategory['listItem']>
+                  columns={getColumns<ICategory['listItem']>('cate', ['sort'])}
                   rowKey="id"
                   loading={loading}
                   dataSource={formativeDataSource || []}

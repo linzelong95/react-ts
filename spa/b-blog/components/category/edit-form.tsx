@@ -1,6 +1,6 @@
 import React, { memo, useCallback, useMemo } from 'react'
 import { Modal, Form, Input, Select, message } from 'antd'
-import type { Sort, Category } from '@b-blog/types'
+import type { ISort, ICategory } from '@b-blog/types'
 import type { FC } from 'react'
 import type { ModalProps } from 'antd/lib/modal'
 import type { ToggleEditorialPanel, SaveData, ListItem } from '@b-blog/containers/category'
@@ -8,12 +8,12 @@ import type { ToggleEditorialPanel, SaveData, ListItem } from '@b-blog/container
 interface EditFormProps extends ModalProps {
   type: 'cate' | 'sort'
   initialValues?: ListItem
-  allSortList: Sort['getListResByAdminRole']['list']
+  allSortList: ISort['getListRes']['list']
   onSave: SaveData
   onToggleEditorialPanel: ToggleEditorialPanel
 }
 
-type FormDataWhenEdited = (Sort | Category)['formDataWhenEdited']
+type FormDataWhenEdited = (ISort | ICategory)['formDataWhenEdited']
 
 const layout = {
   labelCol: { span: 5 },
@@ -33,9 +33,9 @@ const EditForm: FC<EditFormProps> = memo((props) => {
     form
       .validateFields()
       .then((values) => {
-        const { sort, ...commonValues } = values as Category['formDataWhenEdited']
-        if (sort) (commonValues as Category['editParams']).sortId = sort.key
-        onSave({ id: initialValues?.id, ...commonValues } as (Category | Sort)['editParams'], () => {
+        const { sort, ...commonValues } = values as ICategory['formDataWhenEdited']
+        if (sort) (commonValues as ICategory['editParams']).sortId = sort.key
+        onSave({ id: initialValues?.id, ...commonValues } as (ICategory | ISort)['editParams'], () => {
           form.resetFields()
           onToggleEditorialPanel()
         })
@@ -46,7 +46,7 @@ const EditForm: FC<EditFormProps> = memo((props) => {
   }, [form, initialValues, onSave, onToggleEditorialPanel])
 
   const editingFormData = useMemo<FormDataWhenEdited>(() => {
-    const { name, isEnable = 1, sort } = (initialValues || {}) as Category['listItemByAdminRole']
+    const { name, isEnable = 1, sort } = (initialValues || {}) as ICategory['listItem']
     const defaultValues = { isEnable, name } as FormDataWhenEdited
     return { ...defaultValues, sort: sort ? { label: sort.name, key: sort.id } : undefined }
   }, [initialValues])

@@ -1,13 +1,12 @@
 import React, { memo, useCallback, useState, useEffect, useMemo, useImperativeHandle, forwardRef } from 'react'
 import { Modal, Button, Checkbox, Divider, Select, Radio, Badge, Alert, Tree, message } from 'antd'
 import { useService } from '@common/hooks'
-import { adminSortServices } from '@b-blog/services/sort'
-import { adminArticleServices } from '@b-blog/services/article'
+import { sortServices, articleServices } from '@b-blog/services'
 import type { SetStateAction, Dispatch, ForwardRefRenderFunction } from 'react'
 import type { ModalProps } from 'antd/lib/modal'
 import type { SelectValue } from 'antd/lib/select'
 import type { ConditionQuery } from '@b-blog/containers/reply'
-import type { Sort, ArticleTypeCollection } from '@b-blog/types'
+import type { ISort, IArticle } from '@b-blog/types'
 
 type FilterRequest = (type: 'ok' | 'exit' | 'clear') => void
 
@@ -30,11 +29,11 @@ const FilterModal: ForwardRefRenderFunction<FilterModalRef, FilterModalProps> = 
   const { visible, conditionQuery, onSetFilterModalVisible, onSetConditionQuery } = props
 
   const [filterType, setFilterType] = useState<'catalog' | 'article'>('catalog')
-  const [allSortList, setAllSortList] = useState<Sort['getListResByAdminRole']['list']>([])
+  const [allSortList, setAllSortList] = useState<ISort['getListRes']['list']>([])
   const [temporaryCondition, setTemporaryCondition] = useState<TemporaryCondition>({})
   const [articleSearch, setArticleSearch] = useState<string>(undefined)
 
-  const getListParams = useMemo<ArticleTypeCollection['getListParamsByAdminRole']>(
+  const getListParams = useMemo<IArticle['getListParams']>(
     () => ({
       index: 1,
       size: 10,
@@ -42,7 +41,7 @@ const FilterModal: ForwardRefRenderFunction<FilterModalRef, FilterModalProps> = 
     }),
     [articleSearch],
   )
-  const [articleLoading, articleRes, articleErr] = useService(adminArticleServices.getList, getListParams)
+  const [articleLoading, articleRes, articleErr] = useService(articleServices.getList, getListParams)
   const articleList = useMemo(() => {
     if (articleErr) {
       message.error(articleErr.message || '获取列表失败')
@@ -110,7 +109,7 @@ const FilterModal: ForwardRefRenderFunction<FilterModalRef, FilterModalProps> = 
 
   useEffect(() => {
     ;(async () => {
-      const [sortRes] = await adminSortServices.getList({ index: 1, size: 999 })
+      const [sortRes] = await sortServices.getList({ index: 1, size: 999 })
       setAllSortList(sortRes?.data?.list || [])
     })()
   }, [])

@@ -1,8 +1,8 @@
 import React, { memo, useCallback, useMemo, useState } from 'react'
 import { Modal, Form, Input, Select, message } from 'antd'
 import { useService } from '@common/hooks'
-import { adminArticleServices } from '@b-blog/services/article'
-import type { ReplyTypeCollection, ArticleTypeCollection } from '@b-blog/types'
+import { articleServices } from '@b-blog/services'
+import type { IReply, IArticle } from '@b-blog/types'
 import type { FC } from 'react'
 import type { ModalProps } from 'antd/lib/modal'
 import type { ToggleEditorialPanel, SaveData, ListItem } from '@b-blog/containers/reply'
@@ -13,14 +13,14 @@ interface EditFormProps extends ModalProps {
   onToggleEditorialPanel: ToggleEditorialPanel
 }
 
-type FormDataWhenEdited = ReplyTypeCollection['formDataWhenEdited']
+type FormDataWhenEdited = IReply['formDataWhenEdited']
 
 const EditForm: FC<EditFormProps> = memo((props) => {
   const { initialValues, visible, onSave, onToggleEditorialPanel, ...restProps } = props
   const [form] = Form.useForm<FormDataWhenEdited>()
   const [articleSearch, setArticleSearch] = useState<string>(undefined)
 
-  const getListParams = useMemo<ArticleTypeCollection['getListParamsByAdminRole']>(
+  const getListParams = useMemo<IArticle['getListParams']>(
     () => ({
       index: 1,
       size: 10,
@@ -28,7 +28,7 @@ const EditForm: FC<EditFormProps> = memo((props) => {
     }),
     [articleSearch],
   )
-  const [articleLoading, articleRes, articleErr] = useService(adminArticleServices.getList, getListParams, Boolean(initialValues?.id))
+  const [articleLoading, articleRes, articleErr] = useService(articleServices.getList, getListParams, Boolean(initialValues?.id))
   const articleList = useMemo(() => {
     if (articleErr) {
       message.error(articleErr.message || '获取列表失败')

@@ -7,7 +7,7 @@ import { serialize } from '@common/utils'
 import type { FC } from 'react'
 import type { RouteComponentProps } from 'react-router'
 import type { ButtonProps } from 'antd/lib/button'
-import type { AccountTypeCollection } from '@common/types'
+import type { IAccount } from '@common/types'
 
 const layout = {
   labelCol: { span: 5 },
@@ -19,7 +19,7 @@ const tailLayout = {
 
 const Register: FC<RouteComponentProps<never>> = memo(() => {
   const history = useHistory()
-  const [form] = Form.useForm<AccountTypeCollection['registerParams'] & { captcha: string }>()
+  const [form] = Form.useForm<IAccount['registerParams'] & { captcha: string }>()
 
   const [, captchaRes, , forceRequest] = useService(loginServices.getWebpageCaptcha)
 

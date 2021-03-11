@@ -1,6 +1,6 @@
 import React, { memo, useCallback, useMemo } from 'react'
 import { Modal, Form, Input, Select, message } from 'antd'
-import type { Message } from '@b-blog/types'
+import type { IMessage } from '@b-blog/types'
 import type { FC } from 'react'
 import type { ModalProps } from 'antd/lib/modal'
 import type { ToggleEditorialPanel, SaveData, ListItem } from '@b-blog/containers/message'
@@ -11,7 +11,7 @@ interface EditFormProps extends ModalProps {
   onToggleEditorialPanel: ToggleEditorialPanel
 }
 
-type FormDataWhenEdited = Message['formDataWhenEdited']
+type FormDataWhenEdited = IMessage['formDataWhenEdited']
 
 const EditForm: FC<EditFormProps> = memo((props) => {
   const { initialValues, visible, onSave, onToggleEditorialPanel, ...restProps } = props

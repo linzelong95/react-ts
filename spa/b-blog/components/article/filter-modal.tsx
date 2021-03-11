@@ -1,12 +1,11 @@
 import React, { memo, useCallback, useState, useEffect, useMemo, useImperativeHandle, forwardRef } from 'react'
 import { Modal, Button, Row, Col, Tag, Radio, Badge, Alert, Tree, message } from 'antd'
 import { useService } from '@common/hooks'
-import { adminSortServices } from '@b-blog/services/sort'
-import { adminTagServices } from '@b-blog/services/tag'
+import { tagServices, sortServices } from '@b-blog/services'
 import type { SetStateAction, Dispatch, ForwardRefRenderFunction } from 'react'
 import type { ModalProps } from 'antd/lib/modal'
 import type { ConditionQuery } from '@b-blog/containers/article'
-import type { Sort, TagTypeCollection } from '@b-blog/types'
+import type { ISort, ITag } from '@b-blog/types'
 
 type FilterRequest = (type: 'ok' | 'exit' | 'clear') => void
 
@@ -28,10 +27,10 @@ const FilterModal: ForwardRefRenderFunction<FilterModalRef, FilterModalProps> = 
   const { visible, conditionQuery, onSetFilterModalVisible, onSetConditionQuery } = props
 
   const [filterType, setFilterType] = useState<'catalog' | 'tag'>('catalog')
-  const [allSortList, setAllSortList] = useState<Sort['getListResByAdminRole']['list']>([])
+  const [allSortList, setAllSortList] = useState<ISort['getListRes']['list']>([])
   const [temporaryCondition, setTemporaryCondition] = useState<TemporaryCondition>({})
 
-  const getListParams = useMemo<TagTypeCollection['getListParamsByAdminRole']>(
+  const getListParams = useMemo<ITag['getListParams']>(
     () => ({
       index: 1,
       size: 999,
@@ -40,7 +39,7 @@ const FilterModal: ForwardRefRenderFunction<FilterModalRef, FilterModalProps> = 
     [],
   )
 
-  const [, tagRes, tagErr] = useService(adminTagServices.getList, getListParams)
+  const [, tagRes, tagErr] = useService(tagServices.getList, getListParams)
   const tagList = useMemo(() => {
     if (tagErr) {
       message.error(tagErr.message || '获取列表失败')
@@ -102,7 +101,7 @@ const FilterModal: ForwardRefRenderFunction<FilterModalRef, FilterModalProps> = 
 
   useEffect(() => {
     ;(async () => {
-      const [sortRes] = await adminSortServices.getList({ index: 1, size: 999 })
+      const [sortRes] = await sortServices.getList({ index: 1, size: 999 })
       setAllSortList(sortRes?.data?.list || [])
     })()
   }, [])

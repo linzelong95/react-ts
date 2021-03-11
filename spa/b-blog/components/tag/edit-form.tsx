@@ -1,18 +1,18 @@
 import React, { memo, useCallback, useMemo } from 'react'
 import { Modal, Form, Input, Select, message } from 'antd'
-import type { Sort, TagTypeCollection } from '@b-blog/types'
+import type { ISort, ITag } from '@b-blog/types'
 import type { FC } from 'react'
 import type { ModalProps } from 'antd/lib/modal'
 import type { ToggleEditorialPanel, SaveData, ListItem } from '@b-blog/containers/tag'
 
 interface EditFormProps extends ModalProps {
   initialValues?: ListItem
-  allSortList: Sort['getListResByAdminRole']['list']
+  allSortList: ISort['getListRes']['list']
   onSave: SaveData
   onToggleEditorialPanel: ToggleEditorialPanel
 }
 
-type FormDataWhenEdited = TagTypeCollection['formDataWhenEdited']
+type FormDataWhenEdited = ITag['formDataWhenEdited']
 
 const EditForm: FC<EditFormProps> = memo((props) => {
   const { initialValues, visible, allSortList, onSave, onToggleEditorialPanel, ...restProps } = props

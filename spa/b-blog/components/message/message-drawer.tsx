@@ -3,9 +3,9 @@ import { Drawer, Button, Divider, Tooltip, Comment, List, Form, Input, Select, I
 import { SyncOutlined, PaperClipOutlined } from '@ant-design/icons'
 import { useSelector } from 'react-redux'
 import { useService } from '@common/hooks'
-import { adminMessageServices } from '@b-blog/services/message'
+import { messageServices } from '@b-blog/services'
 import moment from 'moment'
-import type { Message } from '@b-blog/types'
+import type { IMessage } from '@b-blog/types'
 import type { StoreState } from '@common/store/types'
 import type { FC, ReactNode } from 'react'
 import type { DrawerProps } from 'antd/lib/drawer'
@@ -23,9 +23,9 @@ type MessageItem = ListItem & { children?: ListItem[] }
 const MessageDrawer: FC<MessageDrawerProps> = memo((props) => {
   const { visible, width, onToggleMessageDrawer, onSave, onHandleItems } = props
   const formRef = useRef<HTMLDivElement>(null)
-  const [form] = Form.useForm<Message['formDataWhenEdited']>()
+  const [form] = Form.useForm<IMessage['formDataWhenEdited']>()
   const currentUser = useSelector<StoreState, StoreState['user']>((state) => state.user)
-  const getListParams = useMemo<Message['getListParamsByAdminRole']>(
+  const getListParams = useMemo<IMessage['getListParams']>(
     () => ({
       index: 1,
       size: 999,
@@ -33,7 +33,7 @@ const MessageDrawer: FC<MessageDrawerProps> = memo((props) => {
     }),
     [],
   )
-  const [loading, messageRes, messageErr, forceRequest] = useService(adminMessageServices.getList, getListParams)
+  const [loading, messageRes, messageErr, forceRequest] = useService(messageServices.getList, getListParams)
 
   const [total, dataSource] = useMemo(() => {
     if (messageErr) {
@@ -64,7 +64,7 @@ const MessageDrawer: FC<MessageDrawerProps> = memo((props) => {
     (item) => {
       const { from, id, parentId: pid, fromMail = '博主' } = item
       const parentId = pid > 0 ? pid : id
-      const to = { label: from.nickName || fromMail, key: from.id || fromMail } as Message['formDataWhenEdited']['to']
+      const to = { label: from.nickName || fromMail, key: from.id || fromMail } as IMessage['formDataWhenEdited']['to']
       form.setFieldsValue({ parentId, to })
       formRef?.current?.scrollIntoView?.({ behavior: 'smooth' })
     },

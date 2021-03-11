@@ -3,9 +3,9 @@ import { Modal, Form, Input, Select, Cascader, Row, Col, message } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { useService } from '@common/hooks'
 import { Upload, RichEditor } from '@common/components'
-import { adminTagServices } from '@b-blog/services/tag'
+import { tagServices } from '@b-blog/services'
 import BraftEditor from 'braft-editor'
-import type { ArticleTypeCollection, TagTypeCollection, Sort } from '@b-blog/types'
+import type { IArticle, ITag, ISort } from '@b-blog/types'
 import type { FC } from 'react'
 import type { ModalProps } from 'antd/lib/modal'
 import type { CascaderProps } from 'antd/lib/cascader'
@@ -15,12 +15,12 @@ import 'cropperjs/dist/cropper.css'
 
 interface EditFormProps extends ModalProps {
   initialValues?: DetailItem
-  allSortList: Sort['listItemByAdminRole'][]
+  allSortList: ISort['listItem'][]
   onSave: SaveData
   onToggleEditorialPanel: ToggleEditorialPanel
 }
 
-type FormDataWhenEdited = ArticleTypeCollection['formDataWhenEdited']
+type FormDataWhenEdited = IArticle['formDataWhenEdited']
 
 const EditForm: FC<EditFormProps> = memo((props) => {
   const { initialValues, visible, allSortList, onSave, onToggleEditorialPanel, ...restProps } = props
@@ -28,7 +28,7 @@ const EditForm: FC<EditFormProps> = memo((props) => {
   const [sortIdsArr, setSortIdsArr] = useState<number[]>([])
   const [categoryOptions, setCategoryOptions] = useState<any[]>([])
 
-  const getTagListParams = useMemo<TagTypeCollection['getListParamsByAdminRole']>(
+  const getTagListParams = useMemo<ITag['getListParams']>(
     () => ({
       index: 1,
       size: 999,
@@ -36,7 +36,7 @@ const EditForm: FC<EditFormProps> = memo((props) => {
     }),
     [sortIdsArr],
   )
-  const [tagLoading, tagRes, tagErr] = useService(adminTagServices.getList, getTagListParams, !sortIdsArr?.length)
+  const [tagLoading, tagRes, tagErr] = useService(tagServices.getList, getTagListParams, !sortIdsArr?.length)
   const tagList = useMemo(() => {
     if (!sortIdsArr?.length || tagLoading) return []
     if (tagErr) {
@@ -63,7 +63,7 @@ const EditForm: FC<EditFormProps> = memo((props) => {
       .then((values) => {
         const { id } = initialValues || {}
         const { title, category, imageUrl, isTop, tags, abstract, content } = values
-        const params: ArticleTypeCollection['editParams'] = {
+        const params: IArticle['editParams'] = {
           id,
           title,
           abstract,

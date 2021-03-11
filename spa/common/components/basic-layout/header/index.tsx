@@ -11,7 +11,7 @@ import { useLocalStorage } from '@common/hooks'
 import { rsa, serialize } from '@common/utils'
 import type { StoreState } from '@common/store/types'
 import type { FC, Dispatch, SetStateAction } from 'react'
-import type { AccountTypeCollection } from '@common/types'
+import type { IAccount } from '@common/types'
 import type { DrawerProps } from 'antd/es/drawer'
 import styles from '../index.module.scss'
 
@@ -47,7 +47,7 @@ const Header: FC<HeaderProps> = memo((props) => {
     [],
   )
 
-  const login = useCallback<(params: AccountTypeCollection['loginParams']) => void>(
+  const login = useCallback<(params: IAccount['loginParams']) => void>(
     async (params) => {
       const { password, autoLogin, captcha } = params
       message.loading({ content: '正在登录...', key: 'login', duration: 0 })

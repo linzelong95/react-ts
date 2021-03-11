@@ -1,19 +1,19 @@
-import type { Category } from '@b-blog/types'
-export default interface Sort {
-  listItemByAdminRole: {
+import type { ICategory } from '@b-blog/types'
+export default interface ISort {
+  listItem: {
     id: number
     createDate: string
     updateDate: string
     isEnable: 0 | 1
     isUsed: 0 | 1
     name: string
-    categories: Omit<Category['listItemByAdminRole'], 'sort'>[]
+    categories: Omit<ICategory['listItem'], 'sort'>[]
   }
-  getListResByAdminRole: {
-    list: Sort['listItemByAdminRole'][]
+  getListRes: {
+    list: ISort['listItem'][]
     total: number
   }
-  getListParamsByAdminRole: {
+  getListParams: {
     index?: number
     size?: number
     conditionQuery?: {
@@ -25,7 +25,7 @@ export default interface Sort {
     }
   }
   // 编辑service的入参ts
-  editParams: Pick<Sort['listItemByAdminRole'], 'isEnable' | 'name'> & { id?: number }
+  editParams: Pick<ISort['listItem'], 'isEnable' | 'name'> & { id?: number }
   // 编辑时form的初始值
   formDataWhenEdited: {
     name?: string

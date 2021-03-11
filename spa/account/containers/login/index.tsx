@@ -12,7 +12,7 @@ import { useHistory, Link } from 'react-router-dom'
 import type { FC } from 'react'
 import type { RouteComponentProps } from 'react-router'
 import type { StoreState } from '@common/store/types'
-import type { AccountTypeCollection } from '@common/types'
+import type { IAccount } from '@common/types'
 import type { ButtonProps } from 'antd/lib/button'
 
 const layout = {
@@ -26,7 +26,7 @@ const tailLayout = {
 const Login: FC<RouteComponentProps<never>> = memo(() => {
   const history = useHistory()
   const dispatch = useDispatch()
-  const [form] = Form.useForm<AccountTypeCollection['loginParams']>()
+  const [form] = Form.useForm<IAccount['loginParams']>()
   const userInfo = useSelector<StoreState, StoreState['user']>((state) => state.user)
   const [accountLocalStorage, setAccountLocalStorage] = useLocalStorage<{ autoLoginMark: boolean; autoLogin: boolean }>(
     LocalStorage.BLOG_STORE_ACCOUNT,

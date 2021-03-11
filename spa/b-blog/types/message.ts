@@ -1,7 +1,7 @@
-import type { UserTypeCollection } from '@common/types'
+import type { IUser } from '@common/types'
 
-export default interface Message {
-  listItemByAdminRole: {
+export default interface IMessage {
+  listItem: {
     id: number
     createDate: string
     isApproved: 0 | 1
@@ -11,14 +11,14 @@ export default interface Message {
     blog?: string
     fromMail: string
     toMail: string
-    from: UserTypeCollection['listItem']
-    to: UserTypeCollection['listItem']
+    from: IUser['listItem']
+    to: IUser['listItem']
   }
-  getListResByAdminRole: {
-    list: Message['listItemByAdminRole'][]
+  getListRes: {
+    list: IMessage['listItem'][]
     total: number
   }
-  getListParamsByAdminRole: {
+  getListParams: {
     index?: number
     size?: number
     conditionQuery?: Partial<{
