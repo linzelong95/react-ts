@@ -2,7 +2,7 @@ import React, { useCallback, memo, useState, useEffect } from 'react'
 import { Form, Input, Checkbox, Modal, message, Row, Col } from 'antd'
 import { UserOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
-import { loginServices } from '@common/services'
+import { accountServices } from '@common/services'
 import { useLocalStorage } from '@common/hooks'
 import type { FC } from 'react'
 import type { ModalProps } from 'antd/es/modal'
@@ -53,7 +53,7 @@ const LoginForm: FC<LoginFormProps> = memo((props) => {
   }, [form, isForRegister, onLogin, onRegister, onClose])
 
   const getRefreshedCaptcha = useCallback<(event?: React.MouseEvent<HTMLElement, MouseEvent>) => void>(async () => {
-    const [captchaRes, captchaErr] = await loginServices.getWebpageCaptcha()
+    const [captchaRes, captchaErr] = await accountServices.getWebpageCaptcha()
     if (captchaErr || !captchaRes?.data?.item) {
       message.error('获取验证码失败')
       return

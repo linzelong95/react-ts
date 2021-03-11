@@ -1,5 +1,5 @@
 import React, { memo, useCallback } from 'react'
-import { loginServices } from '@common/services'
+import { accountServices } from '@common/services'
 import { Card, Form, Input, Button, message, Row, Col } from 'antd'
 import { useHistory, Link } from 'react-router-dom'
 import { useService } from '@common/hooks'
@@ -21,7 +21,7 @@ const Register: FC<RouteComponentProps<never>> = memo(() => {
   const history = useHistory()
   const [form] = Form.useForm<IAccount['registerParams'] & { captcha: string }>()
 
-  const [, captchaRes, , forceRequest] = useService(loginServices.getWebpageCaptcha)
+  const [, captchaRes, , forceRequest] = useService(accountServices.getWebpageCaptcha)
 
   const handleLogin = useCallback<ButtonProps['onClick']>(() => {
     form
@@ -29,13 +29,13 @@ const Register: FC<RouteComponentProps<never>> = memo(() => {
       .then(async (values) => {
         const { captcha, account, password } = values
         message.loading({ content: '正在注册...', key: 'register', duration: 0 })
-        const [, verifyCaptchaErr] = await loginServices.verifyCaptcha(captcha)
+        const [, verifyCaptchaErr] = await accountServices.verifyCaptcha(captcha)
         if (verifyCaptchaErr) {
           message.error({ content: '验证码错误', key: 'register' })
           return
         }
         const md5Password = serialize(password)
-        const [, registerErr] = await loginServices.register({ account, password: md5Password })
+        const [, registerErr] = await accountServices.register({ account, password: md5Password })
         if (registerErr) {
           message.error({ content: registerErr.message || '注册失败', key: 'register' })
           return

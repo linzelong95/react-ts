@@ -1,8 +1,10 @@
 import { post } from '@common/utils'
-import { userApis } from '@common/services/apis'
-import type { ServiceResult } from '@common/types'
-import type { UserState } from '@common/store/types'
+import type { ServiceResult, IUser } from '@common/types'
 
-export function list(params: Record<string, string>): ServiceResult<UserState> {
-  return post<UserState, typeof params>(userApis.LIST, params)
+enum UserApi {
+  LIST = '/api/user/user/list',
+}
+
+export function getList(params: Record<string, string>): ServiceResult<IUser['getListRes']> {
+  return post<IUser['getListRes'], typeof params>(UserApi.LIST, params)
 }

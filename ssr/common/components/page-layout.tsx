@@ -6,7 +6,7 @@ import { Layout, Avatar, Menu, Dropdown, message, Tag } from 'antd'
 import { UserOutlined, CopyrightOutlined, CommentOutlined, HomeOutlined } from '@ant-design/icons'
 import { LocalStorage } from '@ssr/common/constants'
 import { useLocalStorage } from '@ssr/common/hooks'
-import { loginServices } from '@ssr/common/services'
+import { accountServices } from '@ssr/common/services'
 import { Container } from '@ssr/common/components'
 import { createLogoutAction } from '@ssr/common/store/actions'
 import type { StoreState } from '@ssr/common/store/types'
@@ -24,7 +24,7 @@ const PageLayout: FC<unknown> = memo((props) => {
   )
 
   const logout = useCallback<() => void>(async () => {
-    const [, err] = await loginServices.logout()
+    const [, err] = await accountServices.logout()
     if (err) {
       message.error('退出登录失败')
       return

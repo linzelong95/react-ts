@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useEffect } from 'react'
 import { LocalStorage } from '@common/constants'
 import { useLocalStorage, useService } from '@common/hooks'
-import { loginServices } from '@common/services'
+import { accountServices } from '@common/services'
 import { rsa, serialize } from '@common/utils'
 import { Card, Form, Input, Checkbox, Row, Col, Button, message } from 'antd'
 import { GithubOutlined } from '@ant-design/icons'
@@ -32,7 +32,7 @@ const Login: FC<RouteComponentProps<never>> = memo(() => {
     LocalStorage.BLOG_STORE_ACCOUNT,
   )
 
-  const [, captchaRes, , forceRequest] = useService(loginServices.getWebpageCaptcha)
+  const [, captchaRes, , forceRequest] = useService(accountServices.getWebpageCaptcha)
 
   const goToPage = useCallback<() => void>(() => {
     const { redirect } = parse(location.search, { ignoreQueryPrefix: true })
@@ -59,18 +59,18 @@ const Login: FC<RouteComponentProps<never>> = memo(() => {
       .then(async (values) => {
         const { password, autoLogin, captcha } = values
         message.loading({ content: '正在登录...', key: 'login', duration: 0 })
-        const [, verifyCaptchaErr] = await loginServices.verifyCaptcha(captcha)
+        const [, verifyCaptchaErr] = await accountServices.verifyCaptcha(captcha)
         if (verifyCaptchaErr) {
           message.error({ content: '验证码错误', key: 'login' })
           return
         }
-        const [publicKeyRes, publicKeyErr] = await loginServices.getPublicKey()
+        const [publicKeyRes, publicKeyErr] = await accountServices.getPublicKey()
         if (publicKeyErr || !publicKeyRes?.data?.item) {
           message.error({ content: '登录失败', key: 'login' })
           return
         }
         const encryptedPassword = rsa(serialize(password), publicKeyRes.data.item)
-        const [loginRes, loginErr] = await loginServices.login({ ...values, password: encryptedPassword })
+        const [loginRes, loginErr] = await accountServices.login({ ...values, password: encryptedPassword })
         if (loginErr) {
           message.error({ content: loginErr.message || '登录失败', key: 'login' })
           return
@@ -88,7 +88,7 @@ const Login: FC<RouteComponentProps<never>> = memo(() => {
   useEffect(() => {
     if (userInfo?.account) return goToPage()
     ;(async () => {
-      const [loginRes] = await loginServices.login({ autoLogin: true })
+      const [loginRes] = await accountServices.login({ autoLogin: true })
       if (!loginRes?.data?.account) return
       dispatch(createLoginAction(loginRes.data))
       goToPage()

@@ -5,14 +5,13 @@ import { useTranslation } from 'react-i18next'
 import { v4 as uuid } from 'uuid'
 import { Upload } from '@common/components'
 import { useService, useLocalStorage } from '@common/hooks'
-import { adminTagServices } from '@b-blog/services/tag'
 import BraftEditor from 'braft-editor'
 import Preview from './preview'
 import { ContentUtils } from 'braft-utils'
 import { Modifier, EditorState } from 'draft-js'
 import { upload, getFileKeyAndUrl } from '@common/utils'
 import { COS_URL } from '@common/constants/cos'
-import { cosServices } from '@common/services'
+import { cosServices, userServices } from '@common/services'
 import type { UploadProps } from 'antd/lib/upload'
 import type { UploadFile } from 'antd/lib/upload/interface'
 import type { UploadRequestOption } from 'rc-upload/lib/interface'
@@ -68,7 +67,7 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
     [searchUserName],
   )
   // TODO：用户接口暂未实现，先随便给个链接
-  const [loadingUser, userRes, userErr] = useService(adminTagServices.getList, getUserListParams, !searchUserName)
+  const [loadingUser, userRes, userErr] = useService(userServices.getList, getUserListParams, !searchUserName)
   const userList = useMemo<any[]>(() => {
     if (!searchUserName) return usedMentions
     if (userErr) {

@@ -5,7 +5,7 @@ import * as Sentry from '@sentry/browser'
 import { Layout, Spin, message } from 'antd'
 import { LocalStorage } from '@common/constants'
 import { createLoginAction } from '@common/store/actions'
-import { loginServices } from '@common/services'
+import { accountServices } from '@common/services'
 import { Forbidden } from '@common/components'
 import { flatRoutes } from '@common/utils'
 import { useMobile, useLocalStorage } from '@common/hooks'
@@ -56,7 +56,7 @@ const BasicLayout: FC<BasicLayoutProps> = memo((props) => {
   }, [pathname, flattedAccessRoutes, match])
 
   const logout = useCallback<() => void>(async () => {
-    const [, err] = await loginServices.logout()
+    const [, err] = await accountServices.logout()
     if (err) {
       message.error('退出登录失败')
       return
@@ -68,7 +68,7 @@ const BasicLayout: FC<BasicLayoutProps> = memo((props) => {
   useEffect(() => {
     if (userInfo?.account) return
     ;(async () => {
-      const [loginRes] = await loginServices.login({ autoLogin: true })
+      const [loginRes] = await accountServices.login({ autoLogin: true })
       if (!loginRes?.data?.account) {
         window.location.href = `/account/login?redirect=${window.location.href}`
         return

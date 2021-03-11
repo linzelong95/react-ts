@@ -1,4 +1,4 @@
-export default interface User {
+export default interface IUser {
   listItem: {
     id: number
     account: string
@@ -6,5 +6,9 @@ export default interface User {
     roleName: 'admin' | 'user'
     avatar?: string
     github?: string
+  }
+  getListRes: {
+    list: IUser['listItem'][]
+    total: number
   }
 }
