@@ -17,7 +17,6 @@ const style: CSSProperties = {
 function NotFound(): JSX.Element {
   const router = useRouter()
   const backHome = useCallback<ButtonProps['onClick']>(() => {
-    console.log(router)
     const { asPath } = router
     const [, rootPath] = asPath.split('/')
     router.push(`/${rootPath}`)

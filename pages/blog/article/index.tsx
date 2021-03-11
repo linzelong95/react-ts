@@ -6,7 +6,6 @@ import { useService } from '@ssr/common/hooks'
 import moment from 'moment'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import LruCache from 'lru-cache'
 import type { IArticle, ITag, ISort } from '@ssr/blog/types'
 import type { NextPage } from 'next'
 import type { FC } from 'react'
@@ -26,12 +25,8 @@ type FilterLinkProps = Partial<{
   categoryId: number
   tagIds: string
   tagId: number
-  asPath: string
+  pathname: string
 }>
-
-const lruCache = new LruCache({
-  maxAge: 24 * 60 * 60 * 1000, // ms,缓存一天
-})
 
 function formattedMultipleIdQuery(queryName: string, queryValue: string, extraId: number): string {
   if (typeof extraId === 'undefined') return queryValue ? `${queryName}=${queryValue}` : ''
@@ -41,7 +36,7 @@ function formattedMultipleIdQuery(queryName: string, queryValue: string, extraId
   return ids.length ? `${queryName}=${ids.join(',')}` : ''
 }
 
-function getQueryString(params: Omit<FilterLinkProps, 'done' | 'asPath'>): string {
+function getQueryString(params: Omit<FilterLinkProps, 'done' | 'pathname'>): string {
   const { search, page, size, orderName, categoryIds, categoryId, tagIds, tagId } = params
   const categoryIdsStr = formattedMultipleIdQuery('categoryIds', categoryIds, categoryId)
   const tagIdsStr = formattedMultipleIdQuery('tagIds', tagIds, tagId)
@@ -57,10 +52,10 @@ function getQueryString(params: Omit<FilterLinkProps, 'done' | 'asPath'>): strin
 }
 
 const FilterLink: FC<FilterLinkProps> = memo((props) => {
-  const { children, done, asPath, ...restProps } = props
+  const { children, done, pathname, ...restProps } = props
   if (done) return <span>{children}</span>
   return (
-    <Link href={`${asPath}${getQueryString(restProps)}`}>
+    <Link href={`${pathname}${getQueryString(restProps)}`}>
       <a>{children}</a>
     </Link>
   )
@@ -69,8 +64,8 @@ const FilterLink: FC<FilterLinkProps> = memo((props) => {
 const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
   const { articleInfo } = props
   const router = useRouter()
-  const { asPath, query } = router
-  const { page = 1, size = 10, orderName, search, categoryIds = '', tagIds = '' } = (query as unknown) as FilterLinkProps
+  const { pathname, query } = router
+  const { page = 1, size = 10, orderName = 'default', search = '', categoryIds = '', tagIds = '' } = (query as unknown) as FilterLinkProps
 
   const getListParams = useMemo<(ISort | ITag)['getListParams']>(() => {
     return {
@@ -78,55 +73,51 @@ const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
       size: 9999,
     }
   }, [])
-  const [sortLoading, sortRes, sortErr] = useService(sortServices.getList, getListParams, Boolean(lruCache.get('sortList')))
+  const [sortLoading, sortRes, sortErr] = useService(sortServices.getList, getListParams)
   const sortList = useMemo(() => {
     if (sortErr) {
       message.error(sortErr.message || '获取列表失败')
       return []
     }
-    lruCache.set('sortList', sortRes?.data?.list || [])
     return sortRes?.data?.list || []
   }, [sortRes, sortErr])
 
-  const [tagLoading, tagRes, tagErr] = useService(tagServices.getList, getListParams, Boolean(lruCache.get('tagList')))
+  const [tagLoading, tagRes, tagErr] = useService(tagServices.getList, getListParams)
   const tagList = useMemo(() => {
     if (tagErr) {
       message.error(tagErr.message || '获取列表失败')
       return []
     }
-    lruCache.set('tagList', tagRes?.data?.list || [])
     return tagRes?.data?.list || []
   }, [tagRes, tagErr])
 
-  console.log(777, lruCache.get('sortList'), lruCache.get('tagList'))
-
   const handleSearch = useCallback<SearchProps['onSearch']>(
     (search) => {
-      const formattedPathname = `${asPath}${getQueryString({ ...query, search })}`
+      const formattedPathname = `${pathname}${getQueryString({ ...query, search })}`
       router.push(formattedPathname)
     },
-    [query, asPath, router],
+    [query, pathname, router],
   )
 
   return (
     <div className="root">
       <div className="nav-search">
         <div className="tab">
-          <Menu mode="horizontal" selectedKeys={[orderName || 'default']}>
+          <Menu mode="horizontal" selectedKeys={[orderName]}>
             <Menu.Item key="default">
-              <FilterLink {...query} asPath={asPath} orderName="default" done={orderName === 'default'}>
+              <FilterLink {...{ ...query, orderName: 'default' }} pathname={pathname} done={orderName === 'default'}>
                 默认
               </FilterLink>
             </Menu.Item>
             <Menu.Item key="createDate">
-              <FilterLink {...query} asPath={asPath} orderName="createDate" done={orderName === 'createDate'}>
+              <FilterLink {...{ ...query, orderName: 'createDate' }} pathname={pathname} done={orderName === 'createDate'}>
                 时间
               </FilterLink>
             </Menu.Item>
           </Menu>
           <div>
             <Tooltip title="默认展示">
-              <FilterLink asPath={asPath}>
+              <FilterLink pathname={pathname}>
                 <Button type="primary" icon={<HomeOutlined />} shape="circle" size="small" />
               </FilterLink>
             </Tooltip>
@@ -152,7 +143,7 @@ const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
                 const targetPage = renderType === 'page' ? renderPage : formattedPage
                 const name = renderType === 'page' ? renderPage : renderOl
                 return (
-                  <FilterLink {...query} asPath={asPath} page={targetPage}>
+                  <FilterLink {...query} pathname={pathname} page={targetPage}>
                     {name}
                   </FilterLink>
                 )
@@ -231,7 +222,7 @@ const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
                   const colorArr = ['magenta', 'red', 'volcano', 'orange', 'gold', 'lime', 'green', 'cyan', 'blue', 'geekblue', 'purple']
                   const color = colorArr[Math.floor(Math.random() * (colorArr.length - 1))]
                   return (
-                    <FilterLink {...query} asPath={asPath} tagId={id} key={id}>
+                    <FilterLink {...query} pathname={pathname} tagId={id} key={id}>
                       <Tag color={color} style={{ margin: 4 }}>
                         {tagIds.split(',').includes(String(id)) && <CheckOutlined />}
                         {name}
@@ -257,7 +248,7 @@ const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
                       <Col span={17}>
                         {sort.categories.map(({ id, name }) => {
                           return (
-                            <FilterLink {...query} asPath={asPath} categoryId={id} key={id}>
+                            <FilterLink {...query} pathname={pathname} categoryId={id} key={id}>
                               <Tag.CheckableTag checked={categoryIds.split(',').includes(String(id))}>{name}</Tag.CheckableTag>
                             </FilterLink>
                           )

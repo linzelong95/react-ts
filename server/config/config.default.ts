@@ -55,8 +55,7 @@ export default (appInfo: EggAppInfo): PowerPartial<EggAppConfig> => {
   }
 
   config.mysql = {
-    host: '120.78.139.146',
-    // host:'127.0.0.1',
+    host: '127.0.0.1',
     port: 3306,
     username: 'root',
     password: 'admin',

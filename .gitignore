@@ -17,7 +17,8 @@ config/**/*.map
 server/app/public/dll/*
 
 #本地配置文件忽略
-/server/config/*.local.*
+# /server/config/*.local.*
+server/app/**
 
 #开发阶段暂不提交打包文件
 # server/app/**/*.js
