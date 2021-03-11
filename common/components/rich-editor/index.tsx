@@ -12,6 +12,7 @@ import { Modifier, EditorState } from 'draft-js'
 import { upload, getFileKeyAndUrl } from '@common/utils'
 import { COS_URL } from '@common/constants/cos'
 import { cosServices, userServices } from '@common/services'
+import { IUser } from '@common/types'
 import type { UploadProps } from 'antd/lib/upload'
 import type { UploadFile } from 'antd/lib/upload/interface'
 import type { UploadRequestOption } from 'rc-upload/lib/interface'
@@ -19,14 +20,19 @@ import type { BraftEditorProps, MediaType, EditorState as IEditorState } from 'b
 import type { FC, ReactNode } from 'react'
 import 'braft-editor/dist/index.css'
 
-export async function getMentionList(stateOrHtml: IEditorState | string): Promise<any[]> {
+interface MentionUser {
+  id: number
+  nickname: string
+  avatar?: string
+}
+
+export async function getMentionList(stateOrHtml: IEditorState | string): Promise<MentionUser[]> {
   const html: string = typeof stateOrHtml === 'string' ? stateOrHtml : await stateOrHtml.toHTML()
   const mentions: string[] = html.match(/<a href=["']\/.+#mention["']>@\S+\s?<\/a>/g) || []
-  const selectedUsers = mentions.map((user) => {
-    const [, id, name] = user.match(/<a href=["']\/user\/(.+)#mention["']>@(\S+)\s?<\/a>/)
-    return { id, name }
+  return mentions.map((user) => {
+    const [, id, nickname] = user.match(/<a href=["']\/user\/(.+)#mention["']>@(\S+)\s?<\/a>/)
+    return { id: Number(id), nickname }
   })
-  return selectedUsers
 }
 
 interface RichEditorProps extends Omit<BraftEditorProps, 'onChange'> {
@@ -46,11 +52,11 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
   // Upload fileList为[]
   const [fileList, setFileList] = useState<UploadFile[]>([])
   // 本地缓存的曾提及用户
-  const [usedMentions, setUsedMentions] = useLocalStorage<any[]>('__MENTIONED_USER_LIST__', [])
+  const [usedMentions, setUsedMentions] = useLocalStorage<MentionUser[]>('__MENTIONED_USER_LIST__', [])
 
   const { i18n } = useTranslation()
 
-  const updateLocalStoreMentions = useCallback<(userInfo: any) => void>(
+  const updateLocalStoreMentions = useCallback<(userInfo: MentionUser) => void>(
     (userInfo) => {
       const uniqueMentionList = usedMentions.filter((usedMention) => usedMention.id !== userInfo.id)
       setUsedMentions([userInfo, ...uniqueMentionList.slice(0, 3)])
@@ -58,23 +64,23 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
     [usedMentions, setUsedMentions],
   )
 
-  const getUserListParams = useMemo<any>(
+  const getUserListParams = useMemo<IUser['getListParams']>(
     () => ({
-      index: 1,
+      page: 1,
       size: 5,
-      conditionQuery: { name: searchUserName },
+      search: searchUserName,
     }),
     [searchUserName],
   )
-  // TODO：用户接口暂未实现，先随便给个链接
+
   const [loadingUser, userRes, userErr] = useService(userServices.getList, getUserListParams, !searchUserName)
-  const userList = useMemo<any[]>(() => {
+  const userList = useMemo<MentionUser[]>(() => {
     if (!searchUserName) return usedMentions
     if (userErr) {
       message.error(userErr.message || '获取列表失败')
       return []
     }
-    return userRes?.data?.list || []
+    return userRes?.data?.list?.map((user) => ({ id: user.id, nickname: user.nickname, avatar: user.avatar }))
   }, [searchUserName, userRes, userErr, usedMentions])
 
   const cancelMention = useCallback<() => void>(() => {
@@ -98,7 +104,13 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
       })
       const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
       const mentionTextSelection = currentSelectionState.merge({ anchorOffset: start, focusOffset: end })
-      const insertingContent = Modifier.replaceText(value.getCurrentContent(), mentionTextSelection, `@${userInfo.name} `, null, entityKey)
+      const insertingContent = Modifier.replaceText(
+        value.getCurrentContent(),
+        mentionTextSelection,
+        `@${userInfo.nickname} `,
+        null,
+        entityKey,
+      )
       const newEditorState = EditorState.push(value, insertingContent, 'insert-fragment')
       if (onChange) onChange(EditorState.forceSelection(newEditorState, insertingContent.getSelectionAfter()))
       updateLocalStoreMentions(userInfo)
@@ -111,7 +123,7 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
     async (editState) => {
       if (onChange) onChange(editState)
       const selection = window.getSelection()
-      if (!selection.rangeCount) return
+      if (!selection?.rangeCount) return
       const range = selection.getRangeAt(selection.rangeCount - 1)
       const text = range.startContainer.textContent.slice(0, range.startOffset)
       const index = text.lastIndexOf('@')
@@ -123,6 +135,7 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
       const mentionText = text.slice(index + 1)
       if (mentionText.includes(' ')) {
         cancelMention()
+        setSearchUserName('')
         return
       }
       if (mentionText) setSearchUserName(mentionText)
@@ -258,6 +271,11 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
               background-color: #f1f1f1;
               border-left: 3px solid #d1d1d1;
             }
+            .container a[href$='#mention'] {
+              text-decoration: none;
+              font-weight: bold;
+              color: #58f;
+            }
           </style>
         </head>
         <body>
@@ -292,9 +310,9 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
         itemLayout="horizontal"
         dataSource={userList}
         style={{
-          width: 300,
+          width: 200,
           cursor: 'pointer',
-          backgroundColor: 'white',
+          backgroundColor: '#f5f5f6',
           border: '1px solid rgba(0,0,0,0.02)',
           position: 'fixed',
           left: mentionState.left,
@@ -316,7 +334,7 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
           >
             <List.Item.Meta
               avatar={<Avatar size="small" icon={<UserOutlined />} src={`${__SERVER_ORIGIN__}/public/assets/images/default/avatar.jpeg`} />}
-              title={<div style={{ marginLeft: -10, paddingTop: 2 }}>{item.name}</div>}
+              title={<div style={{ marginLeft: -10, paddingTop: 2 }}>{item.nickname}</div>}
             />
           </List.Item>
         )}
@@ -391,6 +409,7 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
 
 const RichEditorForExport = Object.assign(RichEditor, {
   Preview,
+  getMentionList,
 })
 
 export default RichEditorForExport

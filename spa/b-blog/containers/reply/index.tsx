@@ -457,11 +457,11 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
               description={
                 <span>
                   <span style={{ color: 'green', fontWeight: 'bold' }}>
-                    <i>{item.from.nickName}&nbsp;</i>
+                    <i>{item.from.nickname}&nbsp;</i>
                   </span>
                   回复&nbsp;
                   <span style={{ color: '#A0522D', fontWeight: 'bold' }}>
-                    <i>{item.parentId === 0 ? '该文' : item.to.nickName}&nbsp;</i>:
+                    <i>{item.parentId === 0 ? '该文' : item.to.nickname}&nbsp;</i>:
                   </span>
                   &nbsp;<b style={{ color: 'black' }}>{`“${item.reply}”`}</b>
                 </span>

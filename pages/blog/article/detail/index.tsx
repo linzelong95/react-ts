@@ -47,7 +47,7 @@ const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
   const replyContentChange = useCallback<TextAreaProps['onChange']>(
     (event) => {
       if (repliedTo?.id) {
-        const mentionRegexp = new RegExp(`^@${repliedTo.nickName}\\s+`)
+        const mentionRegexp = new RegExp(`^@${repliedTo.nickname}\\s+`)
         if (!mentionRegexp.test(event.target.value)) {
           setReplyContent('')
           setRepliedTo(null)
@@ -91,7 +91,7 @@ const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
       }
       replyBoxRef?.current?.scrollIntoView?.({ behavior: 'smooth' })
       setRepliedTo({ ...item.from, replyId: item.id })
-      setReplyContent(`@${item.from.nickName} `)
+      setReplyContent(`@${item.from.nickname} `)
       replyTextAreaRef?.current?.focus()
     },
     [currentUser],
@@ -130,11 +130,11 @@ const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
           ]}
           author={
             <span>
-              {from.nickName}
+              {from.nickname}
               {parentId > 0 && (
                 <span className="ml5">
                   &nbsp;回复&nbsp;
-                  {to.nickName}
+                  {to.nickname}
                 </span>
               )}
             </span>
@@ -214,7 +214,7 @@ const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
       <div className={styles['author-recommend']}>
         <div style={{ textAlign: 'center' }}>
           <Avatar size={200} src={detailInfo.user.avatar || '/public/assets/images/default/avatar.jpeg'} />
-          <p style={{ fontSize: 25, fontWeight: 'bold', margin: 10 }}>{detailInfo.user.nickName}</p>
+          <p style={{ fontSize: 25, fontWeight: 'bold', margin: 10 }}>{detailInfo.user.nickname}</p>
           <Divider style={{ margin: '5px 0px' }}>
             {detailInfo.user?.github && (
               <a href={detailInfo.user?.github} target="_blank" rel="noreferrer">

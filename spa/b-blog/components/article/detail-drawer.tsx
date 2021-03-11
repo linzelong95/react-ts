@@ -71,7 +71,7 @@ const DetailDrawer: FC<DetailDrawerProps> = memo((props) => {
     (item) => {
       const { from, id, parentId: pid } = item
       const parentId = pid > 0 ? pid : id
-      const to = { label: from?.nickName || '博主', key: from.id || detailItem.user.id }
+      const to = { label: from?.nickname || '博主', key: from.id || detailItem.user.id }
       setReplyBoxVisible((prevValue) => !prevValue)
       setTimeout(() => {
         form.setFieldsValue({ parentId, to })
@@ -148,7 +148,7 @@ const DetailDrawer: FC<DetailDrawerProps> = memo((props) => {
               </a>
             ),
           ]}
-          author={`${from.nickName}${parentId ? `回复@ ${to.nickName}` : ''}`}
+          author={`${from.nickname}${parentId ? `回复@ ${to.nickname}` : ''}`}
           avatar={from?.avatar || `${__SERVER_ORIGIN__ || ''}/public/assets/images/default/avatar.jpeg`}
           content={<span style={{ color: isApproved === 0 ? 'lightgray' : '' }}>{reply}</span>}
         >

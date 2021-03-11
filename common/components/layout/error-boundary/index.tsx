@@ -39,7 +39,16 @@ class ErrorBoundary extends React.Component<unknown, ErrorBoundaryState> {
     if (!hasError) return children
     return (
       <div style={style}>
-        <Result status="500" title="500" subTitle="Sorry, something went wrong." extra={<Button type="primary">Back Home</Button>} />
+        <Result
+          status="500"
+          title="500"
+          subTitle="Sorry, something went wrong."
+          extra={
+            <Button type="primary" href="/">
+              Back Home
+            </Button>
+          }
+        />
       </div>
     )
   }

@@ -27,7 +27,7 @@ interface RenderData {
     showWaterMark: boolean
     user?: {
       account: string
-      nickName: string
+      nickname: string
       roleName: 'admin' | 'user'
     }
   }

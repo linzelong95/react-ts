@@ -489,14 +489,14 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
               title={
                 <span>
                   <span style={{ color: 'green', fontWeight: 'bold', marginRight: 10 }}>
-                    <i>{item.from ? item.from.nickName : `${item.fromMail} [游客]`}</i>
+                    <i>{item.from ? item.from.nickname : `${item.fromMail} [游客]`}</i>
                   </span>
                   的留言
                   {item.parentId > 0 && (
                     <span>
                       ( 回复
                       <i style={{ color: '#A0522D', fontWeight: 'bold', marginLeft: 10, marginRight: 10 }}>
-                        {item.to ? item.to.nickName : `${item.toMail} [游客]`}
+                        {item.to ? item.to.nickname : `${item.toMail} [游客]`}
                       </i>
                       )
                     </span>

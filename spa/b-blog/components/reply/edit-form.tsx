@@ -66,7 +66,7 @@ const EditForm: FC<EditFormProps> = memo((props) => {
     const { isTop = 0, from, article: prevArticle } = initialValues || {}
     const article = prevArticle && { key: prevArticle.id, label: prevArticle.title }
     const toKey = from?.id || prevArticle?.user?.id
-    const toLabel = from?.nickName || prevArticle?.user?.nickName
+    const toLabel = from?.nickname || prevArticle?.user?.nickname
     const to = toKey && { key: toKey, label: toLabel }
     return { isTop, to, article } as FormDataWhenEdited
   }, [initialValues])

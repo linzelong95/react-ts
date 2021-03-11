@@ -58,7 +58,7 @@ export default class AccountController extends Controller {
     const user = await getRepository(User).create({
       account,
       password,
-      nickName: account,
+      nickname: account,
     })
     await getRepository(User).save(user)
     ctx.body = { code: 0, message: '注册成功' }

@@ -64,7 +64,7 @@ const MessageDrawer: FC<MessageDrawerProps> = memo((props) => {
     (item) => {
       const { from, id, parentId: pid, fromMail = '博主' } = item
       const parentId = pid > 0 ? pid : id
-      const to = { label: from.nickName || fromMail, key: from.id || fromMail } as IMessage['formDataWhenEdited']['to']
+      const to = { label: from.nickname || fromMail, key: from.id || fromMail } as IMessage['formDataWhenEdited']['to']
       form.setFieldsValue({ parentId, to })
       formRef?.current?.scrollIntoView?.({ behavior: 'smooth' })
     },
@@ -101,7 +101,7 @@ const MessageDrawer: FC<MessageDrawerProps> = memo((props) => {
           ]}
           author={
             <span>
-              {from ? (from.roleName === 'admin' ? '博主' : from.nickName) : `${fromMail || ''}[游客]`}&nbsp;
+              {from ? (from.roleName === 'admin' ? '博主' : from.nickname) : `${fromMail || ''}[游客]`}&nbsp;
               {blog && (
                 <Tooltip title="博客地址">
                   <a href={blog} target="_blank" rel="noopener noreferrer">
@@ -112,7 +112,7 @@ const MessageDrawer: FC<MessageDrawerProps> = memo((props) => {
               {parentId > 0 && (
                 <>
                   &nbsp;回复&nbsp;
-                  {to ? (to.roleName === 'admin' ? '博主' : to.nickName) : `${toMail || ''}[游客]`}
+                  {to ? (to.roleName === 'admin' ? '博主' : to.nickname) : `${toMail || ''}[游客]`}
                 </>
               )}
             </span>

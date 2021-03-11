@@ -35,10 +35,8 @@ const isNextApp = /^\/(blog|_next)(\/)?.*/
 export default (appInfo: EggAppInfo): PowerPartial<EggAppConfig> => {
   const config = {} as PowerPartial<EggAppConfig>
 
-  // 保密
-  config.keys = appInfo.name + '_test'
+  config.keys = appInfo.name + '******'
 
-  // 保密
   config.rsaPrivateKey = rsaPrivateKey
 
   config.rsaPublicKey = rsaPublicKey
@@ -50,8 +48,8 @@ export default (appInfo: EggAppInfo): PowerPartial<EggAppConfig> => {
     appId: '1302086393',
     region: 'ap-shenzhen-fsi',
     cosUrl: 'https://brief-1302086393.cos.ap-shenzhen-fsi.myqcloud.com',
-    secretId: 'xxx', // 保密
-    secretKey: 'xxx', // 保密
+    secretId: '******',
+    secretKey: '******',
   }
 
   config.mysql = {
@@ -205,7 +203,7 @@ export default (appInfo: EggAppInfo): PowerPartial<EggAppConfig> => {
   config.development = {
     overrideDefault: true,
     watchDirs: ['app', 'config'],
-    ignoreDirs: ['app/public', 'app/manifest'],
+    ignoreDirs: [],
   }
 
   /**
@@ -242,7 +240,7 @@ export default (appInfo: EggAppInfo): PowerPartial<EggAppConfig> => {
     receivers: ['briefNull'],
   }
 
-  // sentry 配置
+  // sentry 配置[暂时没有实现]
   config.sentry = {
     dsn: 'https://120.78.139.146/sentry/888',
   }

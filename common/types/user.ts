@@ -2,7 +2,7 @@ export default interface IUser {
   listItem: {
     id: number
     account: string
-    nickName: string
+    nickname: string
     roleName: 'admin' | 'user'
     avatar?: string
     github?: string
@@ -10,5 +10,11 @@ export default interface IUser {
   getListRes: {
     list: IUser['listItem'][]
     total: number
+  }
+  getListParams: {
+    page?: number
+    size?: number
+    id?: string
+    search?: string
   }
 }

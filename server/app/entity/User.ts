@@ -22,7 +22,7 @@ export class User {
   roleName: UserRole
 
   @Column()
-  nickName: string
+  nickname: string
 
   @Column({ default: '/public/assets/images/default/avatar.jpeg' })
   avatar: string

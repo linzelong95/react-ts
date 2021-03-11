@@ -34,29 +34,32 @@ const Login: FC<RouteComponentProps<never>> = memo(() => {
 
   const [, captchaRes, , forceRequest] = useService(accountServices.getWebpageCaptcha)
 
-  const goToPage = useCallback<() => void>(() => {
-    const { redirect } = parse(location.search, { ignoreQueryPrefix: true })
-    if (!redirect?.length) {
-      history.replace('/center')
-      return
-    }
-    // const urlParams = new URL(window.location.href)
-    // const redirectUrlParams = new URL(redirect)
-    // if (redirectUrlParams.origin !== urlParams.origin) {
-    //   window.location.href = '/b-blog'
-    //   return
-    // }
-    // redirect = redirect.slice(urlParams.origin.length)
-    // if (redirect.match(/^\/.*#/)) {
-    //   redirect = redirect.slice(redirect.indexOf('#') + 1)
-    // }
-    let redirectUrl = (Array.isArray(redirect) ? redirect[0] : redirect) as string
-    try {
-      redirectUrl = decodeURIComponent(redirectUrl)
-    } finally {
-      window.location.href = redirectUrl
-    }
-  }, [history])
+  const goToPage = useCallback<(id: number) => void>(
+    (id) => {
+      const { redirect } = parse(location.search, { ignoreQueryPrefix: true })
+      if (!redirect?.length) {
+        history.replace(`/profile/${id}`)
+        return
+      }
+      // const urlParams = new URL(window.location.href)
+      // const redirectUrlParams = new URL(redirect)
+      // if (redirectUrlParams.origin !== urlParams.origin) {
+      //   window.location.href = '/b-blog'
+      //   return
+      // }
+      // redirect = redirect.slice(urlParams.origin.length)
+      // if (redirect.match(/^\/.*#/)) {
+      //   redirect = redirect.slice(redirect.indexOf('#') + 1)
+      // }
+      let redirectUrl = (Array.isArray(redirect) ? redirect[0] : redirect) as string
+      try {
+        redirectUrl = decodeURIComponent(redirectUrl)
+      } finally {
+        window.location.href = redirectUrl
+      }
+    },
+    [history],
+  )
 
   const handleLogin = useCallback<ButtonProps['onClick']>(() => {
     form
@@ -83,7 +86,7 @@ const Login: FC<RouteComponentProps<never>> = memo(() => {
         message.success({ content: '登录成功', key: 'login' })
         setAccountLocalStorage({ autoLogin, autoLoginMark: autoLogin })
         dispatch(createLoginAction(loginRes.data))
-        goToPage()
+        goToPage(loginRes.data.id)
       })
       .catch(() => {
         message.error('请检查表单是否填写无误')
@@ -91,12 +94,12 @@ const Login: FC<RouteComponentProps<never>> = memo(() => {
   }, [form, dispatch, goToPage, setAccountLocalStorage])
 
   useEffect(() => {
-    if (userInfo?.account) return goToPage()
+    if (userInfo?.account) return goToPage(userInfo.id)
     ;(async () => {
       const [loginRes] = await accountServices.login({ autoLogin: true })
       if (!loginRes?.data?.account) return
       dispatch(createLoginAction(loginRes.data))
-      goToPage()
+      goToPage(loginRes.data.id)
     })()
   }, [userInfo, dispatch, goToPage])
 

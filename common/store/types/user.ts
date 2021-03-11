@@ -6,7 +6,7 @@ export enum UserActionType {
 export interface UserState {
   id: number
   account: string
-  nickName: string
+  nickname: string
   roleName: 'admin' | 'user'
   avatar: string
 }

@@ -87,6 +87,7 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
 
   const toggleEditorialPanel = useCallback<(record?: ListItem) => void>(async (record) => {
     if (!record) {
+      setEditFormData(null)
       setEditFormVisible((prevValue) => !prevValue)
       return
     }

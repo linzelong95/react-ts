@@ -19,6 +19,12 @@ const routes: RouteConfig[] = [
         exact: true,
         component: lazy(() => import(/* webpackPrefetch: true */ '@spa/account/containers/register')),
       },
+      {
+        path: '/profile/:id',
+        menuKey: 'profile',
+        exact: true,
+        component: lazy(() => import(/* webpackPrefetch: true */ '@spa/account/containers/profile')),
+      },
     ],
   },
 ]
