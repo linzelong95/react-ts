@@ -42,7 +42,8 @@ http.interceptors.response.use(
     if (code !== 0) {
       if (isClient && code === StatusCode.NOT_LOGGED_FOR_ADMIN) {
         antMessage.error('您尚未登录')
-        window.location.href = `/account/login?redirect=${window.location.href}`
+        const redirectUrl = encodeURIComponent(window.location.href)
+        window.location.href = `/account/login?redirect=${redirectUrl}`
         return
       }
       const error = new Error(typeof message === 'string' ? message.slice(0, 100) : message)

@@ -64,8 +64,12 @@ const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
       message.warn('登录后才能评论')
       return
     }
-    const parentId = repliedTo?.replyId
     const reply = replyContent.trim()
+    if (!reply) {
+      message.warn('评论内容不能为空')
+      return
+    }
+    const parentId = repliedTo?.replyId
     const toId = repliedTo?.id || detailInfo.user.id
     message.loading({ content: '正在提交...', key: 'saveData', duration: 0 })
     const [, saveErr] = await replyServices.save({ toId, parentId, reply, articleId: detailInfo.id })

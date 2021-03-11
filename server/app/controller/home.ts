@@ -37,12 +37,12 @@ export default class HomeController extends Controller {
   public async index(): Promise<unknown> {
     const { ctx, config } = this
     const { sentry, env, backSysNames, cluster = {} } = config
-    const { originalUrl, request, state, path } = ctx
+    const { request, state, path } = ctx
     if (/^\/(public|api)/.test(path)) return
-    const { referer, host } = request?.header || {}
+    const { host } = request?.header || {}
     const [, moduleName] = path.split('/')
     if (backSysNames.includes(moduleName) && !state?.user) {
-      ctx.redirect(`/account/login?redirect=${referer || originalUrl}`)
+      ctx.redirect(`/account/login?redirect=${encodeURIComponent(path)}`)
       return
     }
     const moduleStatics = getModuleStatics(moduleName)

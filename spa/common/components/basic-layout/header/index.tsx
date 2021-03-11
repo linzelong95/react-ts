@@ -1,6 +1,6 @@
 import React, { memo, useCallback, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { Layout, message, Avatar, Dropdown, Menu, Divider, Input } from 'antd'
+import { Layout, message, Avatar, Dropdown, Menu, Divider, Input, Modal } from 'antd'
 import { TranslationOutlined, SearchOutlined, BellOutlined, MenuUnfoldOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { accountServices } from '@common/services'
@@ -88,6 +88,10 @@ const Header: FC<HeaderProps> = memo((props) => {
     [login],
   )
 
+  const goToCenter = useCallback<() => void>(() => {
+    Modal.info({ title: '感谢使用，暂未开发' })
+  }, [])
+
   return (
     <Layout.Header className={styles['header-area']}>
       <div className={styles['header-left']}>
@@ -137,7 +141,7 @@ const Header: FC<HeaderProps> = memo((props) => {
                   overlay={
                     <Menu>
                       <Menu.Item onClick={onLogout}>{t('common.logout')}</Menu.Item>
-                      <Menu.Item onClick={onLogout}>{t('common.myProfile')}</Menu.Item>
+                      <Menu.Item onClick={goToCenter}>{t('common.myProfile')}</Menu.Item>
                     </Menu>
                   }
                 >

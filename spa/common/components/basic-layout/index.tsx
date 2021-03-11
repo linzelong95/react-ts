@@ -62,7 +62,8 @@ const BasicLayout: FC<BasicLayoutProps> = memo((props) => {
       return
     }
     setAccountLocalStorage({ ...accountLocalStorage, autoLoginMark: false })
-    window.location.href = `/account/login?redirect=${window.location.href}`
+    const redirectUrl = encodeURIComponent(window.location.href)
+    window.location.href = `/account/login?redirect=${redirectUrl}`
   }, [accountLocalStorage, setAccountLocalStorage])
 
   useEffect(() => {
@@ -70,7 +71,8 @@ const BasicLayout: FC<BasicLayoutProps> = memo((props) => {
     ;(async () => {
       const [loginRes] = await accountServices.login({ autoLogin: true })
       if (!loginRes?.data?.account) {
-        window.location.href = `/account/login?redirect=${window.location.href}`
+        const redirectUrl = encodeURIComponent(window.location.href)
+        window.location.href = `/account/login?redirect=${redirectUrl}`
         return
       }
       dispatch(createLoginAction(loginRes.data))

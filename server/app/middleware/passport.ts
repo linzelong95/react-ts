@@ -65,9 +65,10 @@ module.exports = (options, app: Application) => {
   app.use(passport.session())
   ;(app as any).passport = passport
   return async (ctx: Context, next: any) => {
-    const { originalUrl, request } = ctx
-    const { referer = '', host = '' } = request.header || {}
-    const [, , originalHost] = (referer as string).match(/(https?:)\/\/([^/]*).*/) || []
+    const { originalUrl, request, path } = ctx
+    const { referer = path, host = '' } = request.header || {}
+    const oneReferer = Array.isArray(referer) ? referer[0] : referer
+    const [, , originalHost] = oneReferer.match(/(https?:)\/\/([^/]*).*/) || []
     if (!isApi.test(originalUrl)) return await next()
     if (authUserUrlRegexList.some((regex) => regex.test(originalUrl))) {
       if (ctx.isAuthenticated()) return await next()
@@ -77,9 +78,8 @@ module.exports = (options, app: Application) => {
     if (adminUrlRegexList.some((regex) => regex.test(originalUrl))) {
       if (!ctx.isAuthenticated()) {
         if (originalHost === host) {
-          ctx.redirect(`/account/login?redirect=${referer}`)
+          ctx.redirect(`/account/login?redirect=${encodeURIComponent(oneReferer)}`)
         } else {
-          // ctx.redirect(`${protocol}//${originalHost}/account/login?redirect=${referer}`)
           ctx.body = { code: StatusCode.NOT_LOGGED_FOR_ADMIN, message: '管理员未登录' }
         }
         return

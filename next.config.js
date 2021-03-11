@@ -15,4 +15,13 @@ module.exports = {
     GITHUB_OAUTH_URL,
     OAUTH_URL: `${GITHUB_OAUTH_URL}?client_id=${github.client_id}&scope=${SCOPE}`,
   },
+  async redirects() {
+    return [
+      {
+        source: '/blog',
+        destination: '/blog/article',
+        permanent: true,
+      },
+    ]
+  },
 }

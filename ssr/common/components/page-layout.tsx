@@ -2,7 +2,7 @@ import React, { useCallback, memo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Layout, Avatar, Menu, Dropdown, message, Tag } from 'antd'
+import { Layout, Avatar, Menu, Dropdown, Modal, message, Tag } from 'antd'
 import { UserOutlined, CopyrightOutlined, CommentOutlined, HomeOutlined } from '@ant-design/icons'
 import { LocalStorage } from '@ssr/common/constants'
 import { useLocalStorage } from '@ssr/common/hooks'
@@ -16,7 +16,7 @@ const { Header, Footer, Content } = Layout
 
 const PageLayout: FC<unknown> = memo((props) => {
   const { children } = props
-  const router = useRouter()
+  const { asPath } = useRouter()
   const dispatch = useDispatch()
   const userInfo = useSelector<StoreState, StoreState['user']>((state) => state.user)
   const [accountLocalStorage, setAccountLocalStorage] = useLocalStorage<{ autoLoginMark: boolean; autoLogin: boolean }>(
@@ -33,6 +33,10 @@ const PageLayout: FC<unknown> = memo((props) => {
     dispatch(createLogoutAction())
   }, [accountLocalStorage, setAccountLocalStorage, dispatch])
 
+  const goToCenter = useCallback<() => void>(() => {
+    Modal.info({ title: '感谢使用，暂未开发' })
+  }, [])
+
   return (
     <Layout>
       <Header>
@@ -41,11 +45,11 @@ const PageLayout: FC<unknown> = memo((props) => {
             <Link href="/blog">
               <img className="logo" alt="logo" src="/public/assets/images/logo/blog.png" />
             </Link>
-            <Menu theme="dark" selectedKeys={['home']} mode="horizontal">
-              <Menu.Item key="home" icon={<HomeOutlined />}>
-                <Link href="/blog">首页</Link>
+            <Menu theme="dark" selectedKeys={[asPath]} mode="horizontal">
+              <Menu.Item key="/blog/article" icon={<HomeOutlined />}>
+                <Link href="/blog/article">首页</Link>
               </Menu.Item>
-              <Menu.Item key="message" icon={<CommentOutlined />}>
+              <Menu.Item key="/blog/message" icon={<CommentOutlined />}>
                 <Link href="/blog/message">留言</Link>
               </Menu.Item>
             </Menu>
@@ -58,16 +62,15 @@ const PageLayout: FC<unknown> = memo((props) => {
               <Dropdown
                 overlay={
                   <Menu>
-                    <Menu.Item key="logout" onClick={logout}>
-                      退出登录
-                    </Menu.Item>
+                    <Menu.Item onClick={goToCenter}>个人中心</Menu.Item>
+                    <Menu.Item onClick={logout}>退出登录</Menu.Item>
                   </Menu>
                 }
               >
                 <Avatar size={40} src={userInfo.avatar || '/public/assets/images/default/avatar.jpeg'} className="avatar-icon" />
               </Dropdown>
             ) : (
-              <a href={`/account/login?redirect=${router.asPath}`}>
+              <a href={`/account/login?redirect=${encodeURIComponent(asPath)}`}>
                 <Avatar size={40} icon={<UserOutlined />} className="avatar-icon" />
               </a>
             )}

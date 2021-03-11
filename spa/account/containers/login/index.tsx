@@ -36,20 +36,25 @@ const Login: FC<RouteComponentProps<never>> = memo(() => {
 
   const goToPage = useCallback<() => void>(() => {
     const { redirect } = parse(location.search, { ignoreQueryPrefix: true })
-    if (redirect) {
-      window.location.href = (Array.isArray(redirect) ? redirect[0] : redirect) as string
-      // const urlParams = new URL(window.location.href)
-      // const redirectUrlParams = new URL(redirect)
-      // if (redirectUrlParams.origin !== urlParams.origin) {
-      //   window.location.href = '/b-blog'
-      //   return
-      // }
-      // redirect = redirect.slice(urlParams.origin.length)
-      // if (redirect.match(/^\/.*#/)) {
-      //   redirect = redirect.slice(redirect.indexOf('#') + 1)
-      // }
-    } else {
+    if (!redirect?.length) {
       history.replace('/center')
+      return
+    }
+    // const urlParams = new URL(window.location.href)
+    // const redirectUrlParams = new URL(redirect)
+    // if (redirectUrlParams.origin !== urlParams.origin) {
+    //   window.location.href = '/b-blog'
+    //   return
+    // }
+    // redirect = redirect.slice(urlParams.origin.length)
+    // if (redirect.match(/^\/.*#/)) {
+    //   redirect = redirect.slice(redirect.indexOf('#') + 1)
+    // }
+    let redirectUrl = (Array.isArray(redirect) ? redirect[0] : redirect) as string
+    try {
+      redirectUrl = decodeURIComponent(redirectUrl)
+    } finally {
+      window.location.href = redirectUrl
     }
   }, [history])
 
