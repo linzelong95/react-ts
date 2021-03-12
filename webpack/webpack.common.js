@@ -187,7 +187,7 @@ module.exports = {
     ...BUILD_MODULES.map((mdl) => {
       return new WebpackManifestPlugin({
         fileName: `${MANIFEST_ROOT}/${mdl}.manifest.json`,
-        writeToFileEmit: true,
+        writeToFileEmit: false,
         seed: {},
         generate: (seed, files) => {
           for (const file of files) {

@@ -4,7 +4,7 @@ const glob = require('glob')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const commonConfig = require('./webpack.common')
-const { SERVER_ROOT, PUBLIC_ROOT, BUILD_MODULES } = require('./constants')
+const { SERVER_ROOT, PUBLIC_ROOT, BUILD_MODULES, PROJECT_PATH } = require('./constants')
 
 // class MyInjectCustomScriptsPlugin {
 //   constructor(options) {
@@ -75,9 +75,13 @@ module.exports = merge(commonConfig, {
     },
     openPage: BUILD_MODULES,
     watchOptions: {
-      poll: true,
-      aggregateTimeout: 100,
-      ignored: ['/pages/**/*', '/server/**/*', '/ssr/**/*'],
+      ignored: [
+        'node_modules/',
+        `${PROJECT_PATH}/.next/**/*`,
+        `${PROJECT_PATH}/server/**/*`,
+        `${PROJECT_PATH}/ssr/**/*`,
+        `${PROJECT_PATH}/pages/**/*`,
+      ],
     },
     proxy: {
       '/api/': {

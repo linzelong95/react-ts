@@ -203,7 +203,7 @@ export default (appInfo: EggAppInfo): PowerPartial<EggAppConfig> => {
   config.development = {
     overrideDefault: true,
     watchDirs: ['app', 'config'],
-    ignoreDirs: [],
+    ignoreDirs: ['typings'],
   }
 
   /**
