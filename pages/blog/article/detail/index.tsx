@@ -33,8 +33,9 @@ const ArticleDetail: NextPage<ArticleDetailProps, Promise<ArticleDetailProps>> =
     return {
       page: 1,
       size: 9999,
+      articleIds: detailInfo.id,
     }
-  }, [])
+  }, [detailInfo])
   const [replyLoading, replyRes, replyErr, replyForceRequest] = useService(replyServices.getList, getListParams)
   const [replyTotal, replyList] = useMemo(() => {
     if (replyErr) {
@@ -90,7 +91,7 @@ const ArticleDetail: NextPage<ArticleDetailProps, Promise<ArticleDetailProps>> =
         return
       }
       replyBoxRef?.current?.scrollIntoView?.({ behavior: 'smooth' })
-      setRepliedTo({ ...item.from, replyId: item.id })
+      setRepliedTo({ ...item.from, replyId: item.parentId || item.id })
       setReplyContent(`@${item.from.nickname} `)
       replyTextAreaRef?.current?.focus()
     },

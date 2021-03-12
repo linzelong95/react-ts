@@ -35,6 +35,7 @@ const productionConfig = {
   devtool: 'source-map',
 
   optimization: {
+    splitChunks: false,
     minimize: true,
     minimizer: [
       new TerserPlugin({

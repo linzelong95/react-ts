@@ -1,6 +1,6 @@
 import React, { memo, useCallback, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { Layout, message, Avatar, Dropdown, Menu, Divider, Input, Modal } from 'antd'
+import { Layout, message, Avatar, Dropdown, Menu, Divider, Input, Modal, Tag } from 'antd'
 import { TranslationOutlined, SearchOutlined, BellOutlined, MenuUnfoldOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { accountServices } from '@common/services'
@@ -128,6 +128,11 @@ const Header: FC<HeaderProps> = memo((props) => {
               }}
             />
           )}
+        </li>
+        <li>
+          <a href="/blog">
+            <Tag>blog</Tag>
+          </a>
         </li>
         {(!searchBoxVisible || !isMobile) && (
           <>
