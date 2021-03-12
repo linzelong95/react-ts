@@ -1,11 +1,17 @@
 .root {
   margin-top: 16px;
   display: flex;
+  flex-wrap: wrap;
   .article-reply {
     background: white;
     padding: 20px;
     flex: 1;
     min-width: 0;
+    @media (max-width: 800px) {
+      width: 100%;
+      flex: unset;
+      min-width: unset;
+    }
     .article {
       .title {
         font-size: 30px;
@@ -17,8 +23,14 @@
       }
       .abstract {
         color: #999999;
-        margin: 2em 5em;
+        margin: 2em 4em;
         text-indent: 2em;
+        @media (max-width: 800px) {
+          margin: 2em;
+          @media (max-width: 600px) {
+            margin: 1em;
+          }
+        }
       }
       .cover {
         display: block;
@@ -72,5 +84,10 @@
     width: 300px;
     flex-shrink: 0;
     margin-left: 16px;
+    @media (max-width: 800px) {
+      width: 100%;
+      margin-left: unset;
+      margin-top: 16px;
+    }
   }
 }

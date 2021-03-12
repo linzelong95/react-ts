@@ -16,12 +16,12 @@ import type { TextAreaProps } from 'antd/lib/input'
 import styles from './index.module.scss'
 import 'braft-editor/dist/index.css'
 
-interface ArticleProps {
+interface ArticleDetailProps {
   detailInfo: IArticle['getDetailRes']
 }
 type HandleReplyItems = (type: 'remove' | 'approve' | 'disapprove' | 'top' | 'unTop', record: IReply['listItem']) => void
 
-const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
+const ArticleDetail: NextPage<ArticleDetailProps, Promise<ArticleDetailProps>> = memo((props) => {
   const { detailInfo = {} as IArticle['getDetailRes'] } = props
   const replyBoxRef = useRef<HTMLDivElement>(null)
   const replyTextAreaRef = useRef<HTMLTextAreaElement>(null)
@@ -229,10 +229,10 @@ const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
   )
 })
 
-Article.getInitialProps = async ({ query }) => {
+ArticleDetail.getInitialProps = async ({ query }) => {
   const id = query?.id as string
   const [articleRes] = await articleServices.getDetail({ id })
   return { detailInfo: articleRes?.data }
 }
 
-export default Article
+export default ArticleDetail

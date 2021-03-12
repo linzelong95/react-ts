@@ -6,6 +6,7 @@
     "dev": "node ./webpack/build.js dev",
     "build": "node ./webpack/build.js build",
     "dll": "node ./webpack/webpack.dll.js",
+    "next": "next build",
     "analyzer": "node ./webpack/build.js analyzer",
     "lint": "eslint -c ./.eslintrc.js --ext .ts,.tsx"
   },

@@ -3,15 +3,22 @@ import { createConnection } from 'typeorm'
 import type { Application } from 'egg'
 import next from 'next'
 
-export default class AppBootHook {
-  public app: Application & { nextServer: ReturnType<typeof next> }
+type App = Application & { nextServer: ReturnType<typeof next> }
 
-  constructor(app: Application) {
+export default class AppBootHook {
+  app: App
+
+  constructor(app: App) {
     this.app = app
   }
 
   async willReady(): Promise<void> {
-    const { config, nextServer } = this.app
+    const { nextServer } = this.app
+    nextServer.prepare()
+  }
+
+  async didReady(): Promise<void> {
+    const { config } = this.app
     await createConnection({
       type: 'mysql',
       ...config.mysql,
@@ -21,6 +28,5 @@ export default class AppBootHook {
       migrations: [`${__dirname}/app/migration/**/*{.ts,.js}`],
       subscribers: [`${__dirname}/app/subscriber/**/*{.ts,.js}`],
     })
-    await nextServer.prepare()
   }
 }

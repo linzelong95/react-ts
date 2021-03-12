@@ -6,10 +6,12 @@ import { useService } from '@ssr/common/hooks'
 import moment from 'moment'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
+import Head from 'next/head'
 import type { IArticle, ITag, ISort } from '@ssr/blog/types'
 import type { NextPage } from 'next'
 import type { FC } from 'react'
 import type { SearchProps } from 'antd/lib/input'
+import styles from './index.module.scss'
 
 interface ArticleProps {
   articleInfo: IArticle['getListRes']
@@ -100,9 +102,14 @@ const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
   )
 
   return (
-    <div className="root">
-      <div className="nav-search">
-        <div className="tab">
+    <div className={styles.root}>
+      <Head>
+        <title>首页-文章列表</title>
+        <meta name="description" content="博客文章，网站开发技术分享，共同进步" />
+        <meta name="keywords" content="blog,web,spa,ssr,react,egg,next" />
+      </Head>
+      <div className={styles['nav-search']}>
+        <div className={styles.nav}>
           <Menu mode="horizontal" selectedKeys={[orderName]}>
             <Menu.Item key="default">
               <FilterLink {...{ ...query, orderName: 'default' }} pathname={pathname} done={orderName === 'default'}>
@@ -123,12 +130,12 @@ const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
             </Tooltip>
           </div>
         </div>
-        <div className="search">
+        <div className={styles.search}>
           <Input.Search defaultValue={search} onSearch={handleSearch} enterButton allowClear />
         </div>
       </div>
-      <div className="list-filter">
-        <div className="list">
+      <div className={styles['list-filter']}>
+        <div className={styles.list}>
           <List
             dataSource={articleInfo?.list || []}
             style={{ background: 'white' }}
@@ -201,7 +208,7 @@ const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
             )}
           />
         </div>
-        <div className="filter">
+        <div className={styles.filter}>
           <div style={{ textAlign: 'center' }}>
             <Avatar size={200} src="/public/assets/images/default/avatar.jpeg" />
             <p style={{ fontSize: 25, fontWeight: 'bold', margin: 10 }}>BriefNull</p>
@@ -262,49 +269,6 @@ const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
           </div>
         </div>
       </div>
-      <style jsx>{`
-        .root {
-          margin-top: 16px;
-        }
-        .list-filter {
-          display: flex;
-        }
-        .list-filter .list {
-          background: white;
-          padding: 16px;
-          flex: 1;
-          min-width: 0;
-        }
-        .list-filter .filter {
-          background: white;
-          padding: 16px;
-          width: 300px;
-          min-width: 0;
-          flex-shrink: 0;
-          margin-left: 16px;
-        }
-        .nav-search {
-          display: flex;
-          align-items: center;
-          margin-bottom: 16px;
-        }
-        .nav-search .tab {
-          flex: 1;
-          min-width: 0;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 0 16px 0 0;
-          background: white;
-        }
-        .nav-search .search {
-          background: white;
-          padding: 8px 16px;
-          width: 300px;
-          flex-shrink: 0;
-          margin-left: 16px;
-        }
-      `}</style>
     </div>
   )
 })

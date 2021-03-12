@@ -43,14 +43,20 @@ const PageLayout: FC<unknown> = memo((props) => {
         <Container renderer={<div className="header-wrap"></div>}>
           <div className="header-left">
             <Link href="/blog">
-              <img className="logo" alt="logo" src="/public/assets/images/logo/blog.png" />
+              <a>
+                <img className="logo" alt="logo" src="/public/assets/images/logo/blog.png" />
+              </a>
             </Link>
             <Menu theme="dark" selectedKeys={[asPath]} mode="horizontal">
               <Menu.Item key="/blog/article" icon={<HomeOutlined />}>
-                <Link href="/blog/article">首页</Link>
+                <Link href="/blog/article">
+                  <a>首页</a>
+                </Link>
               </Menu.Item>
               <Menu.Item key="/blog/message" icon={<CommentOutlined />}>
-                <Link href="/blog/message">留言</Link>
+                <Link href="/blog/message">
+                  <a>留言</a>
+                </Link>
               </Menu.Item>
             </Menu>
           </div>
@@ -92,11 +98,13 @@ const PageLayout: FC<unknown> = memo((props) => {
         .ant-layout {
           min-height: 100%;
         }
-        .ant-layout-content {
-          display: flex;
-        }
         .ant-layout-header {
           padding: 0;
+          height: 55px;
+          line-height: 55px;
+        }
+        .ant-layout-content {
+          display: flex;
         }
         .header-wrap {
           display: flex;
@@ -127,6 +135,12 @@ const PageLayout: FC<unknown> = memo((props) => {
         }
         .copyright-icon {
           margin: 0 8px;
+        }
+        @media (max-width: 600px) {
+          .ant-menu-dark.ant-menu-horizontal > .ant-menu-item,
+          .ant-menu-dark.ant-menu-horizontal > .ant-menu-submenu {
+            padding: 0 10px;
+          }
         }
       `}</style>
     </Layout>
