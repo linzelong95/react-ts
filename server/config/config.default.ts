@@ -87,9 +87,9 @@ export default (appInfo: EggAppInfo): PowerPartial<EggAppConfig> => {
    */
   config.locals = {
     title: 'blog',
-    keywords: '',
-    description: '',
-    favicon: '',
+    keywords: 'blog',
+    description: 'This is a blog',
+    favicon: '/public/assets/images/logo.png',
   }
 
   // 中间件

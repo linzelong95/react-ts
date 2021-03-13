@@ -36,7 +36,7 @@ interface RenderData {
 export default class HomeController extends Controller {
   public async index(): Promise<unknown> {
     const { ctx, config } = this
-    const { sentry, env, backSysNames, cluster = {} } = config
+    const { sentry, env, backSysNames, locals, cluster = {} } = config
     const { request, state, path } = ctx
     if (/^\/(public|api)/.test(path)) return
     const { host } = request?.header || {}
@@ -56,6 +56,7 @@ export default class HomeController extends Controller {
       keywords: 'blog',
       description: 'This is a blog',
       favicon: '',
+      ...locals, // title,keywords,description,favicon
     }
     const isSameHost = host.endsWith(String(cluster?.listen?.port || ''))
     if (env !== 'prod' && moduleStatics.js.path.startsWith('http') && isSameHost) {
