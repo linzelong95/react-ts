@@ -1,6 +1,5 @@
+const os = require('os')
 const { merge } = require('webpack-merge')
-// const glob = require('glob')
-// const path = require('path')
 // const PurgeCSSPlugin = require('purgecss-webpack-plugin')
 // webpack v5用CssMinimizerPlugin，而不使用OptimizeCSSAssetsPlugin
 // const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
@@ -9,6 +8,7 @@ const TerserPlugin = require('terser-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 // const SentryPlugin = require('webpack-sentry-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const { WebpackManifestPlugin } = require('webpack-manifest-plugin')
 // const SpeedMeasurePlugin = require('speed-measure-webpack-plugin')
 // 找到没有用到的废弃文件
 // const { UnusedFilesWebpackPlugin } = require('unused-files-webpack-plugin')
@@ -19,7 +19,7 @@ const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 
 const commonConfig = require('./webpack.common')
 
-const { BUILD_MODULES, PUBLIC_ROOT } = require('./constants')
+const { BUILD_MODULES, PUBLIC_ROOT, MANIFEST_ROOT, RELEASE_TAG } = require('./constants')
 
 const productionConfig = {
   mode: 'production',
@@ -64,6 +64,28 @@ const productionConfig = {
       dry: false,
       dangerouslyAllowCleanPatternsOutsideProject: true,
       cleanOnceBeforeBuildPatterns: BUILD_MODULES.length ? BUILD_MODULES.map((moduleName) => `${moduleName}/**/*`) : ['index/**/*'],
+    }),
+
+    ...BUILD_MODULES.map((moduleName) => {
+      return new WebpackManifestPlugin({
+        fileName: `${MANIFEST_ROOT}/${moduleName}.manifest.json`,
+        writeToFileEmit: true,
+        seed: {},
+        generate: (seed, files) => {
+          for (const file of files) {
+            const { name, path } = file
+            if (name === `${moduleName}.js` || name === `${moduleName}.css`) {
+              seed[name] = {
+                path,
+                editor: os.userInfo().username,
+                release: RELEASE_TAG,
+              }
+            }
+          }
+          return seed
+        },
+        filter: (file) => /\.(js|css)$/.test(file.name),
+      })
     }),
 
     // 去除无用样式，使用其他有点问题，似乎无法跟webpack动态加载同时使用？

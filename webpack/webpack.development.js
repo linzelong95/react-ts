@@ -1,10 +1,13 @@
+const os = require('os')
+const fs = require('fs')
+const path = require('path')
+const glob = require('glob')
 const webpack = require('webpack')
 const { merge } = require('webpack-merge')
-const glob = require('glob')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const commonConfig = require('./webpack.common')
-const { SERVER_ROOT, PUBLIC_ROOT, BUILD_MODULES, PROJECT_PATH } = require('./constants')
+const { SERVER_ROOT, PUBLIC_ROOT, BUILD_MODULES, PROJECT_PATH, MANIFEST_ROOT } = require('./constants')
 
 // class MyInjectCustomScriptsPlugin {
 //   constructor(options) {
@@ -34,8 +37,34 @@ const { SERVER_ROOT, PUBLIC_ROOT, BUILD_MODULES, PROJECT_PATH } = require('./con
 //   }
 // }
 
-// 是否是开发环境
-const isDevelopment = process.env.NODE_ENV !== 'production'
+const manifestFlag = {}
+
+// 开发环境manifest只需要生成一次，WebpackManifestPlugin似乎不满足需求，只能自定义
+class MyManifestPlugin {
+  apply(compiler) {
+    compiler.hooks.afterEmit.tap('MyManifestPlugin', (compilation) => {
+      const { outputOptions } = compilation
+      for (const moduleName of BUILD_MODULES) {
+        if (manifestFlag[moduleName]) continue
+        const manifestFilename = `${MANIFEST_ROOT}/${moduleName}.manifest.json`
+        const nextPath = `${outputOptions.publicPath}${moduleName}/js/${moduleName}.js`
+        if (fs.existsSync(manifestFilename)) {
+          const existedPath = require(manifestFilename)[`${moduleName}.js`].path
+          if (existedPath === nextPath) continue
+        }
+        manifestFlag[moduleName] = true
+        const output = {
+          [`${moduleName}.js`]: {
+            path: nextPath,
+            editor: os.userInfo().username,
+          },
+        }
+        fs.mkdirSync(path.dirname(manifestFilename), { recursive: true })
+        fs.writeFileSync(manifestFilename, JSON.stringify(output, null, 2))
+      }
+    })
+  }
+}
 
 module.exports = merge(commonConfig, {
   mode: 'development',
@@ -135,24 +164,27 @@ module.exports = merge(commonConfig, {
             (path) => `/${path.split('/').slice(-2).join('/')}`, // '/dll/xxx.js', TODO:确保react、react-dom在最前面
           ),
         },
-        minify: isDevelopment
-          ? false
-          : {
-              removeAttributeQuotes: true,
-              collapseWhitespace: true,
-              removeComments: true,
-              collapseBooleanAttributes: true,
-              collapseInlineTagWhitespace: true,
-              removeRedundantAttributes: true,
-              removeScriptTypeAttributes: true,
-              removeStyleLinkTypeAttributes: true,
-              minifyCSS: true,
-              minifyJS: true,
-              minifyURLs: true,
-              useShortDoctype: true,
-            },
+        minify:
+          process.env.NODE_ENV !== 'production'
+            ? false
+            : {
+                removeAttributeQuotes: true,
+                collapseWhitespace: true,
+                removeComments: true,
+                collapseBooleanAttributes: true,
+                collapseInlineTagWhitespace: true,
+                removeRedundantAttributes: true,
+                removeScriptTypeAttributes: true,
+                removeStyleLinkTypeAttributes: true,
+                minifyCSS: true,
+                minifyJS: true,
+                minifyURLs: true,
+                useShortDoctype: true,
+              },
       })
     }),
+
+    new MyManifestPlugin(),
 
     new webpack.HotModuleReplacementPlugin(),
   ].filter(Boolean),

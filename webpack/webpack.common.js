@@ -1,14 +1,12 @@
-const os = require('os')
 const webpack = require('webpack')
 const autoprefixer = require('autoprefixer')
-const { WebpackManifestPlugin } = require('webpack-manifest-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const ProgressBarPlugin = require('progress-bar-webpack-plugin')
 const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 // const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin')
 // const HardSourceWebpackPlugin = require('hard-source-webpack-plugin')
-const { PROJECT_PATH, WEB_ROOT, BUILD_MODULES, MANIFEST_ROOT, RELEASE_TAG } = require('./constants')
+const { PROJECT_PATH, WEB_ROOT, BUILD_MODULES } = require('./constants')
 
 const externals = require('./externals')
 
@@ -183,28 +181,6 @@ module.exports = {
 
     // 提高打包速度，webpack v5 报错
     // new HardSourceWebpackPlugin(),
-
-    ...BUILD_MODULES.map((mdl) => {
-      return new WebpackManifestPlugin({
-        fileName: `${MANIFEST_ROOT}/${mdl}.manifest.json`,
-        writeToFileEmit: false,
-        seed: {},
-        generate: (seed, files) => {
-          for (const file of files) {
-            const { name, path } = file
-            if (name === `${mdl}.js` || name === `${mdl}.css`) {
-              seed[name] = {
-                path,
-                editor: os.userInfo().username,
-                release: isDevelopment ? undefined : RELEASE_TAG,
-              }
-            }
-          }
-          return seed
-        },
-        filter: (file) => /\.(js|css)$/.test(file.name),
-      })
-    }),
   ],
 
   performance: {

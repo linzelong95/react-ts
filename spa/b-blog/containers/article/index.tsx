@@ -79,6 +79,7 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
     inputSearchRef.current?.setValue?.('')
     setPagination((prevValue) => ({ ...prevValue, current: 1 }))
   }, [])
+  console.log(61)
 
   const handleSearch = useCallback<SearchProps['onSearch']>((value) => {
     setPagination((prevValue) => ({ ...prevValue, current: 1 }))
