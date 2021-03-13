@@ -5,9 +5,10 @@
 涉及的技术栈：react、redux、next.js、egg.js、antd、webpack、eslint、prettier
 ```
 
-### 开发（根目录下）
+### 开发
 
 ```bash
+# 启动web（根目录下）
 
 # 安装依赖
 npm ci
@@ -20,16 +21,27 @@ npm run dll
 # npm run dev account b-blog 启动account和b-blog两个模块
 npm run dev 模块名1 模块名2 ...
 
-# 启动服务端（egg.js、nextjs）
+```
+
+```bash
+# 启动server（egg.js、nextjs）
+
+# 进入server目录
 cd server
+
+# 安装依赖
 npm ci
+
+# 启动
 npm run dev
 
 ```
 
-### 打包（根目录下）
+### 打包
 
 ```bash
+# 根目录下对单页面应用进行打包
+
 # 基础模块打包（如果文件已存在，并且依赖版本未变动，无需重复执行）
 npm run build base
 
@@ -44,7 +56,7 @@ npm run build 模块名1 模块名2 ...
 
 ```bash
 
-# 根目录下
+# 根目录下安装依赖
 npm ci
 
 # next应用打包
@@ -58,20 +70,22 @@ npm run next
 # 切换到 server 目录
 cd server
 
+
 # 安装依赖
-npm install --production
+npm ci
+
+# 用config.local.ts替换config.prod.ts
 
 # 将ts编译成js
 npm run ci
 
-# 启动
-npm run start
+# 启动/终止
+npm run start/stop
 
-# 终止（所有项目），加上--title=xxx可以指定终止某个项目
-npm run stop
+
 ```
 
-### nginx
+### nginx(一个例子)
 
 ```bash
 # 进入nginx目录

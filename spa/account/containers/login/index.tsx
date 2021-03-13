@@ -1,6 +1,6 @@
-import React, { memo, useCallback, useEffect } from 'react'
+import React, { memo, useCallback, useEffect, useMemo } from 'react'
 import { LocalStorage } from '@common/constants'
-import { useLocalStorage, useService } from '@common/hooks'
+import { useLocalStorage, useService, useMobile } from '@common/hooks'
 import { accountServices } from '@common/services'
 import { rsa, serialize } from '@common/utils'
 import { Card, Form, Input, Checkbox, Row, Col, Button, message } from 'antd'
@@ -15,18 +15,11 @@ import type { StoreState } from '@common/store/types'
 import type { IAccount } from '@common/types'
 import type { ButtonProps } from 'antd/lib/button'
 
-const layout = {
-  labelCol: { span: 5 },
-  wrapperCol: { span: 16 },
-}
-const tailLayout = {
-  wrapperCol: { offset: 5, span: 16 },
-}
-
 const Login: FC<RouteComponentProps<never>> = memo(() => {
   const history = useHistory()
   const dispatch = useDispatch()
   const [form] = Form.useForm<IAccount['loginParams']>()
+  const isMobile = useMobile({ includeTraditionalSmallViewPort: true })
   const userInfo = useSelector<StoreState, StoreState['user']>((state) => state.user)
   const [accountLocalStorage, setAccountLocalStorage] = useLocalStorage<{ autoLoginMark: boolean; autoLogin: boolean }>(
     LocalStorage.BLOG_STORE_ACCOUNT,
@@ -55,9 +48,7 @@ const Login: FC<RouteComponentProps<never>> = memo(() => {
       try {
         redirectUrl = decodeURIComponent(redirectUrl)
       } finally {
-        setTimeout(() => {
-          window.location.href = redirectUrl
-        }, 0)
+        window.location.href = redirectUrl
       }
     },
     [history],
@@ -73,6 +64,7 @@ const Login: FC<RouteComponentProps<never>> = memo(() => {
           message.loading({ content: '正在登录...', key: 'login', duration: 0 })
           const [, verifyCaptchaErr] = await accountServices.verifyCaptcha(captcha)
           if (verifyCaptchaErr) {
+            forceRequest()
             message.error({ content: '验证码错误', key: 'login' })
             return
           }
@@ -96,7 +88,7 @@ const Login: FC<RouteComponentProps<never>> = memo(() => {
           message.error('请检查表单是否填写无误')
         })
     },
-    [form, dispatch, goToPage, setAccountLocalStorage],
+    [form, dispatch, goToPage, forceRequest, setAccountLocalStorage],
   )
 
   useEffect(() => {
@@ -109,21 +101,37 @@ const Login: FC<RouteComponentProps<never>> = memo(() => {
     })()
   }, [userInfo, dispatch, goToPage])
 
+  const specialWrapperCol = useMemo<{ offset: number; span: number }>(() => {
+    return isMobile ? { offset: 0, span: 24 } : { offset: 5, span: 16 }
+  }, [isMobile])
+
   return (
     <div style={{ minHeight: '100vh', background: '#f0f2f5', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <Card style={{ width: 500 }}>
+      <Card
+        style={{
+          width: 500,
+          ...(isMobile ? { width: '100vw', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' } : {}),
+        }}
+        bodyStyle={isMobile ? { width: '100%' } : undefined}
+      >
         <div className="mt15 mb20" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <img src={`${__SERVER_ORIGIN__ || ''}/public/assets/images/logo.png`} style={{ width: 40, height: 40, borderRadius: '50%' }} />
           <span style={{ fontSize: 36, fontWeight: 'bold', marginLeft: 16 }}>briefNull</span>
         </div>
-        <Form {...layout} form={form} name="login" initialValues={{ autoLogin: Boolean(accountLocalStorage?.autoLogin) }}>
+        <Form
+          labelCol={{ span: 5 }}
+          wrapperCol={{ span: 16 }}
+          form={form}
+          name="login"
+          initialValues={{ autoLogin: Boolean(accountLocalStorage?.autoLogin) }}
+        >
           <Form.Item label="Account" name="account" rules={[{ required: true, message: 'Please input your account!' }]}>
             <Input />
           </Form.Item>
           <Form.Item label="Password" name="password" rules={[{ required: true, message: 'Please input your password!' }]}>
             <Input.Password />
           </Form.Item>
-          <Form.Item label="Captcha">
+          <Form.Item label="Captcha" required>
             <Row gutter={8}>
               <Col span={18}>
                 <Form.Item noStyle name="captcha" rules={[{ required: true, message: 'Please input captcha!' }]}>
@@ -140,15 +148,15 @@ const Login: FC<RouteComponentProps<never>> = memo(() => {
               </Col>
             </Row>
           </Form.Item>
-          <Form.Item {...tailLayout} name="autoLogin" valuePropName="checked">
+          <Form.Item wrapperCol={specialWrapperCol} name="autoLogin" valuePropName="checked">
             <Checkbox>Remember me</Checkbox>
           </Form.Item>
-          <Form.Item {...tailLayout}>
+          <Form.Item wrapperCol={specialWrapperCol}>
             <Button block type="primary" onClick={handleLogin}>
               登录
             </Button>
           </Form.Item>
-          <Form.Item {...tailLayout}>
+          <Form.Item wrapperCol={specialWrapperCol}>
             <Row>
               <Col span={14}>
                 其他方式
