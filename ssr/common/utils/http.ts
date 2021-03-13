@@ -1,5 +1,4 @@
 import { v4 as uuid } from 'uuid'
-import { parse } from 'qs'
 import axios from 'axios'
 import { message as antMessage } from 'antd'
 import { tryCatch, isClient } from './util'
@@ -25,11 +24,8 @@ export const http = axios.create({
 http.interceptors.request.use((req: AxiosRequestConfig) => {
   req.headers['X-Seq-Id'] = `blog-${uuid()}` // 唯一标记
   if (isClient) {
-    const query = parse(window.location.search, { ignoreQueryPrefix: true })
-    if (query.access_token) {
-      if (!req.params) req.params = {}
-      req.params.access_token = query.access_token
-    }
+    const [, csrfToken] = document.cookie?.match?.(/csrfToken=([^\s;]*)/) || []
+    if (csrfToken) req.headers['x-csrf-token'] = csrfToken
   }
   return req
 })

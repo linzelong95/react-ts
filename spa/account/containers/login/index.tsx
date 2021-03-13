@@ -55,43 +55,49 @@ const Login: FC<RouteComponentProps<never>> = memo(() => {
       try {
         redirectUrl = decodeURIComponent(redirectUrl)
       } finally {
-        window.location.href = redirectUrl
+        setTimeout(() => {
+          window.location.href = redirectUrl
+        }, 0)
       }
     },
     [history],
   )
 
-  const handleLogin = useCallback<ButtonProps['onClick']>(() => {
-    form
-      .validateFields()
-      .then(async (values) => {
-        const { password, autoLogin, captcha } = values
-        message.loading({ content: '正在登录...', key: 'login', duration: 0 })
-        const [, verifyCaptchaErr] = await accountServices.verifyCaptcha(captcha)
-        if (verifyCaptchaErr) {
-          message.error({ content: '验证码错误', key: 'login' })
-          return
-        }
-        const [publicKeyRes, publicKeyErr] = await accountServices.getPublicKey()
-        if (publicKeyErr || !publicKeyRes?.data?.item) {
-          message.error({ content: '登录失败', key: 'login' })
-          return
-        }
-        const encryptedPassword = rsa(serialize(password), publicKeyRes.data.item)
-        const [loginRes, loginErr] = await accountServices.login({ ...values, password: encryptedPassword })
-        if (loginErr) {
-          message.error({ content: loginErr.message || '登录失败', key: 'login' })
-          return
-        }
-        message.success({ content: '登录成功', key: 'login' })
-        setAccountLocalStorage({ autoLogin, autoLoginMark: autoLogin })
-        dispatch(createLoginAction(loginRes.data))
-        goToPage(loginRes.data.id)
-      })
-      .catch(() => {
-        message.error('请检查表单是否填写无误')
-      })
-  }, [form, dispatch, goToPage, setAccountLocalStorage])
+  const handleLogin = useCallback<ButtonProps['onClick']>(
+    (event) => {
+      event.preventDefault()
+      form
+        .validateFields()
+        .then(async (values) => {
+          const { password, autoLogin, captcha } = values
+          message.loading({ content: '正在登录...', key: 'login', duration: 0 })
+          const [, verifyCaptchaErr] = await accountServices.verifyCaptcha(captcha)
+          if (verifyCaptchaErr) {
+            message.error({ content: '验证码错误', key: 'login' })
+            return
+          }
+          const [publicKeyRes, publicKeyErr] = await accountServices.getPublicKey()
+          if (publicKeyErr || !publicKeyRes?.data?.item) {
+            message.error({ content: '登录失败', key: 'login' })
+            return
+          }
+          const encryptedPassword = rsa(serialize(password), publicKeyRes.data.item)
+          const [loginRes, loginErr] = await accountServices.login({ ...values, password: encryptedPassword })
+          if (loginErr) {
+            message.error({ content: loginErr.message || '登录失败', key: 'login' })
+            return
+          }
+          message.success({ content: '登录成功，正在为您跳转', key: 'login' })
+          setAccountLocalStorage({ autoLogin, autoLoginMark: autoLogin })
+          dispatch(createLoginAction(loginRes.data))
+          goToPage(loginRes.data.id)
+        })
+        .catch(() => {
+          message.error('请检查表单是否填写无误')
+        })
+    },
+    [form, dispatch, goToPage, setAccountLocalStorage],
+  )
 
   useEffect(() => {
     if (userInfo?.account) return goToPage(userInfo.id)

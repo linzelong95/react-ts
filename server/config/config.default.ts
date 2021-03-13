@@ -173,7 +173,12 @@ export default (appInfo: EggAppInfo): PowerPartial<EggAppConfig> => {
   // 框架提供了 helper.shtml() 方法对字符串进行 XSS 过滤。将富文本（包含 HTML 代码的文本）当成变量直接在模版里面输出时，需要用到 shtml 来处理
 
   config.cors = {
-    origin: (ctx) => ctx.get('Origin'),
+    origin: (ctx) => {
+      const allowOrigins = ['http://127.0.0.1:7002', 'http://localhost:7002']
+      const { origin } = ctx.request.header
+      const onOrigin = Array.isArray(origin) ? origin[0] : origin
+      return allowOrigins.includes(onOrigin) ? onOrigin : 'http://127.0.0.1:7002'
+    },
     credentials: true,
     allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH',
   }

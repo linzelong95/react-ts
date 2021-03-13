@@ -17,6 +17,7 @@ export default class AppBootHook {
     nextServer.prepare()
   }
 
+  // todo:typeorm对于ts、js同时存在时，会报错
   async didReady(): Promise<void> {
     const { config } = this.app
     await createConnection({

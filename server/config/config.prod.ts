@@ -2,17 +2,25 @@ import { EggAppConfig, PowerPartial } from 'egg'
 
 export default (): PowerPartial<EggAppConfig> => {
   const config: PowerPartial<EggAppConfig> = {}
+
+  // nginx反向代理
+  config.proxy = true
+
+  // 安全需要考虑被nginx代理、外部引入等情况
   config.security = {
     // ctx.redirect白名单
     domainWhiteList: ['127.0.0.1', '120.78.139.146'],
+    // GET|HEAD|OPTIONS|TRACE不需要校验
+    // 如果是完全的前后端分离，前端模板不归 egg 管，是两个域名的话，那就不是 csrf 的范畴了，应该用 egg-cors
     csrf: {
       enable: true,
+      headerName: 'x-csrf-token', // 通过 header 传递 CSRF token 的默认字段为 x-csrf-token
     },
     // 不允许本域页面嵌套于其他页面
-    xframe: {
-      enable: true,
-      value: 'SAMEORIGIN',
-    },
+    // xframe: {
+    //   enable: true,
+    //   value: 'SAMEORIGIN',
+    // },
     // XST(Cross-Site Tracing),禁用trace方法
     methodnoallow: {
       enable: true,
@@ -46,17 +54,18 @@ export default (): PowerPartial<EggAppConfig> => {
     //     "original-policy": "script-src 'self' https://apis.google.com; report-uri http://example.org/my_amazing_csp_report_parser"
     //   }
     // }
-    csp: {
-      enable: true,
-      policy: {
-        'default-src': 'self',
-        'img-src': '*',
-        'media-src': '*',
-        // 'script-src': 'self', // 只信任当前域名
-        // 'style-src': 'self', // 'style-src':'cdn.example.org third-party.org',// 样式表：只信任http://cdn.example.org和http://third-party.org
-        // 'object-src': 'none', // <object>标签：不信任任何URL，即不加载任何资源
-      },
-    },
+    // 需要考虑被nginx代理的情况
+    // csp: {
+    //   enable: true,
+    //   policy: {
+    //     'default-src': 'self',
+    //     'img-src': '*',
+    //     'media-src': '*',
+    //     // 'script-src': 'self', // 只信任当前域名
+    //     // 'style-src': 'self', // 'style-src':'cdn.example.org third-party.org',// 样式表：只信任http://cdn.example.org和http://third-party.org
+    //     // 'object-src': 'none', // <object>标签：不信任任何URL，即不加载任何资源
+    //   },
+    // },
   }
   return config
 }

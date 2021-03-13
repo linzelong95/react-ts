@@ -46,6 +46,8 @@ export default class AccountController extends Controller {
         ctx.cookies.set('userInfo', `${account}&&${password}`, { encrypt: true, signed: true, maxAge })
       }
       ctx.login(user)
+      ctx.rotateCsrfSecret()
+      // console.log(ctx.csrf)
       ctx.body = { code: 0, message: '登录成功', data: user }
     })(ctx)
   }
