@@ -76,6 +76,8 @@ npm ci
 
 # 用config.local.ts替换config.prod.ts
 
+#typeorm的entity不能js、ts共存，需要移除ts文件：rm *.ts -f
+
 # 将ts编译成js
 npm run ci
 
@@ -163,11 +165,35 @@ http {
         location / {
             # 等同于 proxy_pass http://my_server;
             proxy_pass http://127.0.0.1:7001;
+
+            # 用户的真实ip就被放在X-real-ip这个变量里，request.getAttribute("X-real-ip")
+            proxy_set_header X-real-ip $remote_addr;
+
+            # 意思是增加一个$proxy_add_x_forwarded_for到X-Forwarded-For里去
+            # 逗号隔开，第一个IP是用户访问的ip
+            X-Forwarded-For $proxy_add_x_forwarded_for
+
+            proxy_set_header Host $http_host;
+
             # 响应头设置禁用缓存标志
             # add_header Pragma   no-cache;
             # add_header Expires  0;
             # add_header Cache-Control no-cache,no-store,must-revalidate;
         }
+
+        # 访问的是egg.js渲染的模板，不缓存
+        location ^~ /b-blog|account/ {
+            add_header Pragma   no-cache;
+            add_header Expires  0;
+            add_header Cache-Control no-cache,no-store,must-revalidate;
+        }
+        # 模板不缓存
+        location ~* \.(html|ejs)$ {
+            add_header Pragma   no-cache;
+            add_header Expires  0;
+            add_header Cache-Control no-cache,no-store,must-revalidate;
+        }
+
 
 
         #location / {
@@ -260,7 +286,7 @@ http {
 
 ### TODO
 
-```
+```bash
 1、用 eslint-webpack-plugin 代替 eslint-loader
 2、处理server端不符合eslint规则的地方（目前已忽略检测）
 3、优化server端报错提示
@@ -272,7 +298,7 @@ http {
 
 ### 其他待研究
 
-```
+```bash
 日志可视化工具
 www.elastic.co/cn/kibana
 拓展：Logstash、Elasticsearch、Beats
