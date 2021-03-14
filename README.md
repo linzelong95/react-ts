@@ -152,13 +152,13 @@ http {
         include /etc/nginx/default.d/*.conf;
 
         # 启用压缩
-        # gzip on;
-	      # gzip_buffers 32 4K;
-	      # gzip_comp_level 6;
-        # gzip_min_length 100;
-	      # gzip_types application/javascript text/css text/xml;
-        # gzip_disable "MSIE [1-6]\."; #表示ie6及以下不启用gzip（因为ie低版本不支持）
-        # gzip_vary on;
+        gzip on;
+	      gzip_buffers 32 4K;
+	      gzip_comp_level 6;
+        gzip_min_length 100;
+	      gzip_types application/javascript text/css text/xml;
+        gzip_disable "MSIE [1-6]\."; #表示ie6及以下不启用gzip（因为ie低版本不支持）
+        gzip_vary on;
 
         location / {
             # 等同于 proxy_pass http://my_server;

@@ -26,11 +26,11 @@ const productionConfig = {
   mode: 'production',
 
   output: {
-    filename: '[name]/js/[name]-[contenthash:8].js',
+    filename: '[name]/js/[name]_[contenthash].js',
     path: PUBLIC_ROOT,
     publicPath: '/public/',
-    chunkFilename: (pathData) => `${pathData.chunk.runtime}/js/chunks/[id].js`,
-    assetModuleFilename: (pathData) => `${pathData.runtime}/js/asset/[name]-[hash][ext][query]`,
+    chunkFilename: (pathData) => `${pathData.chunk.runtime}/js/chunks/[id]_[contenthash].js`,
+    assetModuleFilename: (pathData) => `${pathData.runtime}/js/asset/[name]_[hash][ext][query]`,
   },
 
   devtool: 'source-map',
@@ -56,8 +56,8 @@ const productionConfig = {
   plugins: [
     // 抽离出css
     new MiniCssExtractPlugin({
-      filename: '[name]/css/[name]-[contenthash:8].css',
-      chunkFilename: (pathData) => `${pathData.chunk.runtime}/css/chunks/[id].css`,
+      filename: '[name]/css/[name]_[contenthash].css',
+      chunkFilename: (pathData) => `${pathData.chunk.runtime}/css/chunks/[id]_[contenthash].css`,
     }),
 
     // 删除无用文件
