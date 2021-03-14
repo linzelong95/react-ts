@@ -2,7 +2,7 @@
 
 ```
 本项目主要集合spa、ssr、server为一体，用blog应用作为实践，以node为中心，处理spa、ssr页面的访问及api请求。
-涉及的技术栈：react、redux、next.js、egg.js、antd、webpack、eslint、prettier
+涉及的技术栈：react、redux、next.js、egg.js、typescript、antd、webpack、eslint、prettier
 ```
 
 ### 开发
@@ -151,9 +151,22 @@ http {
         # Load configuration files for the default server block.
         include /etc/nginx/default.d/*.conf;
 
+        # 启用压缩
+        # gzip on;
+	      # gzip_buffers 32 4K;
+	      # gzip_comp_level 6;
+        # gzip_min_length 100;
+	      # gzip_types application/javascript text/css text/xml;
+        # gzip_disable "MSIE [1-6]\."; #表示ie6及以下不启用gzip（因为ie低版本不支持）
+        # gzip_vary on;
+
         location / {
             # 等同于 proxy_pass http://my_server;
             proxy_pass http://127.0.0.1:7001;
+            # 响应头设置禁用缓存标志
+            # add_header Pragma   no-cache;
+            # add_header Expires  0;
+            # add_header Cache-Control no-cache,no-store,must-revalidate;
         }
 
 

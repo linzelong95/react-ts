@@ -4,6 +4,7 @@ const { merge } = require('webpack-merge')
 // webpack v5用CssMinimizerPlugin，而不使用OptimizeCSSAssetsPlugin
 // const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
+// const CompressionPlugin = require('compression-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 // const SentryPlugin = require('webpack-sentry-plugin')
@@ -66,6 +67,10 @@ const productionConfig = {
       cleanOnceBeforeBuildPatterns: BUILD_MODULES.length ? BUILD_MODULES.map((moduleName) => `${moduleName}/**/*`) : ['index/**/*'],
     }),
 
+    // 使用zip压缩（配置此项，nginx等方向代理无需开启zip压缩）
+    // new CompressionPlugin(),
+
+    // 生成清单
     ...BUILD_MODULES.map((moduleName) => {
       return new WebpackManifestPlugin({
         fileName: `${MANIFEST_ROOT}/${moduleName}.manifest.json`,
