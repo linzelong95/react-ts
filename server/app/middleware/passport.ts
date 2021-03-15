@@ -85,7 +85,7 @@ module.exports = (options, app: Application) => {
         return
       }
       if (ctx.isAuthenticated() && ctx.state.user.roleName !== 'admin') {
-        ctx.body = { code: StatusCode.FORBIDDEN, message: '无权限操作' }
+        ctx.body = { code: StatusCode.FORBIDDEN, message: '您不是管理员，暂无权限操作' }
         return
       }
       return await next()

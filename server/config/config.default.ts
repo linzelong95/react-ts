@@ -35,6 +35,12 @@ const isNextApp = /^\/(blog|_next)(\/)?.*/
 export default (appInfo: EggAppInfo): PowerPartial<EggAppConfig> => {
   const config = {} as PowerPartial<EggAppConfig>
 
+  /**
+   * Cookie 密钥
+   * keys 配置成一个字符串，可以按照逗号分隔配置多个 key
+   * 如果我们想要更新 Cookie 的秘钥，但是又不希望之前设置到用户浏览器上的 Cookie 失效，可以将新的秘钥配置到 keys 最前面
+   * @see https://eggjs.org/zh-cn/core/cookie-and-session.html#cookie-%E7%A7%98%E9%92%A5
+   */
   config.keys = appInfo.name + '******'
 
   config.rsaPrivateKey = rsaPrivateKey

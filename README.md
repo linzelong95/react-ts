@@ -37,6 +37,18 @@ npm run dev
 
 ```
 
+```bash
+# 访问
+
+# spa页面
+方式一、通过webpackDevServer访问：http://127.0.0.1:7002/模块名
+方式二、通过node(egg.js)访问：http://127.0.0.1:7001/模块名
+
+# nextjs应用
+通过node(egg.js)访问：http://127.0.0.1:7001/blog
+
+```
+
 ### 打包
 
 ```bash
