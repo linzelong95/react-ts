@@ -11,7 +11,7 @@ if (!['dev', 'dll', 'build', 'build-all', 'analyzer'].includes(mode)) {
   throw new Error('您输入的指令有误')
 }
 
-if (!['dll'].includes(mode)) {
+if (!['dll', 'build-all'].includes(mode)) {
   if (!modules.length) {
     throw new Error(`必须添加要编译的 app 名，例如 npm run ${mode} appName`)
   }
@@ -43,7 +43,7 @@ if (['build', 'build-all', 'analyzer'].includes(mode)) {
   env.NODE_ENV = 'production'
   if (mode === 'build-all') {
     env.BUILD_MODULES = fs
-      .readdirSync(path.resolve(__dirname, '../src'), { withFileTypes: true })
+      .readdirSync(path.resolve(__dirname, '../spa'), { withFileTypes: true })
       .filter((file) => file.isDirectory() && !['base', 'common'].includes(file.name))
       .map((file) => file.name)
       .join('&')

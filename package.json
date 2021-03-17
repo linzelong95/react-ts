@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "node ./webpack/build.js dev",
     "build": "node ./webpack/build.js build",
+    "build-all": "node ./webpack/build.js build-all",
     "dll": "node ./webpack/webpack.dll.js",
     "next": "next build",
     "analyzer": "node ./webpack/build.js analyzer",
