@@ -27,7 +27,7 @@ export class User {
   @Column({ default: '/public/assets/images/default/avatar.jpeg' })
   avatar: string
 
-  @Column()
+  @Column({ nullable: true })
   github: string
 
   @OneToMany(() => Article, (article) => article.user)

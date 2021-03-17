@@ -3,6 +3,7 @@
 ```
 本项目主要集合spa、ssr、server为一体，用blog应用作为实践，以node为中心，处理spa、ssr页面的访问及api请求。
 涉及的技术栈：react、redux、next.js、egg.js、typescript、antd、webpack、eslint、prettier
+体验：http://120.78.138.146  管理员：98@qq.com/linzelong 普通用户：111/111
 ```
 
 ### 开发
