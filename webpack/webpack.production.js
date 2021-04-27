@@ -6,6 +6,7 @@ const { merge } = require('webpack-merge')
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
 // const CompressionPlugin = require('compression-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 // const SentryPlugin = require('webpack-sentry-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
@@ -54,6 +55,14 @@ const productionConfig = {
   },
 
   plugins: [
+    // TS 类型检查
+    new ForkTsCheckerWebpackPlugin({
+      eslint: {
+        enabled: true,
+        files: ['**/spa/**/*.{ts,tsx}'],
+      },
+    }),
+
     // 抽离出css
     new MiniCssExtractPlugin({
       filename: '[name]/css/[name]_[contenthash].css',

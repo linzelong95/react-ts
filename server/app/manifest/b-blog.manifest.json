@@ -1,12 +1,6 @@
 {
-  "b-blog.css": {
-    "path": "/public/b-blog/css/b-blog_54105402bbc831f334e1.css",
-    "editor": "briefNull",
-    "release": "briefNull-1615721247648"
-  },
   "b-blog.js": {
-    "path": "/public/b-blog/js/b-blog_91bba4b42434ad1cb619.js",
-    "editor": "briefNull",
-    "release": "briefNull-1615721247648"
+    "path": "http://127.0.0.1:7002/b-blog/js/b-blog.js",
+    "editor": "briefNull"
   }
 }

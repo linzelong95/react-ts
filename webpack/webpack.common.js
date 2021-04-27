@@ -3,7 +3,6 @@ const autoprefixer = require('autoprefixer')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const ProgressBarPlugin = require('progress-bar-webpack-plugin')
 const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin')
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 // const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin')
 // const HardSourceWebpackPlugin = require('hard-source-webpack-plugin')
 const { PROJECT_PATH, WEB_ROOT, BUILD_MODULES } = require('./constants')
@@ -51,19 +50,20 @@ module.exports = {
   // loader 配置
   module: {
     rules: [
-      {
-        test: /\.tsx?$/,
-        enforce: 'pre',
-        use: [
-          {
-            loader: 'eslint-loader',
-            options: {
-              fix: false,
-              emitError: true,
-            },
-          },
-        ],
-      },
+      // ForkTsCheckerWebpackPlugin里做校验就可以了
+      // {
+      //   test: /\.tsx?$/,
+      //   enforce: 'pre',
+      //   use: [
+      //     {
+      //       loader: 'eslint-loader',
+      //       options: {
+      //         fix: false,
+      //         emitError: true,
+      //       },
+      //     },
+      //   ],
+      // },
       {
         // js ts 都用 babel-loader 处理
         test: /\.(j|t)sx?$/,
@@ -153,14 +153,6 @@ module.exports = {
     new webpack.DefinePlugin({
       __SERVER_ORIGIN__: JSON.stringify(isDevelopment ? 'http://127.0.0.1:7001' : ''),
       __IS_DEV_MODE__: JSON.stringify(process.env.NODE_ENV === 'development'),
-    }),
-
-    // TS 类型检查
-    new ForkTsCheckerWebpackPlugin({
-      eslint: {
-        enabled: true,
-        files: ['**/spa/**/*.{ts,tsx}'],
-      },
     }),
 
     // 优化错误展示，与webpack 5暂不兼容？
