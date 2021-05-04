@@ -5,14 +5,7 @@ const glob = require('glob')
 
 const PUBLIC_ROOT = path.resolve(__dirname, `../public`)
 
-function getModuleStatics(moduleName): Record<'js' | 'css', { path: string; release: string; editor: string }> | null {
-  const appManifestPath = path.resolve(__dirname, `../manifest/${moduleName}.manifest.json`)
-  if (!fs.existsSync(appManifestPath)) return null
-  return {
-    js: require(appManifestPath)[`${moduleName}.js`],
-    css: require(appManifestPath)[`${moduleName}.css`],
-  } as Record<'js' | 'css', { path: string; release: string; editor: string }>
-}
+type ModuleStatics = Record<'js' | 'runtimeJs' | 'css', { path: string; release: string; editor: string }> | null
 
 interface RenderData {
   jsList: string[]
@@ -33,6 +26,15 @@ interface RenderData {
   }
 }
 
+function getModuleStatics(moduleName: string): ModuleStatics {
+  const appManifestPath = path.resolve(__dirname, `../manifest/${moduleName}.manifest.json`)
+  if (!fs.existsSync(appManifestPath)) return null
+  return {
+    js: require(appManifestPath)[`${moduleName}.js`],
+    runtimeJs: require(appManifestPath)[`${moduleName}/runtime~${moduleName}.js`],
+    css: require(appManifestPath)[`${moduleName}.css`],
+  }
+}
 export default class HomeController extends Controller {
   public async index(): Promise<unknown> {
     const { ctx, config } = this
@@ -64,11 +66,14 @@ export default class HomeController extends Controller {
       glob.sync(`${PUBLIC_ROOT}/dll/*.js`, { nodir: true }).forEach((path) => {
         renderData.jsList.push(`/public/${path.split('/').slice(-2).join('/')}`)
       })
-    } else {
-      if (baseStatics?.js?.path) renderData.jsList.unshift(baseStatics.js.path)
+    } else if (baseStatics?.js?.path) {
+      renderData.jsList.unshift(baseStatics.js.path)
     }
-    renderData.jsList.push(moduleStatics.js.path)
     if (baseStatics?.css?.path) renderData.cssList.unshift(baseStatics.css.path)
+    if (moduleStatics.js?.path) {
+      renderData.jsList.push(moduleStatics.js.path)
+      if (moduleStatics.runtimeJs?.path) renderData.jsList.push(moduleStatics.runtimeJs.path)
+    }
     return ctx.render('index.ejs', renderData)
   }
 }

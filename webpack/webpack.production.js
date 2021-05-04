@@ -27,17 +27,24 @@ const productionConfig = {
   mode: 'production',
 
   output: {
-    filename: '[name]/js/[name]_[contenthash].js',
     path: PUBLIC_ROOT,
     publicPath: '/public/',
-    chunkFilename: (pathData) => `${pathData.chunk.runtime}/js/chunks/[id]_[contenthash].js`,
-    assetModuleFilename: (pathData) => `${pathData.runtime}/js/asset/[name]_[hash][ext][query]`,
+    // filename: '[name]/js/[name]_[contenthash].js',
+    // chunkFilename: (pathData) => `${pathData.chunk.runtime}/js/chunks/[id]_[contenthash].js`,
+    // assetModuleFilename: (pathData) => `${pathData.runtime}/js/asset/[name]_[hash][ext][query]`,
+    filename: (pathData) => (pathData.chunk.name.includes('runtime') ? '[name]_[contenthash].js' : '[name]/[name]_[contenthash].js'),
+    chunkFilename: (pathData) => `${pathData.chunk.runtime}/[name]_[id]_[contenthash].js`,
+    assetModuleFilename: (pathData) => `${pathData.runtime}/asset/[name]_[hash][ext][query]`,
   },
 
-  devtool: 'source-map',
+  // devtool: 'source-map',
 
   optimization: {
     splitChunks: false,
+    runtimeChunk: !BUILD_MODULES.includes('base') && {
+      name: (entry) => `${entry.name}/runtime~${entry.name}`,
+    },
+    emitOnErrors: true,
     minimize: true,
     minimizer: [
       new TerserPlugin({
@@ -65,8 +72,10 @@ const productionConfig = {
 
     // 抽离出css
     new MiniCssExtractPlugin({
-      filename: '[name]/css/[name]_[contenthash].css',
-      chunkFilename: (pathData) => `${pathData.chunk.runtime}/css/chunks/[id]_[contenthash].css`,
+      // filename: '[name]/css/[name]_[contenthash].css',
+      // chunkFilename: (pathData) => `${pathData.chunk.runtime}/css/chunks/[id]_[contenthash].css`,
+      filename: (pathData) => (pathData.chunk.name.includes('runtime') ? '[name]_[contenthash].css' : '[name]/[name]_[contenthash].css'),
+      chunkFilename: (pathData) => `${pathData.chunk.runtime}/[name]_[id]_[contenthash].css`,
     }),
 
     // 删除无用文件
@@ -86,9 +95,10 @@ const productionConfig = {
         writeToFileEmit: true,
         seed: {},
         generate: (seed, files) => {
+          const regExp = new RegExp(`^(${moduleName}/runtime~)?${moduleName}\\.(js|css)`)
           for (const file of files) {
             const { name, path } = file
-            if (name === `${moduleName}.js` || name === `${moduleName}.css`) {
+            if (regExp.test(name)) {
               seed[name] = {
                 path,
                 editor: os.userInfo().username,
