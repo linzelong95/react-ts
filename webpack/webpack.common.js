@@ -23,7 +23,7 @@ module.exports = {
   context: PROJECT_PATH,
 
   // 如果打包的是 base，externals 不被忽略
-  externals: BUILD_MODULES.includes('base') || isDevelopment ? {} : externals,
+  // externals: BUILD_MODULES.includes('base') || isDevelopment ? {} : externals,
 
   // 路径及 alias 配置
   resolve: {

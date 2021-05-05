@@ -1,7 +1,7 @@
 import i18next from 'i18next'
 import LanguageDetector from 'i18next-browser-languagedetector'
 import { initReactI18next } from 'react-i18next'
-import { locale } from 'moment'
+// import { locale } from 'moment'
 import en from './en'
 import zh from './zh-cn'
 
@@ -23,8 +23,8 @@ i18next
     },
   })
 
-i18next.on('languageChanged', function (lng) {
-  locale(lng.toLowerCase())
-})
+// i18next.on('languageChanged', function (lng) {
+//   locale(lng.toLowerCase())
+// })
 
 export default i18next

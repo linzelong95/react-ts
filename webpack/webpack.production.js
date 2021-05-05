@@ -15,13 +15,16 @@ const { WebpackManifestPlugin } = require('webpack-manifest-plugin')
 // 找到没有用到的废弃文件
 // const { UnusedFilesWebpackPlugin } = require('unused-files-webpack-plugin')
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const glob = require('glob')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 // 测速插件，webpack 5暂不支持
 // const smp = new SpeedMeasurePlugin()
 
 const commonConfig = require('./webpack.common')
 
-const { BUILD_MODULES, PUBLIC_ROOT, MANIFEST_ROOT, RELEASE_TAG } = require('./constants')
+const { BUILD_MODULES, PUBLIC_ROOT, MANIFEST_ROOT, RELEASE_TAG, SERVER_ROOT } = require('./constants')
 
 const productionConfig = {
   mode: 'production',
@@ -40,7 +43,40 @@ const productionConfig = {
   // devtool: 'source-map',
 
   optimization: {
-    splitChunks: false,
+    splitChunks: {
+      cacheGroups: {
+        // chunks: 'initial',
+        defaultVendors: false,
+        default: false,
+        reactCore: {
+          name: 'common/react_core',
+          filename: (pathData) => `${pathData.chunk.name}_[contenthash].js`,
+          chunks: 'all',
+          test: /[/\\]node_modules[/\\](react|react-dom|react-router)[/\\]/,
+          enforce: true,
+          reuseExistingChunk: true,
+          priority: 9,
+        },
+        moment: {
+          name: 'common/moment',
+          filename: (pathData) => `${pathData.chunk.name}_[contenthash].js`,
+          chunks: 'all',
+          test: /[/\\]node_modules[/\\]moment[/\\]/,
+          enforce: true,
+          reuseExistingChunk: true,
+          priority: 8,
+        },
+        axios: {
+          name: 'common/axios',
+          filename: (pathData) => `${pathData.chunk.name}_[contenthash].js`,
+          chunks: 'all',
+          test: /[/\\]node_modules[/\\](axios|i18next)[/\\]/,
+          enforce: true,
+          reuseExistingChunk: true,
+          priority: 7,
+        },
+      },
+    },
     runtimeChunk: !BUILD_MODULES.includes('base') && {
       name: (entry) => `${entry.name}/runtime~${entry.name}`,
     },
@@ -63,12 +99,12 @@ const productionConfig = {
 
   plugins: [
     // TS 类型检查
-    new ForkTsCheckerWebpackPlugin({
-      eslint: {
-        enabled: true,
-        files: ['**/spa/**/*.{ts,tsx}'],
-      },
-    }),
+    // new ForkTsCheckerWebpackPlugin({
+    //   eslint: {
+    //     enabled: true,
+    //     files: ['**/spa/**/*.{ts,tsx}'],
+    //   },
+    // }),
 
     // 抽离出css
     new MiniCssExtractPlugin({
@@ -87,6 +123,56 @@ const productionConfig = {
 
     // 使用zip压缩（配置此项，nginx等方向代理无需开启zip压缩）
     // new CompressionPlugin(),
+
+    // new CopyWebpackPlugin({
+    //   patterns: [
+    //     { from: `${PUBLIC_ROOT}/base`, to: '/base' },
+    //     ...glob.sync(`${PUBLIC_ROOT}/dll/*.js`, { nodir: true }).map((from) => {
+    //       return { from, to: '/dll' }
+    //     }),
+    //   ],
+    // }),
+
+    ...BUILD_MODULES.map((moduleName) => {
+      if (moduleName === 'base') return null
+      return new HtmlWebpackPlugin({
+        template: `${SERVER_ROOT}/app/view/index.ejs`,
+        filename: `${moduleName}/index.html`,
+        inject: 'body',
+        chunks: ['common', moduleName], // 若不设置则默认将当前entry多文件全部注入
+        templateParameters: {
+          title: 'briefNull project',
+          keywords: 'blog,next,egg,react',
+          description: 'this is a project for sharing.',
+          favicon: 'http://127.0.0.1:7001/public/assets/images/logo.png',
+          cssList: [],
+          jsList: [],
+          // cssList: glob.sync(`${PUBLIC_ROOT}/base/**/*.css`, { nodir: true }).map(
+          //   (path) => `/${path.split('/').slice(-3).join('/')}`, // '/base/css/xxx.css'
+          // ),
+          // jsList: glob.sync(`${PUBLIC_ROOT}/dll/*.js`, { nodir: true }).map(
+          //   (path) => `/${path.split('/').slice(-2).join('/')}`, // '/dll/xxx.js', TODO:确保react、react-dom在最前面
+          // ),
+        },
+        minify:
+          process.env.NODE_ENV !== 'production'
+            ? false
+            : {
+                removeAttributeQuotes: true,
+                collapseWhitespace: true,
+                removeComments: true,
+                collapseBooleanAttributes: true,
+                collapseInlineTagWhitespace: true,
+                removeRedundantAttributes: true,
+                removeScriptTypeAttributes: true,
+                removeStyleLinkTypeAttributes: true,
+                minifyCSS: true,
+                minifyJS: true,
+                minifyURLs: true,
+                useShortDoctype: true,
+              },
+      })
+    }),
 
     // 生成清单
     ...BUILD_MODULES.map((moduleName) => {
