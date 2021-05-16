@@ -13,18 +13,22 @@ import type { ProviderProps } from 'react-redux'
 import type { RouteConfig } from '@common/types'
 
 interface FrameworkOptions {
-  // 应用名称
-  appName: string
   // 应用基础路径
-  basename: string
+  basename?: string
   // 路由
   routes?: RouteConfig[]
   // store
   store: ProviderProps['store']
+  // 隐藏头部和菜单
+  hideAll?: string
+  // 只隐藏头部
+  hideHeader?: boolean // 优先级高于hideAll
+  // 只隐藏菜单
+  hideMenu?: boolean // 优先级高于hideAll
 }
 
 const Framework: FC<FrameworkOptions> = (props) => {
-  const { store, routes, basename } = props
+  const { store, basename = '/', ...restProps } = props
   const { i18n } = useTranslation()
 
   return (
@@ -32,7 +36,12 @@ const Framework: FC<FrameworkOptions> = (props) => {
       <ErrorBoundary>
         <Provider store={store}>
           <BrowserRouter basename={basename}>
-            <ConfigProvider locale={i18n.language === 'zh-CN' ? zhCN : enUS}>{renderRoutes(routes, basename)}</ConfigProvider>
+            <ConfigProvider locale={i18n.language === 'zh-CN' ? zhCN : enUS}>
+              {renderRoutes({
+                basename,
+                ...restProps,
+              })}
+            </ConfigProvider>
           </BrowserRouter>
         </Provider>
       </ErrorBoundary>

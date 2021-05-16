@@ -7,13 +7,34 @@ import type { CElement } from 'react'
 import type { SwitchProps, RedirectProps, RouteComponentProps } from 'react-router-dom'
 import type { RouteConfig } from '@common/types'
 
-function renderRoute(route: RouteConfig, props: RouteComponentProps, allRoutes: RouteConfig[], basename: string): JSX.Element {
+type RenderRoute = (params: {
+  route: RouteConfig
+  props: RouteComponentProps
+  allRoutes: RouteConfig[]
+  basename: string
+  // 隐藏头部和菜单
+  hideAll?: string
+  // 只隐藏头部
+  hideHeader?: boolean // 优先级高于hideAll
+  // 只隐藏菜单
+  hideMenu?: boolean // 优先级高于hideAll}) => JSX.Element
+}) => JSX.Element
+
+type RenderRoutes = (params: {
+  routes?: RouteConfig[]
+  basename: string
+  allRoutes?: RouteConfig[]
+  redirectComponent?: CElement<RedirectProps, Redirect>
+  useNotFoundComponent?: boolean
+}) => CElement<SwitchProps, Switch>
+
+const renderRoute: RenderRoute = (params) => {
+  const { route, props, allRoutes, basename, ...restParams } = params
   const { component: Component, routes, redirect, path, wrappers } = route
   const redirectComponent = redirect && <Redirect key={`${uuid()}-redirect`} exact from={path} to={redirect} />
   const useNotFoundComponent = !Component || Boolean(routes?.length)
-  const children = renderRoutes(routes, basename, allRoutes, { redirectComponent, useNotFoundComponent })
-  const formativeProps =
-    path === '/' && Component ? { ...props, basename, routes: allRoutes, hideHeader: true, hideMenu: true } : { ...props }
+  const children = renderRoutes({ routes, basename, allRoutes, redirectComponent, useNotFoundComponent })
+  const formativeProps = path === '/' && Component ? { ...props, basename, routes: allRoutes, ...restParams } : { ...props }
   let ret = Component ? (
     <Suspense fallback={<Spin size="large" style={{ marginTop: 50 }} />}>
       {isValidElement(Component) ? (
@@ -36,15 +57,8 @@ function renderRoute(route: RouteConfig, props: RouteComponentProps, allRoutes: 
   return ret
 }
 
-type RenderRoutes = (
-  routes: RouteConfig[],
-  basename?: string,
-  allRoutes?: RouteConfig[],
-  extraParams?: { redirectComponent?: CElement<RedirectProps, Redirect>; useNotFoundComponent?: boolean },
-) => CElement<SwitchProps, Switch>
-
-export const renderRoutes: RenderRoutes = (routes = [], basename, allRoutes, extraParams = {}) => {
-  const { redirectComponent, useNotFoundComponent = true } = extraParams
+export const renderRoutes: RenderRoutes = (params) => {
+  const { routes = [], allRoutes, redirectComponent, useNotFoundComponent = true, ...resParams } = params
   return (
     <Switch key={uuid()}>
       {routes.map((route) => {
@@ -54,7 +68,14 @@ export const renderRoutes: RenderRoutes = (routes = [], basename, allRoutes, ext
           <Route
             key={menuKey}
             {...{ path, exact, strict, sensitive }}
-            render={(props) => renderRoute(route, props, allRoutes || route.routes, basename)}
+            render={(props) =>
+              renderRoute({
+                route,
+                props,
+                allRoutes: allRoutes || route.routes,
+                ...resParams,
+              })
+            }
           />
         )
       })}

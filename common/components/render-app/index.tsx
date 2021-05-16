@@ -1,4 +1,3 @@
-import React from 'react'
 import { render } from 'react-dom'
 import { ReducersMapObject } from 'redux'
 // import { init } from '@sentry/browser'
@@ -8,12 +7,16 @@ import { NotFound } from '@common/components'
 import type { RouteConfig } from '@common/types'
 
 interface RenderAppProps {
-  // 应用名称
-  appName: string
   // 应用基础路径
-  basename: string
+  basename?: string
   // 路由
   routes?: RouteConfig[]
+  // 隐藏头部和菜单
+  hideAll?: string
+  // 只隐藏头部
+  hideHeader?: boolean // 优先级高于hideAll
+  // 只隐藏菜单
+  hideMenu?: boolean // 优先级高于hideAll
   // redux reducer
   reducerMap?: ReducersMapObject
   // redux state
@@ -22,7 +25,7 @@ interface RenderAppProps {
 
 function renderApp(options: RenderAppProps): void {
   const { reducerMap = {}, initialStateMap = {}, ...frameworkOptions } = options
-  const { appName, basename } = frameworkOptions
+  const { basename = '/' } = frameworkOptions
   const { pathname } = window.location
 
   if (!pathname.startsWith(basename) && !(window as any).__LOCK__) {
@@ -30,7 +33,7 @@ function renderApp(options: RenderAppProps): void {
     return
   }
 
-  console.log(`当前渲染 App 为：${appName}`)
+  console.log(`当前渲染 App 路径为：${basename}`)
 
   // 开发环境下，可能同时启动多个模块，但NotFound最多只需要渲染一次
   if (__IS_DEV_MODE__) (window as any).__LOCK__ = basename

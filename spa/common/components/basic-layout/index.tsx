@@ -3,6 +3,7 @@ import { useLocation, useRouteMatch } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import * as Sentry from '@sentry/browser'
 import { Layout, Spin, message } from 'antd'
+import { parse } from 'qs'
 import { LocalStorage } from '@common/constants'
 import { createLoginAction } from '@common/store/actions'
 import { accountServices } from '@common/services'
@@ -47,6 +48,20 @@ const BasicLayout: FC<BasicLayoutProps> = memo((props) => {
   const [accountLocalStorage, setAccountLocalStorage] = useLocalStorage<{ autoLoginMark: boolean; autoLogin: boolean }>(
     LocalStorage.BLOG_STORE_ACCOUNT,
   )
+
+  const { toHideHeader, toHideMenu } = useMemo<{ toHideHeader: boolean; toHideMenu: boolean }>(() => {
+    const queriesFromUrl = parse(location.search, {
+      ignoreQueryPrefix: true,
+    }) as {
+      hideAll: string
+      hideHeader: string
+      hideMenu: string
+    }
+    return {
+      toHideHeader: Boolean(queriesFromUrl?.hideHeader || queriesFromUrl?.hideAll || hideHeader),
+      toHideMenu: Boolean(queriesFromUrl?.hideMenu || queriesFromUrl?.hideAll || hideMenu),
+    }
+  }, [hideHeader, hideMenu])
 
   const getUserAuthPoints = useCallback<() => string[]>(() => {
     if (!userInfo?.roleName) return []
@@ -99,9 +114,9 @@ const BasicLayout: FC<BasicLayoutProps> = memo((props) => {
     <Layout className={styles['basic-layout']}>
       {userInfo?.account ? (
         <>
-          {!hideHeader && <Header userInfo={userInfo} isMobile={isMobile} onLogout={logout} onToggleMenuDrawer={setMenuDrawerVisible} />}
+          {!toHideHeader && <Header userInfo={userInfo} isMobile={isMobile} onLogout={logout} onToggleMenuDrawer={setMenuDrawerVisible} />}
           <Layout className={styles['body-area']}>
-            {!hideMenu && (
+            {!toHideMenu && (
               <SideMenu
                 routes={routes}
                 basename={basename}
@@ -119,7 +134,7 @@ const BasicLayout: FC<BasicLayoutProps> = memo((props) => {
           </Layout>
         </>
       ) : (
-        <div className="mt20 text-center">
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <Spin size="large" />
         </div>
       )}
