@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import { memo } from 'react'
 import { Card, Result, Button } from 'antd'
 import type { FC } from 'react'
 import type { RouteComponentProps } from 'react-router'

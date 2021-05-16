@@ -2,16 +2,16 @@
   "account.css": {
     "path": "/public/account/account_3e6d9b891eff76a29295.css",
     "editor": "briefNull",
-    "release": "briefNull-1620128672113"
+    "release": "briefNull-1621174735791"
   },
   "account.js": {
-    "path": "/public/account/account_8375dc07d462738426b6.js",
+    "path": "/public/account/account_a78b46ba6d89e746fa8c.js",
     "editor": "briefNull",
-    "release": "briefNull-1620128672113"
+    "release": "briefNull-1621174735791"
   },
   "account/runtime~account.js": {
-    "path": "/public/account/runtime~account_34c72bde53dd4a818c9d.js",
+    "path": "/public/account/runtime~account_d63e891d31d29a06fb25.js",
     "editor": "briefNull",
-    "release": "briefNull-1620128672113"
+    "release": "briefNull-1621174735791"
   }
 }

@@ -3,7 +3,6 @@ import routes from './configs/routes'
 import './locales'
 
 renderApp({
-  appName: 'account',
   basename: '/account',
   routes,
 })
@@ -11,7 +10,6 @@ renderApp({
 if (module?.hot) {
   module.hot.accept(() => {
     renderApp({
-      appName: 'account',
       basename: '/account',
       routes,
     })

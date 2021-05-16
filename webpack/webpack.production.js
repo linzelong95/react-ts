@@ -66,7 +66,9 @@ const productionConfig = {
     new ForkTsCheckerWebpackPlugin({
       eslint: {
         enabled: true,
-        files: ['**/spa/**/*.{ts,tsx}'],
+        // 路径相对于项目根目录
+        // files: ['**/spa/**/*.{ts,tsx}'],
+        files: BUILD_MODULES.map((moduleName) => `spa/${moduleName}/**/*.{ts,tsx}`),
       },
     }),
 
@@ -78,11 +80,15 @@ const productionConfig = {
       chunkFilename: (pathData) => `${pathData.chunk.runtime}/[name]_[id]_[contenthash].css`,
     }),
 
-    // 删除无用文件
+    // 删除无用文件,路径相对于output
     new CleanWebpackPlugin({
       dry: false,
-      dangerouslyAllowCleanPatternsOutsideProject: true,
-      cleanOnceBeforeBuildPatterns: BUILD_MODULES.length ? BUILD_MODULES.map((moduleName) => `${moduleName}/**/*`) : ['index/**/*'],
+      // cleanOnceBeforeBuildPatterns: BUILD_MODULES.map((moduleName) => `${moduleName}/**/*`),
+      cleanOnceBeforeBuildPatterns: BUILD_MODULES.reduce((patterns, moduleName) => {
+        patterns.push(`${moduleName}/**/*`)
+        patterns.push(`!${moduleName}/**/favicon.ico`)
+        return patterns
+      }, []),
     }),
 
     // 使用zip压缩（配置此项，nginx等方向代理无需开启zip压缩）
