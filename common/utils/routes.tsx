@@ -41,7 +41,7 @@ const renderRoute: RenderRoute = (params) => {
   const redirectComponent = redirect && <Redirect key={`${uuid()}-redirect`} exact from={path} to={redirect} />
   const useNotFoundComponent = !Component || Boolean(routes?.length)
   const children = renderRoutes({ routes, basename, allRoutes, redirectComponent, useNotFoundComponent })
-  const formativeProps = path === '/' && Component ? { ...props, basename, routes: allRoutes, ...restParams } : { ...props }
+  const formativeProps = path === '/' && Component ? { basename, routes: allRoutes, ...restParams, ...props } : { ...props }
   let ret = Component ? (
     <Suspense fallback={<Spin size="large" style={{ marginTop: 50 }} />}>
       {isValidElement(Component) ? (

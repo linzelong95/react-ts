@@ -25,7 +25,7 @@ interface BasicLayoutProps extends RouteComponentProps<Record<string, never>> {
   hideAll?: boolean
   hideHeader?: boolean // 优先级高于hideAll
   hideMenu?: boolean // 优先级高于hideAll
-  hideFooter: boolean // 优先级高于hideAll
+  hideFooter?: boolean // 优先级高于hideAll
 }
 
 const BasicLayout: FC<BasicLayoutProps> = memo((props) => {
