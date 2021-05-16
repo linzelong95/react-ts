@@ -1,4 +1,5 @@
 const os = require('os')
+const glob = require('glob')
 const { merge } = require('webpack-merge')
 // const PurgeCSSPlugin = require('purgecss-webpack-plugin')
 // webpack v5用CssMinimizerPlugin，而不使用OptimizeCSSAssetsPlugin
@@ -15,13 +16,17 @@ const { WebpackManifestPlugin } = require('webpack-manifest-plugin')
 // 找到没有用到的废弃文件
 // const { UnusedFilesWebpackPlugin } = require('unused-files-webpack-plugin')
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 // 测速插件，webpack 5暂不支持
 // const smp = new SpeedMeasurePlugin()
 
+const templateParameters = require('./template-parameters')
+
 const commonConfig = require('./webpack.common')
 
-const { BUILD_MODULES, PUBLIC_ROOT, MANIFEST_ROOT, RELEASE_TAG } = require('./constants')
+const { BUILD_MODULES, WEB_ROOT, SERVER_ROOT, PUBLIC_ROOT, MANIFEST_ROOT, RELEASE_TAG } = require('./constants')
 
 const productionConfig = {
   mode: 'production',
@@ -63,13 +68,21 @@ const productionConfig = {
 
   plugins: [
     // TS 类型检查
-    new ForkTsCheckerWebpackPlugin({
-      eslint: {
-        enabled: true,
-        // 路径相对于项目根目录
-        // files: ['**/spa/**/*.{ts,tsx}'],
-        files: BUILD_MODULES.map((moduleName) => `spa/${moduleName}/**/*.{ts,tsx}`),
-      },
+    process.env.IS_ANALYZER !== 'true' &&
+      new ForkTsCheckerWebpackPlugin({
+        eslint: {
+          enabled: true,
+          // 路径相对于项目根目录
+          // files: ['**/spa/**/*.{ts,tsx}'],
+          files: BUILD_MODULES.map((moduleName) => `spa/${moduleName}/**/*.{ts,tsx}`),
+        },
+      }),
+
+    new CopyWebpackPlugin({
+      patterns: BUILD_MODULES.map((moduleName) => ({
+        from: `${WEB_ROOT}/spa/${moduleName}/favicon.ico`,
+        to: `${PUBLIC_ROOT}/${moduleName}`,
+      })),
     }),
 
     // 抽离出css
@@ -83,10 +96,9 @@ const productionConfig = {
     // 删除无用文件,路径相对于output
     new CleanWebpackPlugin({
       dry: false,
-      // cleanOnceBeforeBuildPatterns: BUILD_MODULES.map((moduleName) => `${moduleName}/**/*`),
       cleanOnceBeforeBuildPatterns: BUILD_MODULES.reduce((patterns, moduleName) => {
         patterns.push(`${moduleName}/**/*`)
-        patterns.push(`!${moduleName}/**/favicon.ico`)
+        // patterns.push(`!${moduleName}/**/favicon.ico`) // 加上 ！表示不要清除该项
         return patterns
       }, []),
     }),
@@ -147,7 +159,50 @@ const productionConfig = {
     // }),
 
     // bundler 分析
-    process.env.IS_ANALYZER === 'true' && new BundleAnalyzerPlugin(),
+    ...(process.env.IS_ANALYZER === 'true'
+      ? [
+          new BundleAnalyzerPlugin(),
+          ...BUILD_MODULES.map((moduleName) => {
+            if (moduleName === 'base') return null
+            return new HtmlWebpackPlugin({
+              template: `${SERVER_ROOT}/app/view/index.ejs`,
+              filename: `${moduleName}/index.html`,
+              inject: 'body',
+              chunks: [moduleName], // 若不设置则默认将当前entry多文件全部注入
+              templateParameters: {
+                ...templateParameters,
+                ...templateParameters[moduleName],
+                cssList: [
+                  ...glob.sync(`${PUBLIC_ROOT}/base/**/*.css`, { nodir: true }).map(
+                    (path) => `/${path.split('/').slice(-2).join('/')}`, // '/base/css/xxx.css'
+                  ),
+                  ...((templateParameters[moduleName] && templateParameters[moduleName].cssList) || []),
+                ],
+                jsList: [
+                  ...glob.sync(`${PUBLIC_ROOT}/dll/*.js`, { nodir: true }).map(
+                    (path) => `/${path.split('/').slice(-2).join('/')}`, // '/dll/xxx.js', TODO:确保react、react-dom在最前面
+                  ),
+                  ...((templateParameters[moduleName] && templateParameters[moduleName].jsList) || []),
+                ],
+              },
+              minify: {
+                removeAttributeQuotes: true,
+                collapseWhitespace: true,
+                removeComments: true,
+                collapseBooleanAttributes: true,
+                collapseInlineTagWhitespace: true,
+                removeRedundantAttributes: true,
+                removeScriptTypeAttributes: true,
+                removeStyleLinkTypeAttributes: true,
+                minifyCSS: true,
+                minifyJS: true,
+                minifyURLs: true,
+                useShortDoctype: true,
+              },
+            })
+          }),
+        ]
+      : []),
   ].filter(Boolean),
 
   // 设置信息展示

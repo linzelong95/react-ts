@@ -1,3 +1,4 @@
+const path = require('path')
 const webpack = require('webpack')
 const autoprefixer = require('autoprefixer')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
@@ -44,7 +45,9 @@ module.exports = {
       ? {
           'react-dom': '@hot-loader/react-dom',
         }
-      : {},
+      : {
+          'bn.js': path.resolve(PROJECT_PATH, 'node_modules', 'bn.js'), // 避免重复打包
+        },
   },
 
   // loader 配置

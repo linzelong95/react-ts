@@ -7,7 +7,8 @@ const { merge } = require('webpack-merge')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const commonConfig = require('./webpack.common')
-const { SERVER_ROOT, PUBLIC_ROOT, BUILD_MODULES, PROJECT_PATH, MANIFEST_ROOT } = require('./constants')
+const templateParameters = require('./template-parameters')
+const { SERVER_ROOT, PUBLIC_ROOT, WEB_ROOT, BUILD_MODULES, PROJECT_PATH, MANIFEST_ROOT } = require('./constants')
 
 // class MyInjectCustomScriptsPlugin {
 //   constructor(options) {
@@ -139,9 +140,8 @@ module.exports = merge(commonConfig, {
     new CopyWebpackPlugin({
       patterns: [
         { from: `${PUBLIC_ROOT}/base`, to: '/base' },
-        ...glob.sync(`${PUBLIC_ROOT}/dll/*.js`, { nodir: true }).map((from) => {
-          return { from, to: '/dll' }
-        }),
+        ...BUILD_MODULES.map((moduleName) => ({ from: `${WEB_ROOT}/spa/${moduleName}/favicon.ico`, to: '/' })),
+        ...glob.sync(`${PUBLIC_ROOT}/dll/*.js`, { nodir: true }).map((from) => ({ from, to: '/dll' })),
       ],
     }),
 
@@ -153,34 +153,22 @@ module.exports = merge(commonConfig, {
         inject: 'body',
         chunks: [moduleName], // 若不设置则默认将当前entry多文件全部注入
         templateParameters: {
-          title: 'briefNull project',
-          keywords: 'blog,next,egg,react',
-          description: 'this is a project for sharing.',
-          favicon: 'http://127.0.0.1:7001/public/assets/images/logo.png',
-          cssList: glob.sync(`${PUBLIC_ROOT}/base/**/*.css`, { nodir: true }).map(
-            (path) => `/${path.split('/').slice(-2).join('/')}`, // '/base/css/xxx.css'
-          ),
-          jsList: glob.sync(`${PUBLIC_ROOT}/dll/*.js`, { nodir: true }).map(
-            (path) => `/${path.split('/').slice(-2).join('/')}`, // '/dll/xxx.js', TODO:确保react、react-dom在最前面
-          ),
+          ...templateParameters,
+          ...templateParameters[moduleName],
+          cssList: [
+            ...glob.sync(`${PUBLIC_ROOT}/base/**/*.css`, { nodir: true }).map(
+              (path) => `/${path.split('/').slice(-2).join('/')}`, // '/base/css/xxx.css'
+            ),
+            ...((templateParameters[moduleName] && templateParameters[moduleName].cssList) || []),
+          ],
+          jsList: [
+            ...glob.sync(`${PUBLIC_ROOT}/dll/*.js`, { nodir: true }).map(
+              (path) => `/${path.split('/').slice(-2).join('/')}`, // '/dll/xxx.js', TODO:确保react、react-dom在最前面
+            ),
+            ...((templateParameters[moduleName] && templateParameters[moduleName].jsList) || []),
+          ],
         },
-        minify:
-          process.env.NODE_ENV !== 'production'
-            ? false
-            : {
-                removeAttributeQuotes: true,
-                collapseWhitespace: true,
-                removeComments: true,
-                collapseBooleanAttributes: true,
-                collapseInlineTagWhitespace: true,
-                removeRedundantAttributes: true,
-                removeScriptTypeAttributes: true,
-                removeStyleLinkTypeAttributes: true,
-                minifyCSS: true,
-                minifyJS: true,
-                minifyURLs: true,
-                useShortDoctype: true,
-              },
+        minify: false,
       })
     }),
 

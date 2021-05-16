@@ -1,17 +1,6 @@
 {
-  "b-blog.css": {
-    "path": "/public/b-blog/b-blog_629f5737d7af719a4c7a.css",
-    "editor": "briefNull",
-    "release": "briefNull-1620128948368"
-  },
   "b-blog.js": {
-    "path": "/public/b-blog/b-blog_d42689e41091bdec8dca.js",
-    "editor": "briefNull",
-    "release": "briefNull-1620128948368"
-  },
-  "b-blog/runtime~b-blog.js": {
-    "path": "/public/b-blog/runtime~b-blog_fd80d071d790a93839dc.js",
-    "editor": "briefNull",
-    "release": "briefNull-1620128948368"
+    "path": "http://127.0.0.1:7002/b-blog/js/b-blog.js",
+    "editor": "briefNull"
   }
 }
