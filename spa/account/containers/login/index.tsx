@@ -1,11 +1,10 @@
-import React, { memo, useCallback, useEffect, useMemo } from 'react'
+import { memo, useCallback, useEffect, useMemo } from 'react'
 import { LocalStorage } from '@common/constants'
 import { useLocalStorage, useService, useMobile } from '@common/hooks'
 import { accountServices } from '@common/services'
 import { rsa, serialize } from '@common/utils'
 import { Card, Form, Input, Checkbox, Row, Col, Button, message } from 'antd'
 import { GithubOutlined } from '@ant-design/icons'
-import { parse } from 'qs'
 import { useDispatch, useSelector } from 'react-redux'
 import { createLoginAction } from '@common/store/actions'
 import { useHistory, Link } from 'react-router-dom'
@@ -29,8 +28,9 @@ const Login: FC<RouteComponentProps<never>> = memo(() => {
 
   const goToPage = useCallback<(id: number) => void>(
     (id) => {
-      const { redirect } = parse(location.search, { ignoreQueryPrefix: true })
-      if (!redirect?.length) {
+      const queries = new URLSearchParams(window.location.search)
+      let redirectUrl = queries.get('redirect')
+      if (!redirectUrl) {
         history.replace(`/profile/${id}`)
         return
       }
@@ -44,7 +44,6 @@ const Login: FC<RouteComponentProps<never>> = memo(() => {
       // if (redirect.match(/^\/.*#/)) {
       //   redirect = redirect.slice(redirect.indexOf('#') + 1)
       // }
-      let redirectUrl = (Array.isArray(redirect) ? redirect[0] : redirect) as string
       try {
         redirectUrl = decodeURIComponent(redirectUrl)
       } finally {

@@ -7,26 +7,33 @@ import type { CElement } from 'react'
 import type { SwitchProps, RedirectProps, RouteComponentProps } from 'react-router-dom'
 import type { RouteConfig } from '@common/types'
 
-type RenderRoute = (params: {
-  route: RouteConfig
-  props: RouteComponentProps
-  allRoutes: RouteConfig[]
-  basename: string
-  // 隐藏头部和菜单
-  hideAll?: string
-  // 只隐藏头部
-  hideHeader?: boolean // 优先级高于hideAll
-  // 只隐藏菜单
-  hideMenu?: boolean // 优先级高于hideAll}) => JSX.Element
-}) => JSX.Element
-
-type RenderRoutes = (params: {
-  routes?: RouteConfig[]
+type CommonParams = {
   basename: string
   allRoutes?: RouteConfig[]
-  redirectComponent?: CElement<RedirectProps, Redirect>
-  useNotFoundComponent?: boolean
-}) => CElement<SwitchProps, Switch>
+  // 隐藏头部、菜单、脚部
+  hideAll?: boolean
+  // 只隐藏头部
+  hideHeader?: boolean // 优先级高于hideAll
+  // 只隐藏尾部
+  hideFooter?: boolean // 优先级高于hideAll
+  // 只隐藏菜单
+  hideMenu?: boolean // 优先级高于hideAll
+}
+
+type RenderRoute = (
+  params: {
+    route: RouteConfig
+    props: RouteComponentProps
+  } & CommonParams,
+) => JSX.Element
+
+type RenderRoutes = (
+  params: {
+    routes?: RouteConfig[]
+    redirectComponent?: CElement<RedirectProps, Redirect>
+    useNotFoundComponent?: boolean
+  } & CommonParams,
+) => CElement<SwitchProps, Switch>
 
 const renderRoute: RenderRoute = (params) => {
   const { route, props, allRoutes, basename, ...restParams } = params

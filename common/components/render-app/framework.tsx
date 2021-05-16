@@ -20,9 +20,11 @@ interface FrameworkOptions {
   // store
   store: ProviderProps['store']
   // 隐藏头部和菜单
-  hideAll?: string
+  hideAll?: boolean
   // 只隐藏头部
   hideHeader?: boolean // 优先级高于hideAll
+  // 只隐藏尾部
+  hideFooter?: boolean // 优先级高于hideAll
   // 只隐藏菜单
   hideMenu?: boolean // 优先级高于hideAll
 }

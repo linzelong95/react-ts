@@ -3,7 +3,6 @@ import { useLocation, useRouteMatch } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import * as Sentry from '@sentry/browser'
 import { Layout, Spin, message } from 'antd'
-import { parse } from 'qs'
 import { LocalStorage } from '@common/constants'
 import { createLoginAction } from '@common/store/actions'
 import { accountServices } from '@common/services'
@@ -23,24 +22,25 @@ import styles from './index.module.scss'
 interface BasicLayoutProps extends RouteComponentProps<Record<string, never>> {
   routes?: RouteConfig[]
   basename?: string
-  hideAll?: string
+  hideAll?: boolean
   hideHeader?: boolean // 优先级高于hideAll
   hideMenu?: boolean // 优先级高于hideAll
+  hideFooter: boolean // 优先级高于hideAll
 }
 
 const BasicLayout: FC<BasicLayoutProps> = memo((props) => {
   const { routes = [], basename = '/', children, hideAll = window.top !== window.self } = props
-  const { hideHeader = hideAll, hideMenu = hideAll } = props
+  const { hideHeader = hideAll, hideMenu = hideAll, hideFooter = hideAll } = props
   const dispatch = useDispatch()
   const { pathname } = useLocation()
-  let userInfo = useSelector<StoreState, StoreState['user']>((state) => state.user)
-  userInfo = {
-    account: 'ssss',
-    nickname: 'CCCC',
-    id: 1,
-    roleName: 'user',
-    avatar: '',
-  }
+  const userInfo = useSelector<StoreState, StoreState['user']>((state) => state.user)
+  // userInfo = {
+  //   account: 'ssss',
+  //   nickname: 'CCCC',
+  //   id: 1,
+  //   roleName: 'user',
+  //   avatar: '',
+  // }
   const isSmallViewPort = useMobile({ includePad: true, includeTraditionalSmallViewPort: 767 })
   const isMobile = useMobile({ includeTraditionalSmallViewPort: true })
   const [menuDrawerVisible, setMenuDrawerVisible] = useState<DrawerProps['visible']>(false)
@@ -49,19 +49,14 @@ const BasicLayout: FC<BasicLayoutProps> = memo((props) => {
     LocalStorage.BLOG_STORE_ACCOUNT,
   )
 
-  const { toHideHeader, toHideMenu } = useMemo<{ toHideHeader: boolean; toHideMenu: boolean }>(() => {
-    const queriesFromUrl = parse(location.search, {
-      ignoreQueryPrefix: true,
-    }) as {
-      hideAll: string
-      hideHeader: string
-      hideMenu: string
-    }
+  const { toHideHeader, toHideMenu, toHideFooter } = useMemo<{ toHideHeader: boolean; toHideMenu: boolean; toHideFooter: boolean }>(() => {
+    const queries = new URLSearchParams(location.search)
     return {
-      toHideHeader: Boolean(queriesFromUrl?.hideHeader || queriesFromUrl?.hideAll || hideHeader),
-      toHideMenu: Boolean(queriesFromUrl?.hideMenu || queriesFromUrl?.hideAll || hideMenu),
+      toHideHeader: queries.has('hideHeader') || queries.has('hideAll') || hideHeader,
+      toHideMenu: queries.has('hideMenu') || queries.has('hideAll') || hideMenu,
+      toHideFooter: queries.has('hideFooter') || queries.has('hideAll') || hideFooter,
     }
-  }, [hideHeader, hideMenu])
+  }, [hideHeader, hideMenu, hideFooter])
 
   const getUserAuthPoints = useCallback<() => string[]>(() => {
     if (!userInfo?.roleName) return []
@@ -129,7 +124,7 @@ const BasicLayout: FC<BasicLayoutProps> = memo((props) => {
             )}
             <Layout className={styles['body-right']}>
               <Layout.Content className={styles['main-content']}>{isForbidden ? <Forbidden /> : children}</Layout.Content>
-              <Footer />
+              {!toHideFooter && <Footer />}
             </Layout>
           </Layout>
         </>

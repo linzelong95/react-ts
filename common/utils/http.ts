@@ -17,7 +17,10 @@ export const http = axios.create({
   baseURL: isClient ? '/' : 'http://127.0.0.1:7001/',
   timeout: 30000,
   withCredentials: true,
-  headers: { 'X-Requested-With': 'XMLHttpRequest' },
+  headers: {
+    'X-Requested-With': 'XMLHttpRequest',
+    'Content-Language': 'zh-CN',
+  },
 })
 
 // 请求前做一些操作
