@@ -158,7 +158,7 @@ module.exports = merge(commonConfig, {
           description: 'this is a project for sharing.',
           favicon: 'http://127.0.0.1:7001/public/assets/images/logo.png',
           cssList: glob.sync(`${PUBLIC_ROOT}/base/**/*.css`, { nodir: true }).map(
-            (path) => `/${path.split('/').slice(-3).join('/')}`, // '/base/css/xxx.css'
+            (path) => `/${path.split('/').slice(-2).join('/')}`, // '/base/css/xxx.css'
           ),
           jsList: glob.sync(`${PUBLIC_ROOT}/dll/*.js`, { nodir: true }).map(
             (path) => `/${path.split('/').slice(-2).join('/')}`, // '/dll/xxx.js', TODO:确保react、react-dom在最前面

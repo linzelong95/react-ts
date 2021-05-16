@@ -1,4 +1,4 @@
-import React, { Suspense, createElement } from 'react'
+import { Suspense, createElement, isValidElement, cloneElement } from 'react'
 import { Redirect, Route, Switch } from 'react-router-dom'
 import { Spin } from 'antd'
 import { NotFound } from '@common/components'
@@ -12,20 +12,20 @@ function renderRoute(route: RouteConfig, props: RouteComponentProps, allRoutes: 
   const redirectComponent = redirect && <Redirect key={`${uuid()}-redirect`} exact from={path} to={redirect} />
   const useNotFoundComponent = !Component || Boolean(routes?.length)
   const children = renderRoutes(routes, basename, allRoutes, { redirectComponent, useNotFoundComponent })
-  const formativeProps = path === '/' && Component ? { ...props, basename, routes: allRoutes } : { ...props }
+  const formativeProps =
+    path === '/' && Component ? { ...props, basename, routes: allRoutes, hideHeader: true, hideMenu: true } : { ...props }
   let ret = Component ? (
-    <Suspense
-      fallback={
-        <div style={{ width: '100%', height: 100, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <Spin size="large" />
-        </div>
-      }
-    >
-      <Component {...formativeProps}>{children}</Component>
+    <Suspense fallback={<Spin size="large" style={{ marginTop: 50 }} />}>
+      {isValidElement(Component) ? (
+        cloneElement(Component as any, formativeProps, children)
+      ) : (
+        <Component {...formativeProps}>{children}</Component>
+      )}
     </Suspense>
   ) : (
     children
   )
+
   if (wrappers?.length) {
     let len = wrappers.length - 1
     while (len >= 0) {
