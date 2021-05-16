@@ -52,9 +52,15 @@ module.exports = {
     'operator-linebreak': 'off', // 与prettier冲突，关闭校验
     'space-before-function-paren': 'off', // 与prettier冲突，关闭校验
     'react/prop-types': 'off',
-    'react/jsx-no-bind': 'off',
-    'react/no-did-update-set-state': 'off',
-    'react/jsx-fragments': ['error', 'syntax'],
+    // 'react/jsx-no-bind': 'off',
+    'react/jsx-uses-react': 'off', // react 17 import react是非必要的
+    'react/react-in-jsx-scope': 'off', // react 17 import react是非必要的
+    'react/jsx-handler-names': 'off',
+    'react/display-name': 'off',
+    'react-hooks/rules-of-hooks': 'error', // 检查 Hook 的规则
+    'react-hooks/exhaustive-deps': 'warn', // 检查 effect 的依赖
+    // 'react/no-did-update-set-state': 'off',
+    // 'react/jsx-fragments': ['error', 'syntax'],
     'lines-between-class-members': ['error', 'always'],
     'react/jsx-wrap-multilines': [
       'error',
@@ -67,17 +73,12 @@ module.exports = {
     camelcase: 'warn',
     'promise/always-return': 'off',
     'standard/no-callback-literal': 'off',
-    'react/jsx-handler-names': 'off',
-    'react/display-name': 'off',
-    'react-hooks/rules-of-hooks': 'error', // 检查 Hook 的规则
-    'react-hooks/exhaustive-deps': 'warn', // 检查 effect 的依赖
     'unicorn/no-reduce': 'off',
     'unicorn/no-null': 'off',
     'unicorn/prevent-abbreviations': 'off',
     'unicorn/no-useless-undefined': 'off', // 允许设置undefined
     'unicorn/explicit-length-check': 'off', // 允许length不跟某个值比较， 如'xxx'.length?1:0
     'unicorn/no-unreadable-array-destructuring': 'off', // 此配置旨在允许不读取多个元组元素，如[, , fileKey]
-    'react/react-in-jsx-scope': 'error',
     'prefer-regex-literals': 'off', // 允许使用new RegExp
     'no-use-before-define': 'off', // 解决'React' was used before it was defined的报错以及在上方调用下方声明的函数时的报错
     'node/no-path-concat': 'off', // 该配置旨在允许使用`${__dirname}/app/entity/**/*{.ts,.js}`，而非必要通过path.resolve()来达到目的
