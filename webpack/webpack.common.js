@@ -79,11 +79,6 @@ module.exports = {
         ],
       },
       {
-        test: /\.js$/,
-        include: /node_modules\/react-dom/,
-        use: ['react-hot-loader/webpack'],
-      },
-      {
         // 加了module字样，按照模块引入组件
         test: new RegExp(`^(.*\\.module).*\\.less`),
         use: [
