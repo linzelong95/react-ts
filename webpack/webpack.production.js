@@ -1,11 +1,9 @@
 const os = require('os')
 const glob = require('glob')
 const { merge } = require('webpack-merge')
-// const PurgeCSSPlugin = require('purgecss-webpack-plugin')
 // webpack v5用CssMinimizerPlugin，而不使用OptimizeCSSAssetsPlugin
 // const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
-// const CompressionPlugin = require('compression-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
@@ -129,12 +127,6 @@ const productionConfig = {
         filter: (file) => /\.(js|css)$/.test(file.name),
       })
     }),
-
-    // 去除无用样式，使用其他有点问题，似乎无法跟webpack动态加载同时使用？
-    // !BUILD_MODULES.includes('base') &&
-    //   new PurgeCSSPlugin({
-    //     paths: glob.sync(`${path.resolve(WEB_ROOT, './src')}/**/*`, { nodir: true }),
-    //   }),
 
     // sentry 上报
     // new SentryPlugin({
