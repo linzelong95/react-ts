@@ -120,7 +120,11 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: [isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader, { loader: 'css-loader', options: { importLoaders: 1 } }],
+        use: [
+          isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader,
+          { loader: 'css-loader', options: { importLoaders: 1 } },
+          { loader: 'postcss-loader', options: { postcssOptions: { plugins: [autoprefixer] } } },
+        ],
       },
       // {
       //   test: /\.(jpe?g|png|gif|svg)$/i,
