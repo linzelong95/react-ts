@@ -20,7 +20,9 @@ const PROJECT_NAME = path.parse(PROJECT_PATH).name
 // 动态生成要编译的模块,进入webpack构建时，才有process.env.BUILD_MODULES注入
 const envBuildModules = process && process.env && process.env.BUILD_MODULES
 // 进行构建的模块
-const BUILD_MODULES = (envBuildModules && envBuildModules.split('&').filter((mdl) => mdl !== 'common')) || []
+const BUILD_MODULES = envBuildModules
+  ? envBuildModules.split('&').filter((mdl) => mdl !== 'common')
+  : []
 
 const ALL_MODULES = glob
   .sync(`${WEB_ROOT}/spa/*`)
@@ -30,6 +32,9 @@ const ALL_MODULES = glob
     return dirName
   })
   .filter(Boolean)
+
+const SERVER_HOST = '0.0.0.0'
+const SERVER_PORT = 7002
 
 module.exports = {
   PROJECT_PATH,
@@ -41,4 +46,6 @@ module.exports = {
   MANIFEST_ROOT,
   PUBLIC_ROOT,
   SERVER_ROOT,
+  SERVER_HOST,
+  SERVER_PORT,
 }

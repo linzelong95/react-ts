@@ -2,8 +2,8 @@ module.exports = {
   root: true,
   // 开启eslint支持
   eslintIntegration: true,
-  // 一行最多 140 字符
-  printWidth: 140,
+  // 一行最多 100 字符
+  printWidth: 100,
   // 行尾不要有分号
   semi: false,
   // 使用单引号
@@ -18,9 +18,6 @@ module.exports = {
   jsxBracketSameLine: false,
   // 箭头函数，只有一个参数的时候，也需要括号
   arrowParens: 'always',
-  // 每个文件格式化的范围是文件的全部内容
-  rangeStart: 0,
-  rangeEnd: Infinity,
   // 不需要写文件开头的 @prettier
   requirePragma: false,
   // 不需要自动在文件开头插入 @prettier
@@ -31,11 +28,4 @@ module.exports = {
   htmlWhitespaceSensitivity: 'css',
   // 换行符使用 auto
   endOfLine: 'auto',
-  //---------------以下配置与官方默认配置一样，可以不写-------------------
-  // 一个tab代表 2 个空格
-  tabWidth: 2,
-  // 不使用缩进符，而使用空格
-  useTabs: false,
-  // 大括号内的首尾需要空格
-  bracketSpacing: true,
 }

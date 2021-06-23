@@ -8,7 +8,16 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const commonConfig = require('./webpack.common')
 const templateParameters = require('./template-parameters')
-const { SERVER_ROOT, PUBLIC_ROOT, WEB_ROOT, BUILD_MODULES, PROJECT_PATH, MANIFEST_ROOT } = require('./constants')
+const {
+  SERVER_ROOT,
+  PUBLIC_ROOT,
+  WEB_ROOT,
+  BUILD_MODULES,
+  PROJECT_PATH,
+  MANIFEST_ROOT,
+  SERVER_PORT,
+  SERVER_HOST,
+} = require('./constants')
 
 // class MyInjectCustomScriptsPlugin {
 //   constructor(options) {
@@ -82,8 +91,8 @@ module.exports = merge(commonConfig, {
   devtool: 'eval-cheap-module-source-map',
   target: 'web', // 默认
   devServer: {
-    port: 7002,
-    host: '127.0.0.1', // '0.0.0.0',允许局域网中其他设备访问本地服务
+    port: SERVER_PORT,
+    host: SERVER_HOST, // '0.0.0.0',允许局域网中其他设备访问本地服务
     // publicPath: '/static/',
     publicPath: '/',
     hot: true, // 尝试热替换，失败则尝试热更新
@@ -103,7 +112,10 @@ module.exports = merge(commonConfig, {
         return { from: regExp, to: `/${moduleName}` }
       }),
     },
-    openPage: BUILD_MODULES,
+    openPage:
+      SERVER_HOST !== '0.0.0.0'
+        ? BUILD_MODULES
+        : BUILD_MODULES.map((moduleName) => `http://localhost:${SERVER_PORT}/${moduleName}`),
     watchOptions: {
       ignored: [
         'node_modules/',
@@ -140,8 +152,13 @@ module.exports = merge(commonConfig, {
     new CopyWebpackPlugin({
       patterns: [
         { from: `${PUBLIC_ROOT}/base`, to: '/base' },
-        ...BUILD_MODULES.map((moduleName) => ({ from: `${WEB_ROOT}/spa/${moduleName}/favicon.ico`, to: '/' })),
-        ...glob.sync(`${PUBLIC_ROOT}/dll/*.js`, { nodir: true }).map((from) => ({ from, to: '/dll' })),
+        ...BUILD_MODULES.map((moduleName) => ({
+          from: `${WEB_ROOT}/spa/${moduleName}/favicon.ico`,
+          to: '/',
+        })),
+        ...glob
+          .sync(`${PUBLIC_ROOT}/dll/*.js`, { nodir: true })
+          .map((from) => ({ from, to: '/dll' })),
       ],
     }),
 
