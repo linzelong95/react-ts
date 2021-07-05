@@ -20,9 +20,10 @@ const Login: FC<RouteComponentProps<never>> = memo(() => {
   const [form] = Form.useForm<IAccount['loginParams']>()
   const isMobile = useMobile({ includeTraditionalSmallViewPort: true })
   const userInfo = useSelector<StoreState, StoreState['user']>((state) => state.user)
-  const [accountLocalStorage, setAccountLocalStorage] = useLocalStorage<{ autoLoginMark: boolean; autoLogin: boolean }>(
-    LocalStorage.BLOG_STORE_ACCOUNT,
-  )
+  const [accountLocalStorage, setAccountLocalStorage] = useLocalStorage<{
+    autoLoginMark: boolean
+    autoLogin: boolean
+  }>(LocalStorage.BLOG_STORE_ACCOUNT)
 
   const [, captchaRes, , forceRequest] = useService(accountServices.getWebpageCaptcha)
 
@@ -73,7 +74,10 @@ const Login: FC<RouteComponentProps<never>> = memo(() => {
             return
           }
           const encryptedPassword = rsa(serialize(password), publicKeyRes.data.item)
-          const [loginRes, loginErr] = await accountServices.login({ ...values, password: encryptedPassword })
+          const [loginRes, loginErr] = await accountServices.login({
+            ...values,
+            password: encryptedPassword,
+          })
           if (loginErr) {
             message.error({ content: loginErr.message || '登录失败', key: 'login' })
             return
@@ -105,16 +109,38 @@ const Login: FC<RouteComponentProps<never>> = memo(() => {
   }, [isMobile])
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f0f2f5', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    <div
+      style={{
+        minHeight: '100vh',
+        background: '#f0f2f5',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
       <Card
         style={{
           width: 500,
-          ...(isMobile ? { width: '100vw', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' } : {}),
+          ...(isMobile
+            ? {
+                width: '100vw',
+                height: '100vh',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }
+            : {}),
         }}
         bodyStyle={isMobile ? { width: '100%' } : undefined}
       >
-        <div className="mt15 mb20" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <img src={`${__SERVER_ORIGIN__ || ''}/public/assets/images/logo.png`} style={{ width: 40, height: 40, borderRadius: '50%' }} />
+        <div
+          className="mt15 mb20"
+          style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+        >
+          <img
+            src={`${__SERVER_ORIGIN__ || ''}/public/assets/images/logo.png`}
+            style={{ width: 40, height: 40, borderRadius: '50%' }}
+          />
           <span style={{ fontSize: 36, fontWeight: 'bold', marginLeft: 16 }}>briefNull</span>
         </div>
         <Form
@@ -124,16 +150,28 @@ const Login: FC<RouteComponentProps<never>> = memo(() => {
           name="login"
           initialValues={{ autoLogin: Boolean(accountLocalStorage?.autoLogin) }}
         >
-          <Form.Item label="Account" name="account" rules={[{ required: true, message: 'Please input your account!' }]}>
+          <Form.Item
+            label="Account"
+            name="account"
+            rules={[{ required: true, message: 'Please input your account!' }]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item label="Password" name="password" rules={[{ required: true, message: 'Please input your password!' }]}>
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[{ required: true, message: 'Please input your password!' }]}
+          >
             <Input.Password />
           </Form.Item>
           <Form.Item label="Captcha" required>
             <Row gutter={8}>
               <Col span={18}>
-                <Form.Item noStyle name="captcha" rules={[{ required: true, message: 'Please input captcha!' }]}>
+                <Form.Item
+                  noStyle
+                  name="captcha"
+                  rules={[{ required: true, message: 'Please input captcha!' }]}
+                >
                   <Input placeholder="captcha" />
                 </Form.Item>
               </Col>
@@ -141,7 +179,13 @@ const Login: FC<RouteComponentProps<never>> = memo(() => {
                 <img
                   alt="验证码"
                   src={captchaRes?.data?.item && `data:image/png;base64,${captchaRes.data.item}`}
-                  style={{ height: 31, width: '100%', border: '1px solid gray', padding: 3, cursor: 'pointer' }}
+                  style={{
+                    height: 31,
+                    width: '100%',
+                    border: '1px solid gray',
+                    padding: 3,
+                    cursor: 'pointer',
+                  }}
                   onClick={forceRequest}
                 />
               </Col>

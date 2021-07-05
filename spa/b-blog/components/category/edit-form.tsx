@@ -21,7 +21,15 @@ const layout = {
 }
 
 const EditForm: FC<EditFormProps> = memo((props) => {
-  const { type, initialValues, visible, allSortList, onSave, onToggleEditorialPanel, ...restProps } = props
+  const {
+    type,
+    initialValues,
+    visible,
+    allSortList,
+    onSave,
+    onToggleEditorialPanel,
+    ...restProps
+  } = props
   const [form] = Form.useForm<FormDataWhenEdited>()
 
   const handleCancel = useCallback<ModalProps['onCancel']>(() => {
@@ -35,10 +43,13 @@ const EditForm: FC<EditFormProps> = memo((props) => {
       .then((values) => {
         const { sort, ...commonValues } = values as ICategory['formDataWhenEdited']
         if (sort) (commonValues as ICategory['editParams']).sortId = sort.key
-        onSave({ id: initialValues?.id, ...commonValues } as (ICategory | ISort)['editParams'], () => {
-          form.resetFields()
-          onToggleEditorialPanel()
-        })
+        onSave(
+          { id: initialValues?.id, ...commonValues } as (ICategory | ISort)['editParams'],
+          () => {
+            form.resetFields()
+            onToggleEditorialPanel()
+          },
+        )
       })
       .catch((error) => {
         message.error(error.message)
@@ -76,7 +87,12 @@ const EditForm: FC<EditFormProps> = memo((props) => {
             </Select>
           </Form.Item>
         )}
-        <Form.Item label="状态" name="isEnable" rules={[{ required: true, message: '请选择状态!' }]} style={{ marginBottom: 0 }}>
+        <Form.Item
+          label="状态"
+          name="isEnable"
+          rules={[{ required: true, message: '请选择状态!' }]}
+          style={{ marginBottom: 0 }}
+        >
           <Select>
             <Select.Option value={1}>可用</Select.Option>
             <Select.Option value={0}>不可用</Select.Option>

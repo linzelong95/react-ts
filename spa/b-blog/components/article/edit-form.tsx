@@ -23,7 +23,14 @@ interface EditFormProps extends ModalProps {
 type FormDataWhenEdited = IArticle['formDataWhenEdited']
 
 const EditForm: FC<EditFormProps> = memo((props) => {
-  const { initialValues, visible, allSortList, onSave, onToggleEditorialPanel, ...restProps } = props
+  const {
+    initialValues,
+    visible,
+    allSortList,
+    onSave,
+    onToggleEditorialPanel,
+    ...restProps
+  } = props
   const [form] = Form.useForm<FormDataWhenEdited>()
   const [sortIdsArr, setSortIdsArr] = useState<number[]>([])
   const [categoryOptions, setCategoryOptions] = useState<any[]>([])
@@ -36,7 +43,11 @@ const EditForm: FC<EditFormProps> = memo((props) => {
     }),
     [sortIdsArr],
   )
-  const [tagLoading, tagRes, tagErr] = useService(tagServices.getList, getTagListParams, !sortIdsArr?.length)
+  const [tagLoading, tagRes, tagErr] = useService(
+    tagServices.getList,
+    getTagListParams,
+    !sortIdsArr?.length,
+  )
   const tagList = useMemo(() => {
     if (!sortIdsArr?.length || tagLoading) return []
     if (tagErr) {
@@ -47,7 +58,9 @@ const EditForm: FC<EditFormProps> = memo((props) => {
   }, [sortIdsArr, tagLoading, tagRes, tagErr])
 
   const formatFileList = useCallback<UploadProps['onChange']>(({ fileList }) => {
-    const validFileList = fileList.filter((file) => file.url && ['uploading', 'done'].includes(file.status))
+    const validFileList = fileList.filter(
+      (file) => file.url && ['uploading', 'done'].includes(file.status),
+    )
     if (validFileList.length < fileList.length) Modal.error({ title: '上传失败', okText: '知道了' })
     return validFileList
   }, [])
@@ -97,7 +110,9 @@ const EditForm: FC<EditFormProps> = memo((props) => {
       .map((sort) => ({
         ...sort,
         disabled: !sort?.isEnable,
-        categories: sort?.categories?.map?.((category) => ({ ...category, disabled: !category.isEnable })) || [],
+        categories:
+          sort?.categories?.map?.((category) => ({ ...category, disabled: !category.isEnable })) ||
+          [],
       }))
     setCategoryOptions(formattedCategories)
   }, [allSortList])
@@ -129,7 +144,12 @@ const EditForm: FC<EditFormProps> = memo((props) => {
       keyboard={false}
       {...restProps}
     >
-      <Form labelCol={{ span: 3 }} wrapperCol={{ span: 19 }} form={form} initialValues={editingFormData}>
+      <Form
+        labelCol={{ span: 3 }}
+        wrapperCol={{ span: 19 }}
+        form={form}
+        initialValues={editingFormData}
+      >
         <Form.Item label="标题" name="title" rules={[{ required: true, message: '请输入标题!' }]}>
           <Input />
         </Form.Item>
@@ -177,7 +197,11 @@ const EditForm: FC<EditFormProps> = memo((props) => {
             </Col>
           </Row>
         </Form.Item>
-        <Form.Item label="置顶" name="isTop" rules={[{ required: true, message: '请选择是否置顶!' }]}>
+        <Form.Item
+          label="置顶"
+          name="isTop"
+          rules={[{ required: true, message: '请选择是否置顶!' }]}
+        >
           <Select>
             <Select.Option value={1}>是</Select.Option>
             <Select.Option value={0}>否</Select.Option>
@@ -190,7 +214,12 @@ const EditForm: FC<EditFormProps> = memo((props) => {
           getValueFromEvent={formatFileList}
           rules={[{ required: true, message: '请上传封面' }]}
         >
-          <Upload.Crop maxFiles={1} listType="picture-card" accept="image/*" cropperProps={{ aspectRatio: 23 / 16 }}>
+          <Upload.Crop
+            maxFiles={1}
+            listType="picture-card"
+            accept="image/*"
+            cropperProps={{ aspectRatio: 23 / 16 }}
+          >
             <div>
               <PlusOutlined />
               <div style={{ marginTop: 8 }}>Upload</div>
@@ -200,7 +229,12 @@ const EditForm: FC<EditFormProps> = memo((props) => {
         <Form.Item label="摘要" name="abstract">
           <Input.TextArea rows={2} />
         </Form.Item>
-        <Form.Item label="正文" name="content" rules={[{ required: true, message: '请输入正文!' }]} style={{ marginBottom: 0 }}>
+        <Form.Item
+          label="正文"
+          name="content"
+          rules={[{ required: true, message: '请输入正文!' }]}
+          style={{ marginBottom: 0 }}
+        >
           <RichEditor />
         </Form.Item>
       </Form>

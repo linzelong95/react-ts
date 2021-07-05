@@ -45,11 +45,16 @@ const BasicLayout: FC<BasicLayoutProps> = memo((props) => {
   const isMobile = useMobile({ includeTraditionalSmallViewPort: true })
   const [menuDrawerVisible, setMenuDrawerVisible] = useState<DrawerProps['visible']>(false)
 
-  const [accountLocalStorage, setAccountLocalStorage] = useLocalStorage<{ autoLoginMark: boolean; autoLogin: boolean }>(
-    LocalStorage.BLOG_STORE_ACCOUNT,
-  )
+  const [accountLocalStorage, setAccountLocalStorage] = useLocalStorage<{
+    autoLoginMark: boolean
+    autoLogin: boolean
+  }>(LocalStorage.BLOG_STORE_ACCOUNT)
 
-  const { toHideHeader, toHideMenu, toHideFooter } = useMemo<{ toHideHeader: boolean; toHideMenu: boolean; toHideFooter: boolean }>(() => {
+  const { toHideHeader, toHideMenu, toHideFooter } = useMemo<{
+    toHideHeader: boolean
+    toHideMenu: boolean
+    toHideFooter: boolean
+  }>(() => {
     const queries = new URLSearchParams(location.search)
     return {
       toHideHeader: queries.has('hideHeader') || queries.has('hideAll') || hideHeader,
@@ -67,7 +72,10 @@ const BasicLayout: FC<BasicLayoutProps> = memo((props) => {
     Record<'flattedRoutes' | 'flattedAccessRoutes', Omit<RouteConfig, 'routes'>[]>
   >(() => {
     const authPoints = getUserAuthPoints()
-    return { flattedRoutes: flatRoutes(routes), flattedAccessRoutes: flatRoutes(routes, authPoints) }
+    return {
+      flattedRoutes: flatRoutes(routes),
+      flattedAccessRoutes: flatRoutes(routes, authPoints),
+    }
   }, [routes, getUserAuthPoints])
 
   const match = useRouteMatch(flattedRoutes.map((route) => route.path))
@@ -109,7 +117,14 @@ const BasicLayout: FC<BasicLayoutProps> = memo((props) => {
     <Layout className={styles['basic-layout']}>
       {userInfo?.account ? (
         <>
-          {!toHideHeader && <Header userInfo={userInfo} isMobile={isMobile} onLogout={logout} onToggleMenuDrawer={setMenuDrawerVisible} />}
+          {!toHideHeader && (
+            <Header
+              userInfo={userInfo}
+              isMobile={isMobile}
+              onLogout={logout}
+              onToggleMenuDrawer={setMenuDrawerVisible}
+            />
+          )}
           <Layout className={styles['body-area']}>
             {!toHideMenu && (
               <SideMenu
@@ -123,7 +138,9 @@ const BasicLayout: FC<BasicLayoutProps> = memo((props) => {
               />
             )}
             <Layout className={styles['body-right']}>
-              <Layout.Content className={styles['main-content']}>{isForbidden ? <Forbidden /> : children}</Layout.Content>
+              <Layout.Content className={styles['main-content']}>
+                {isForbidden ? <Forbidden /> : children}
+              </Layout.Content>
               {!toHideFooter && <Footer />}
             </Layout>
           </Layout>

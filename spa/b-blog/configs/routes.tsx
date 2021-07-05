@@ -14,21 +14,36 @@ const routes: RouteConfig[] = [
         path: '/article',
         menuKey: 'article',
         exact: true,
-        component: lazy(() => import(/* webpackPrefetch: true */ /* webpackChunkName: "article" */ '@b-blog/containers/article')),
+        component: lazy(
+          () =>
+            import(
+              /* webpackPrefetch: true */ /* webpackChunkName: "article" */ '@b-blog/containers/article'
+            ),
+        ),
         icon: <AlipayOutlined />,
       },
       {
         path: '/reply',
         menuKey: 'reply',
         exact: true,
-        component: lazy(() => import(/* webpackPrefetch: true */ /* webpackChunkName: "reply" */ '@b-blog/containers/reply')),
+        component: lazy(
+          () =>
+            import(
+              /* webpackPrefetch: true */ /* webpackChunkName: "reply" */ '@b-blog/containers/reply'
+            ),
+        ),
         icon: <AlipayOutlined />,
       },
       {
         path: '/message',
         menuKey: 'message',
         exact: true,
-        component: lazy(() => import(/* webpackPrefetch: true */ /* webpackChunkName: "message" */ '@b-blog/containers/message')),
+        component: lazy(
+          () =>
+            import(
+              /* webpackPrefetch: true */ /* webpackChunkName: "message" */ '@b-blog/containers/message'
+            ),
+        ),
         // authPoints: ['blog.super_admin-is', 'blog.personal_admin-is'],
         // authOperator: 'or',
         icon: <ZhihuOutlined />,
@@ -37,14 +52,24 @@ const routes: RouteConfig[] = [
         path: '/category',
         menuKey: 'category',
         exact: true,
-        component: lazy(() => import(/* webpackPrefetch: true */ /* webpackChunkName: "category" */ '@b-blog/containers/category')),
+        component: lazy(
+          () =>
+            import(
+              /* webpackPrefetch: true */ /* webpackChunkName: "category" */ '@b-blog/containers/category'
+            ),
+        ),
         icon: <AlipayOutlined />,
       },
       {
         path: '/tag',
         menuKey: 'tag',
         exact: true,
-        component: lazy(() => import(/* webpackPrefetch: true */ /* webpackChunkName: "tag" */ '@b-blog/containers/tag')),
+        component: lazy(
+          () =>
+            import(
+              /* webpackPrefetch: true */ /* webpackChunkName: "tag" */ '@b-blog/containers/tag'
+            ),
+        ),
         icon: <AlipayOutlined />,
       },
     ],

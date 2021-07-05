@@ -1,5 +1,19 @@
 import React, { memo, useEffect, useState, useMemo, useCallback, useRef } from 'react'
-import { Drawer, Tag, Row, Col, Comment, Button, List, Divider, Form, Select, Input, InputNumber, message } from 'antd'
+import {
+  Drawer,
+  Tag,
+  Row,
+  Col,
+  Comment,
+  Button,
+  List,
+  Divider,
+  Form,
+  Select,
+  Input,
+  InputNumber,
+  message,
+} from 'antd'
 import moment from 'moment'
 import {
   TagsOutlined,
@@ -28,7 +42,10 @@ interface DetailDrawerProps extends DrawerProps {
 }
 
 type FormattedReplyItem = IReply['listItem'] & { children?: IReply['listItem'][] }
-export type HandleReplyItems = (type: 'remove' | 'approve' | 'disapprove' | 'top' | 'unTop', record: FormattedReplyItem) => void
+export type HandleReplyItems = (
+  type: 'remove' | 'approve' | 'disapprove' | 'top' | 'unTop',
+  record: FormattedReplyItem,
+) => void
 
 const DetailDrawer: FC<DetailDrawerProps> = memo((props) => {
   const { visible, detailItem, onClose } = props
@@ -36,7 +53,9 @@ const DetailDrawer: FC<DetailDrawerProps> = memo((props) => {
   const [form] = Form.useForm<IReply['formDataWhenEdited']>()
   const [replyBoxVisible, setReplyBoxVisible] = useState<boolean>(false)
   const [clientHeight, setClientHeight] = useState<number>(document.documentElement.clientHeight)
-  const [replyConditionQuery, setReplyConditionQuery] = useState<IReply['getListParams']['conditionQuery']>({
+  const [replyConditionQuery, setReplyConditionQuery] = useState<
+    IReply['getListParams']['conditionQuery']
+  >({
     prettyFormat: true,
     articleIdsArr: [detailItem.id],
     orderBy: undefined,
@@ -50,7 +69,10 @@ const DetailDrawer: FC<DetailDrawerProps> = memo((props) => {
     }
   }, [replyConditionQuery])
 
-  const [loading, replyRes, replyErr, forceRequest] = useService(replyServices.getList, getReplyListParams)
+  const [loading, replyRes, replyErr, forceRequest] = useService(
+    replyServices.getList,
+    getReplyListParams,
+  )
 
   const [replyTotal, replyList] = useMemo(() => {
     if (replyErr) {
@@ -64,7 +86,10 @@ const DetailDrawer: FC<DetailDrawerProps> = memo((props) => {
 
   const replySort = useCallback<TagProps['onClick']>(({ currentTarget }) => {
     const name = currentTarget.id as IReply['getListParams']['conditionQuery']['orderBy']['name']
-    setReplyConditionQuery((prevValue) => ({ ...prevValue, orderBy: { name, by: prevValue?.orderBy?.by === 'ASC' ? 'DESC' : 'ASC' } }))
+    setReplyConditionQuery((prevValue) => ({
+      ...prevValue,
+      orderBy: { name, by: prevValue?.orderBy?.by === 'ASC' ? 'DESC' : 'ASC' },
+    }))
   }, [])
 
   const prepareForReplying = useCallback<(item: FormattedReplyItem) => void>(
@@ -88,7 +113,12 @@ const DetailDrawer: FC<DetailDrawerProps> = memo((props) => {
         const { parentId, to, reply } = values
         const toId = typeof to.key === 'number' ? to.key : undefined
         message.loading({ content: '正在提交...', key: 'saveData', duration: 0 })
-        const [, saveErr] = await replyServices.save({ toId, parentId, reply, articleId: detailItem.id })
+        const [, saveErr] = await replyServices.save({
+          toId,
+          parentId,
+          reply,
+          articleId: detailItem.id,
+        })
         if (saveErr) {
           message.error({ content: saveErr.message || '提交失败', key: 'saveData' })
           return
@@ -129,12 +159,20 @@ const DetailDrawer: FC<DetailDrawerProps> = memo((props) => {
               回复
             </a>,
             roleName === 'admin' && (
-              <a key="remove" onClick={() => handleReplyItems('remove', item)} style={{ color: 'red', marginLeft: 10, fontSize: 12 }}>
+              <a
+                key="remove"
+                onClick={() => handleReplyItems('remove', item)}
+                style={{ color: 'red', marginLeft: 10, fontSize: 12 }}
+              >
                 删除
               </a>
             ),
             roleName === 'admin' && isApproved === 0 && (
-              <a key="approve" onClick={() => handleReplyItems('approve', item)} style={{ color: '#66CD00', marginLeft: 10, fontSize: 12 }}>
+              <a
+                key="approve"
+                onClick={() => handleReplyItems('approve', item)}
+                style={{ color: '#66CD00', marginLeft: 10, fontSize: 12 }}
+              >
                 展示
               </a>
             ),
@@ -149,7 +187,9 @@ const DetailDrawer: FC<DetailDrawerProps> = memo((props) => {
             ),
           ]}
           author={`${from.nickname}${parentId ? `回复@ ${to.nickname}` : ''}`}
-          avatar={from?.avatar || `${__SERVER_ORIGIN__ || ''}/public/assets/images/default/avatar.jpeg`}
+          avatar={
+            from?.avatar || `${__SERVER_ORIGIN__ || ''}/public/assets/images/default/avatar.jpeg`
+          }
           content={<span style={{ color: isApproved === 0 ? 'lightgray' : '' }}>{reply}</span>}
         >
           {children?.map?.((item) => getCommentComponent(item))}
@@ -201,7 +241,13 @@ const DetailDrawer: FC<DetailDrawerProps> = memo((props) => {
                 {detailItem.abstract}
               </p>
             )}
-            <img src={detailItem.imageUrl || `${__SERVER_ORIGIN__ || ''}/public/assets/images/default/article.jpeg`} width="100%" />
+            <img
+              src={
+                detailItem.imageUrl ||
+                `${__SERVER_ORIGIN__ || ''}/public/assets/images/default/article.jpeg`
+              }
+              width="100%"
+            />
             <RichEditor.Preview value={detailItem.content} />
             <div style={{ marginBottom: 10, fontSize: 12, textAlign: 'center' }}>
               <span>
@@ -220,9 +266,15 @@ const DetailDrawer: FC<DetailDrawerProps> = memo((props) => {
             <h2>
               <span style={{ marginRight: 10 }}>回复区</span>
               {replyBoxVisible ? (
-                <DownCircleOutlined style={{ color: '#1890FF' }} onClick={() => setReplyBoxVisible((prevValue) => !prevValue)} />
+                <DownCircleOutlined
+                  style={{ color: '#1890FF' }}
+                  onClick={() => setReplyBoxVisible((prevValue) => !prevValue)}
+                />
               ) : (
-                <UpCircleOutlined style={{ color: '#1890FF' }} onClick={() => setReplyBoxVisible((prevValue) => !prevValue)} />
+                <UpCircleOutlined
+                  style={{ color: '#1890FF' }}
+                  onClick={() => setReplyBoxVisible((prevValue) => !prevValue)}
+                />
               )}
             </h2>
             <Divider style={{ marginTop: -5 }} />
@@ -241,7 +293,11 @@ const DetailDrawer: FC<DetailDrawerProps> = memo((props) => {
                     <Select.Option value={detailItem.user.id}>博主</Select.Option>
                   </Select>
                 </Form.Item>
-                <Form.Item label="回复" name="reply" rules={[{ required: true, message: '请输入回复内容!' }]}>
+                <Form.Item
+                  label="回复"
+                  name="reply"
+                  rules={[{ required: true, message: '请输入回复内容!' }]}
+                >
                   <Input.TextArea rows={2} />
                 </Form.Item>
                 <Form.Item hidden name="parentId">
@@ -249,7 +305,11 @@ const DetailDrawer: FC<DetailDrawerProps> = memo((props) => {
                 </Form.Item>
                 <Form.Item wrapperCol={{ span: 23 }}>
                   <div style={{ float: 'right' }}>
-                    <Button size="small" style={{ marginRight: 10 }} onClick={() => form.resetFields()}>
+                    <Button
+                      size="small"
+                      style={{ marginRight: 10 }}
+                      onClick={() => form.resetFields()}
+                    >
                       重置
                     </Button>
                     <Button size="small" type="primary" onClick={handleReply}>
@@ -266,7 +326,8 @@ const DetailDrawer: FC<DetailDrawerProps> = memo((props) => {
               <ReloadOutlined style={{ color: '#1890FF', marginLeft: 10 }} onClick={forceRequest} />
               <Tag color="magenta" id="createDate" style={{ marginLeft: 10 }} onClick={replySort}>
                 时间
-                {replyConditionQuery?.orderBy?.name === 'createDate' && replyConditionQuery?.orderBy?.by === 'ASC' ? (
+                {replyConditionQuery?.orderBy?.name === 'createDate' &&
+                replyConditionQuery?.orderBy?.by === 'ASC' ? (
                   <CaretUpOutlined />
                 ) : (
                   <CaretDownOutlined />
@@ -280,7 +341,12 @@ const DetailDrawer: FC<DetailDrawerProps> = memo((props) => {
                 overflow: 'auto',
               }}
             >
-              <List loading={loading} itemLayout="horizontal" dataSource={replyList || []} renderItem={getCommentComponent} />
+              <List
+                loading={loading}
+                itemLayout="horizontal"
+                dataSource={replyList || []}
+                renderItem={getCommentComponent}
+              />
             </div>
           </div>
         </Col>

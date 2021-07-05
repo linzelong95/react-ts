@@ -11,7 +11,11 @@ import type { MenuProps } from 'antd/es/menu'
 import type { DrawerProps } from 'antd/es/drawer'
 import styles from '../index.module.scss'
 
-function getMenuItems(routes: RouteConfig[], flattedAccessRoutes: RouteConfig[], t: TFunction<string>): JSX.Element[] {
+function getMenuItems(
+  routes: RouteConfig[],
+  flattedAccessRoutes: RouteConfig[],
+  t: TFunction<string>,
+): JSX.Element[] {
   return routes?.map((route) => {
     const { path, icon, menuKey } = route
     const enableRoute = flattedAccessRoutes.find((route) => route.path === path)
@@ -40,7 +44,14 @@ interface SideMenuProps {
 }
 
 const SideMenu: FC<SideMenuProps> = memo((props) => {
-  const { routes, flattedAccessRoutes, isMobile, isSmallViewPort, menuDrawerVisible, onToggleMenuDrawer } = props
+  const {
+    routes,
+    flattedAccessRoutes,
+    isMobile,
+    isSmallViewPort,
+    menuDrawerVisible,
+    onToggleMenuDrawer,
+  } = props
   const history = useHistory()
   const { pathname } = useLocation()
   const { t } = useTranslation()
@@ -89,7 +100,16 @@ const SideMenu: FC<SideMenuProps> = memo((props) => {
         {getMenuItems(routes, flattedAccessRoutes, t)}
       </Menu>
     ),
-    [selectedMenuKeys, menuOpenKeys, routes, flattedAccessRoutes, isMobile, t, clickMenu, openChangeMenu],
+    [
+      selectedMenuKeys,
+      menuOpenKeys,
+      routes,
+      flattedAccessRoutes,
+      isMobile,
+      t,
+      clickMenu,
+      openChangeMenu,
+    ],
   )
 
   return isMobile ? (
@@ -97,7 +117,11 @@ const SideMenu: FC<SideMenuProps> = memo((props) => {
       width={200}
       title={
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-evenly' }}>
-          <img src={`${__SERVER_ORIGIN__ || ''}/public/assets/images/logo.png`} width={40} height={40} />
+          <img
+            src={`${__SERVER_ORIGIN__ || ''}/public/assets/images/logo.png`}
+            width={40}
+            height={40}
+          />
           <span style={{ color: 'white', fontWeight: 'bold', fontSize: 26 }}>briefNull</span>
         </div>
       }
@@ -105,7 +129,11 @@ const SideMenu: FC<SideMenuProps> = memo((props) => {
       closable={false}
       visible={menuDrawerVisible}
       bodyStyle={{ background: '#001529', padding: 0 }}
-      headerStyle={{ background: '#001529', borderBottomColor: '#424144', padding: '12px 16px 10px 16px' }}
+      headerStyle={{
+        background: '#001529',
+        borderBottomColor: '#424144',
+        padding: '12px 16px 10px 16px',
+      }}
       onClose={() => {
         onToggleMenuDrawer(false)
       }}

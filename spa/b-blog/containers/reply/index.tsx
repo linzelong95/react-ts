@@ -18,7 +18,10 @@ import {
   AlignCenterOutlined,
 } from '@ant-design/icons'
 import EditForm from '@b-blog/components/reply/edit-form'
-import FilterModal, { FilterModalRef, TemporaryCondition } from '@b-blog/components/reply/filter-modal'
+import FilterModal, {
+  FilterModalRef,
+  TemporaryCondition,
+} from '@b-blog/components/reply/filter-modal'
 import moment from 'moment'
 import { replyServices } from '@b-blog/services'
 import type { FC, ReactNode } from 'react'
@@ -32,13 +35,20 @@ import type { TagProps } from 'antd/lib/tag'
 export type ListItem = IReply['listItem']
 export type ToggleEditorialPanel = (record?: ListItem) => void
 export type SaveData = (params: IReply['editParams'], callback?: () => void) => void
-export type HandleItems = (type: 'remove' | 'approve' | 'disapprove' | 'top' | 'unTop', record?: ListItem, callback?: () => void) => void
+export type HandleItems = (
+  type: 'remove' | 'approve' | 'disapprove' | 'top' | 'unTop',
+  record?: ListItem,
+  callback?: () => void,
+) => void
 export type ConditionQuery = IReply['getListParams']['conditionQuery'] & TemporaryCondition
 
 const MessageManagement: FC<RouteComponentProps> = memo(() => {
   const inputSearchRef = useRef<Input>(null)
   const filterModalRef = useRef<FilterModalRef>(null)
-  const [pagination, setPagination] = useState<{ current: number; pageSize: number }>({ current: 1, pageSize: 10 })
+  const [pagination, setPagination] = useState<{ current: number; pageSize: number }>({
+    current: 1,
+    pageSize: 10,
+  })
   const [editFormVisible, setEditFormVisible] = useState<boolean>(false)
   const [editFormData, setEditFormData] = useState<ListItem>(null)
   const [selectedItems, setSelectedItems] = useState<ListItem[]>([])
@@ -48,7 +58,12 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
   const [showSorterFlag, setShowSorterFlag] = useState<boolean>(false)
 
   const getListParams = useMemo<IReply['getListParams']>(() => {
-    const neededConditionQuery = { ...conditionQuery, commonFilterArr: undefined, articleArr: undefined, filteredSortArr: undefined }
+    const neededConditionQuery = {
+      ...conditionQuery,
+      commonFilterArr: undefined,
+      articleArr: undefined,
+      filteredSortArr: undefined,
+    }
     return {
       index: pagination.current,
       size: pagination.pageSize,
@@ -56,7 +71,10 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
     }
   }, [pagination, conditionQuery])
 
-  const [loading, replyRes, replyErr, forceRequest] = useService(replyServices.getList, getListParams)
+  const [loading, replyRes, replyErr, forceRequest] = useService(
+    replyServices.getList,
+    getListParams,
+  )
 
   const [total, dataSource] = useMemo(() => {
     if (replyErr) {
@@ -66,7 +84,9 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
     return [replyRes?.data?.total || 0, replyRes?.data?.list || []]
   }, [replyRes, replyErr])
 
-  const showDataByDefaultWay = useCallback<(event: React.MouseEvent<HTMLElement, MouseEvent>) => void>(() => {
+  const showDataByDefaultWay = useCallback<
+    (event: React.MouseEvent<HTMLElement, MouseEvent>) => void
+  >(() => {
     setConditionQuery({})
     filterModalRef.current?.clear()
     inputSearchRef.current?.setValue?.('')
@@ -105,9 +125,13 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
 
   const toggleSelectAll = useCallback<ButtonProps['onClick']>(() => {
     if (!dataSource?.length) return
-    const uniqueSelectedItems = dataSource.filter((dataItem) => !selectedItems.some((selectedItem) => selectedItem.id === dataItem.id))
+    const uniqueSelectedItems = dataSource.filter(
+      (dataItem) => !selectedItems.some((selectedItem) => selectedItem.id === dataItem.id),
+    )
     const newSelectedItems = allSelectedFlag
-      ? selectedItems.filter((selectedItem) => !dataSource.some((dataItem) => dataItem.id === selectedItem.id))
+      ? selectedItems.filter(
+          (selectedItem) => !dataSource.some((dataItem) => dataItem.id === selectedItem.id),
+        )
       : [...selectedItems, ...uniqueSelectedItems]
     setSelectedItems(newSelectedItems)
     setAllSelectedFlag(!allSelectedFlag)
@@ -122,7 +146,9 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
       setAllSelectedFlag(
         !dataSource?.length
           ? false
-          : dataSource.every((listItem) => newSelectedItems.some((selectedItem) => selectedItem.id === listItem.id)),
+          : dataSource.every((listItem) =>
+              newSelectedItems.some((selectedItem) => selectedItem.id === listItem.id),
+            ),
       )
     },
     [selectedItems, dataSource],
@@ -158,7 +184,10 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
 
   const handleItems = useCallback<HandleItems>(
     async (type, record, callback) => {
-      const handlingItems = (record ? [record] : selectedItems).map((item) => ({ id: item.id, parentId: item.parentId }))
+      const handlingItems = (record ? [record] : selectedItems).map((item) => ({
+        id: item.id,
+        parentId: item.parentId,
+      }))
       const [, err] = await replyServices[type]({ items: handlingItems })
       if (err) {
         message.error('操作失败')
@@ -179,7 +208,11 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
 
   useEffect(() => {
     setAllSelectedFlag(
-      !dataSource?.length ? false : dataSource.every((listItem) => selectedItems.some((selectedItem) => selectedItem.id === listItem.id)),
+      !dataSource?.length
+        ? false
+        : dataSource.every((listItem) =>
+            selectedItems.some((selectedItem) => selectedItem.id === listItem.id),
+          ),
     )
   }, [selectedItems, dataSource])
 
@@ -202,7 +235,9 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
               icon={<FilterOutlined />}
               type="primary"
               danger={Boolean(
-                conditionQuery?.filteredSortArr?.length || conditionQuery?.articleArr?.length || conditionQuery?.commonFilterArr?.length,
+                conditionQuery?.filteredSortArr?.length ||
+                  conditionQuery?.articleArr?.length ||
+                  conditionQuery?.commonFilterArr?.length,
               )}
               size="small"
               onClick={() => {
@@ -236,11 +271,23 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
           </Col>
           <Col xs={2} sm={2} md={1} lg={1} xl={1}>
             <Tooltip title="默认展示">
-              <Button type="primary" icon={<HomeOutlined />} shape="circle" size="small" onClick={showDataByDefaultWay} />
+              <Button
+                type="primary"
+                icon={<HomeOutlined />}
+                shape="circle"
+                size="small"
+                onClick={showDataByDefaultWay}
+              />
             </Tooltip>
           </Col>
           <Col xs={10} sm={9} md={8} lg={7} xl={6}>
-            <Input.Search ref={inputSearchRef} placeholder="Enter something" onSearch={handleSearch} enterButton allowClear />
+            <Input.Search
+              ref={inputSearchRef}
+              placeholder="Enter something"
+              onSearch={handleSearch}
+              enterButton
+              allowClear
+            />
           </Col>
         </Row>
         {(selectedItems?.length > 0 || showSorterFlag) && (
@@ -322,28 +369,51 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
             <Col>
               {showSorterFlag && (
                 <>
-                  <Tag color="magenta" id="default" style={{ marginLeft: 10, cursor: 'pointer' }} onClick={handleSort}>
+                  <Tag
+                    color="magenta"
+                    id="default"
+                    style={{ marginLeft: 10, cursor: 'pointer' }}
+                    onClick={handleSort}
+                  >
                     默认
                   </Tag>
-                  <Tag color="magenta" id="createDate" style={{ cursor: 'pointer' }} onClick={handleSort}>
+                  <Tag
+                    color="magenta"
+                    id="createDate"
+                    style={{ cursor: 'pointer' }}
+                    onClick={handleSort}
+                  >
                     时间
-                    {conditionQuery?.orderBy?.name === 'createDate' && conditionQuery?.orderBy?.by === 'DESC' ? (
+                    {conditionQuery?.orderBy?.name === 'createDate' &&
+                    conditionQuery?.orderBy?.by === 'DESC' ? (
                       <CaretDownOutlined />
                     ) : (
                       <CaretUpOutlined />
                     )}
                   </Tag>
-                  <Tag color="magenta" id="isApproved" style={{ cursor: 'pointer' }} onClick={handleSort}>
+                  <Tag
+                    color="magenta"
+                    id="isApproved"
+                    style={{ cursor: 'pointer' }}
+                    onClick={handleSort}
+                  >
                     显示
-                    {conditionQuery?.orderBy?.name === 'isApproved' && conditionQuery?.orderBy?.by === 'DESC' ? (
+                    {conditionQuery?.orderBy?.name === 'isApproved' &&
+                    conditionQuery?.orderBy?.by === 'DESC' ? (
                       <CaretDownOutlined />
                     ) : (
                       <CaretUpOutlined />
                     )}
                   </Tag>
-                  <Tag color="magenta" id="isTop" style={{ cursor: 'pointer' }} onClick={handleSort}>
+                  <Tag
+                    color="magenta"
+                    id="isTop"
+                    style={{ cursor: 'pointer' }}
+                    onClick={handleSort}
+                  >
                     置顶
-                    {conditionQuery?.orderBy?.name === 'isTop' && conditionQuery?.orderBy?.by === 'DESC' ? (
+                    {conditionQuery?.orderBy?.name === 'isTop' &&
+                    conditionQuery?.orderBy?.by === 'DESC' ? (
                       <CaretDownOutlined />
                     ) : (
                       <CaretUpOutlined />
@@ -390,7 +460,9 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
             style={{ background: selectedItems.map((i) => i.id).includes(item.id) && '#FFFFE0' }}
             key={item.id}
             actions={[
-              <span key="createDate">{moment(new Date(item.createDate)).format('YYYY-MM-DD')}</span>,
+              <span key="createDate">
+                {moment(new Date(item.createDate)).format('YYYY-MM-DD')}
+              </span>,
               <Button
                 key="remove"
                 size="small"
@@ -438,7 +510,10 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
               avatar={
                 <>
                   <Checkbox
-                    checked={allSelectedFlag || selectedItems.map((selectedItem) => selectedItem.id).includes(item.id)}
+                    checked={
+                      allSelectedFlag ||
+                      selectedItems.map((selectedItem) => selectedItem.id).includes(item.id)
+                    }
                     onChange={() => {
                       toggleSelectOne(item)
                     }}
@@ -499,7 +574,12 @@ const MessageManagement: FC<RouteComponentProps> = memo(() => {
   const editFormComponent = useMemo<ReactNode>(() => {
     return (
       editFormVisible && (
-        <EditForm visible={editFormVisible} initialValues={editFormData} onToggleEditorialPanel={toggleEditorialPanel} onSave={saveData} />
+        <EditForm
+          visible={editFormVisible}
+          initialValues={editFormData}
+          onToggleEditorialPanel={toggleEditorialPanel}
+          onSave={saveData}
+        />
       )
     )
   }, [editFormVisible, editFormData, toggleEditorialPanel, saveData])

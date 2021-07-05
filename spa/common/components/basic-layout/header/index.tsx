@@ -1,7 +1,12 @@
 import React, { memo, useCallback, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Layout, message, Avatar, Dropdown, Menu, Divider, Input, Modal, Tag } from 'antd'
-import { TranslationOutlined, SearchOutlined, BellOutlined, MenuUnfoldOutlined } from '@ant-design/icons'
+import {
+  TranslationOutlined,
+  SearchOutlined,
+  BellOutlined,
+  MenuUnfoldOutlined,
+} from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { accountServices } from '@common/services'
 import { LocalStorage } from '@common/constants'
@@ -30,7 +35,10 @@ const Header: FC<HeaderProps> = memo((props) => {
   const searchBoxRef = useRef<Input>(null)
   const { t, i18n } = useTranslation()
   const dispatch = useDispatch()
-  const [, setAccountLocalStorage] = useLocalStorage<{ autoLoginMark: boolean; autoLogin: boolean }>(LocalStorage.BLOG_STORE_ACCOUNT)
+  const [, setAccountLocalStorage] = useLocalStorage<{
+    autoLoginMark: boolean
+    autoLogin: boolean
+  }>(LocalStorage.BLOG_STORE_ACCOUNT)
 
   const changeLang = useCallback<(event: React.MouseEvent<HTMLElement, MouseEvent>) => void>(() => {
     const nextLang = i18n.language === 'zh-CN' ? 'en' : 'zh-CN'
@@ -38,14 +46,13 @@ const Header: FC<HeaderProps> = memo((props) => {
     message.info(`当前语言已设置为${nextLang === 'zh-CN' ? '中文' : '英文'}`)
   }, [i18n])
 
-  const showLoginForm = useCallback<(event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, forRegister?: boolean) => void>(
-    (event, forRegister) => {
-      event.preventDefault()
-      setLoginFormVisible(true)
-      setIsForRegister(Boolean(forRegister))
-    },
-    [],
-  )
+  const showLoginForm = useCallback<
+    (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, forRegister?: boolean) => void
+  >((event, forRegister) => {
+    event.preventDefault()
+    setLoginFormVisible(true)
+    setIsForRegister(Boolean(forRegister))
+  }, [])
 
   const login = useCallback<(params: IAccount['loginParams']) => void>(
     async (params) => {
@@ -62,7 +69,10 @@ const Header: FC<HeaderProps> = memo((props) => {
         return
       }
       const encryptedPassword = rsa(serialize(password), publicKeyRes.data.item)
-      const [loginRes, loginErr] = await accountServices.login({ ...params, password: encryptedPassword })
+      const [loginRes, loginErr] = await accountServices.login({
+        ...params,
+        password: encryptedPassword,
+      })
       if (loginErr) {
         message.error({ content: loginErr.message || '登录失败', key: 'login' })
         return
@@ -95,7 +105,10 @@ const Header: FC<HeaderProps> = memo((props) => {
   return (
     <Layout.Header className={styles['header-area']}>
       <div className={styles['header-left']}>
-        <img src={`${__SERVER_ORIGIN__ || ''}/public/assets/images/logo.png`} className={styles['site-logo']} />
+        <img
+          src={`${__SERVER_ORIGIN__ || ''}/public/assets/images/logo.png`}
+          className={styles['site-logo']}
+        />
         {isMobile ? (
           <MenuUnfoldOutlined
             style={{ fontSize: 20, marginLeft: 8 }}
@@ -152,7 +165,10 @@ const Header: FC<HeaderProps> = memo((props) => {
                 >
                   <Avatar
                     style={{ cursor: 'pointer' }}
-                    src={userInfo?.avatar || `${__SERVER_ORIGIN__ || ''}/public/assets/images/default/avatar.jpeg`}
+                    src={
+                      userInfo?.avatar ||
+                      `${__SERVER_ORIGIN__ || ''}/public/assets/images/default/avatar.jpeg`
+                    }
                   />
                 </Dropdown>
               ) : (

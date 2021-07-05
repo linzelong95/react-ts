@@ -6,7 +6,15 @@ import type { RouteComponentProps } from 'react-router'
 const Register: FC<RouteComponentProps<{ id: string }>> = memo((props) => {
   const { id } = props.match.params
   return (
-    <div style={{ minHeight: '100vh', background: '#f0f2f5', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    <div
+      style={{
+        minHeight: '100vh',
+        background: '#f0f2f5',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
       <Card style={{ width: 600 }}>
         <Result
           status="success"

@@ -16,7 +16,16 @@ export interface UploadProps extends AntdUploadProps {
 }
 
 const Upload: ForwardRefRenderFunction<typeof AntdUpload, UploadProps> = (props, ref) => {
-  const { fileList, maxFiles, children, useInUploadCrop, beforeUpload, onChange, onRemove, ...restProps } = props
+  const {
+    fileList,
+    maxFiles,
+    children,
+    useInUploadCrop,
+    beforeUpload,
+    onChange,
+    onRemove,
+    ...restProps
+  } = props
   const { multiple = Number.isFinite(maxFiles) && maxFiles > 1, ...otherProps } = restProps
   const [cosUploadSignature, setCosUploadSignature] = useState<string>(undefined)
 
@@ -53,12 +62,15 @@ const Upload: ForwardRefRenderFunction<typeof AntdUpload, UploadProps> = (props,
     ({ file, fileList, event }) => {
       if (file.status === 'error') message.error(`${file.name}上传失败！`)
       if (file.status === 'done') message.success(`${file.name}上传成功！`)
-      if (onChange && !useInUploadCrop) onChange({ file, fileList: fileList.slice(0, formattedMaxFiles), event })
+      if (onChange && !useInUploadCrop)
+        onChange({ file, fileList: fileList.slice(0, formattedMaxFiles), event })
     },
     [formattedMaxFiles, useInUploadCrop, onChange],
   )
 
-  const getFileKeyAndSignature = useCallback<(token: string) => Promise<{ fileKey: string; signature: string }>>(async (token) => {
+  const getFileKeyAndSignature = useCallback<
+    (token: string) => Promise<{ fileKey: string; signature: string }>
+  >(async (token) => {
     const fileKeyAndSignatureMap = { fileKey: '', signature: '' }
     if (!token) return fileKeyAndSignatureMap
     if (token.match(/^([^:]*:)?\/\/brief-1302086393[^/]*\//)) {
@@ -67,7 +79,9 @@ const Upload: ForwardRefRenderFunction<typeof AntdUpload, UploadProps> = (props,
       fileKeyAndSignatureMap.fileKey = fileKey
     }
     try {
-      fileKeyAndSignatureMap.signature = await cosServices.getCosSignature(fileKeyAndSignatureMap.fileKey)
+      fileKeyAndSignatureMap.signature = await cosServices.getCosSignature(
+        fileKeyAndSignatureMap.fileKey,
+      )
     } catch {}
     return fileKeyAndSignatureMap
   }, [])
@@ -76,7 +90,8 @@ const Upload: ForwardRefRenderFunction<typeof AntdUpload, UploadProps> = (props,
     async (file) => {
       message.info('正在处理，请稍等...')
       const { fileKey, signature } = await getFileKeyAndSignature(file.url)
-      if (!fileKey || !signature) return Modal.error({ title: '文件可能已损坏，预览失败', okText: '知道了' })
+      if (!fileKey || !signature)
+        return Modal.error({ title: '文件可能已损坏，预览失败', okText: '知道了' })
       window.open(`${COS_URL}/${encodeURIComponent(fileKey)}?sign=${encodeURIComponent(signature)}`)
       // 或window.open(`${COS_URL}/${encodeURIComponent(fileKey)}?${signature}`)
     },
@@ -87,10 +102,16 @@ const Upload: ForwardRefRenderFunction<typeof AntdUpload, UploadProps> = (props,
     async (file) => {
       message.info('正在处理，请稍等...')
       const { fileKey, signature } = await getFileKeyAndSignature(file.url)
-      if (!fileKey || !signature) return Modal.error({ title: '文件可能已损坏，下载失败', okText: '知道了' })
+      if (!fileKey || !signature)
+        return Modal.error({ title: '文件可能已损坏，下载失败', okText: '知道了' })
       window.open(
-        `${COS_URL}/${encodeURIComponent(fileKey)}?response-content-disposition=${encodeURIComponent(
-          `attachment;filename="${fileKey.replace(/^blog_system\/\d{6}\/\w{8}(-\w{4}){3}-\w{12}_/, '')}"`,
+        `${COS_URL}/${encodeURIComponent(
+          fileKey,
+        )}?response-content-disposition=${encodeURIComponent(
+          `attachment;filename="${fileKey.replace(
+            /^blog_system\/\d{6}\/\w{8}(-\w{4}){3}-\w{12}_/,
+            '',
+          )}"`,
         )}&${signature}`,
       )
     },

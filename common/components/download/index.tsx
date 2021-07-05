@@ -8,8 +8,14 @@ import { isPreviewSupported } from '@common/utils'
 import type { FC, ReactNode, CSSProperties, AnchorHTMLAttributes } from 'react'
 
 export function getFilename(token: string): string {
-  if (token?.match?.(/^([^:]*:)?\/\/brief-1302086393[^/]*\/blog_system{6}\/\w{8}(-\w{4}){3}-\w{12}_([^?]*)/)) {
-    const [, , , filename] = token.match(/^([^:]*:)?\/\/brief-1302086393[^/]*\/blog_system{6}\/\w{8}(-\w{4}){3}-\w{12}_([^?]*)/)
+  if (
+    token?.match?.(
+      /^([^:]*:)?\/\/brief-1302086393[^/]*\/blog_system{6}\/\w{8}(-\w{4}){3}-\w{12}_([^?]*)/,
+    )
+  ) {
+    const [, , , filename] = token.match(
+      /^([^:]*:)?\/\/brief-1302086393[^/]*\/blog_system{6}\/\w{8}(-\w{4}){3}-\w{12}_([^?]*)/,
+    )
     return filename
   }
   return '附件'
@@ -30,7 +36,17 @@ export interface DownloadProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
 }
 
 const Download: FC<DownloadProps> = memo((props) => {
-  const { token, showOnBrowserWindow, showPreview, previewBoxHeight, filename, children, showInOneRow = true, style, ...otherProps } = props
+  const {
+    token,
+    showOnBrowserWindow,
+    showPreview,
+    previewBoxHeight,
+    filename,
+    children,
+    showInOneRow = true,
+    style,
+    ...otherProps
+  } = props
 
   const [previewModalVisible, setPreviewModalVisible] = useState<boolean>(false)
   const [cosUploadSignature, setCosUploadSignature] = useState<string>(undefined)
@@ -47,8 +63,12 @@ const Download: FC<DownloadProps> = memo((props) => {
     if (!cosFileKey || !cosUploadSignature) return undefined
     const contentDisposition = showOnBrowserWindow
       ? ''
-      : `response-content-disposition=${encodeURIComponent(`attachment;filename="${getFilename(token)}"`)}`
-    return `${COS_URL}/${encodeURIComponent(cosFileKey)}?${contentDisposition ? `${contentDisposition}&` : ''}${cosUploadSignature}`
+      : `response-content-disposition=${encodeURIComponent(
+          `attachment;filename="${getFilename(token)}"`,
+        )}`
+    return `${COS_URL}/${encodeURIComponent(cosFileKey)}?${
+      contentDisposition ? `${contentDisposition}&` : ''
+    }${cosUploadSignature}`
   }, [cosFileKey, cosUploadSignature, showOnBrowserWindow, token])
 
   useEffect(() => {
@@ -65,13 +85,28 @@ const Download: FC<DownloadProps> = memo((props) => {
 
   const downloadComponent = useMemo<ReactNode>(() => {
     const iconStyle: CSSProperties =
-      !children && showInOneRow ? { position: 'absolute', right: showPreview ? 28 : 5, top: 4 } : { marginLeft: 10 }
+      !children && showInOneRow
+        ? { position: 'absolute', right: showPreview ? 28 : 5, top: 4 }
+        : { marginLeft: 10 }
     const linkStyle: CSSProperties =
       !children && showInOneRow
-        ? { display: 'inline-block', height: '100%', width: '100%', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }
+        ? {
+            display: 'inline-block',
+            height: '100%',
+            width: '100%',
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
+          }
         : {}
     return (
-      <a {...otherProps} href={downloadUrl || null} target="_blank" rel="noopener noreferrer" style={linkStyle}>
+      <a
+        {...otherProps}
+        href={downloadUrl || null}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={linkStyle}
+      >
         {children || (
           <>
             {filename || getFilename(token)}
@@ -85,7 +120,8 @@ const Download: FC<DownloadProps> = memo((props) => {
   const previewComponent = useMemo<ReactNode>(() => {
     if (!showPreview) return null
     const supportPreview: boolean = isPreviewSupported(token)
-    const iconStyle: CSSProperties = !children && showInOneRow ? { position: 'absolute', right: 5, top: 4 } : { marginLeft: 5 }
+    const iconStyle: CSSProperties =
+      !children && showInOneRow ? { position: 'absolute', right: 5, top: 4 } : { marginLeft: 5 }
     return (
       <>
         <Tooltip title={supportPreview ? '预览' : '不支持预览'}>

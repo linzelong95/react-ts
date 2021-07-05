@@ -19,9 +19,10 @@ const PageLayout: FC<unknown> = memo((props) => {
   const { asPath } = useRouter()
   const dispatch = useDispatch()
   const userInfo = useSelector<StoreState, StoreState['user']>((state) => state.user)
-  const [accountLocalStorage, setAccountLocalStorage] = useLocalStorage<{ autoLoginMark: boolean; autoLogin: boolean }>(
-    LocalStorage.BLOG_STORE_ACCOUNT,
-  )
+  const [accountLocalStorage, setAccountLocalStorage] = useLocalStorage<{
+    autoLoginMark: boolean
+    autoLogin: boolean
+  }>(LocalStorage.BLOG_STORE_ACCOUNT)
 
   const logout = useCallback<() => void>(async () => {
     const [, err] = await accountServices.logout()
@@ -73,7 +74,11 @@ const PageLayout: FC<unknown> = memo((props) => {
                   </Menu>
                 }
               >
-                <Avatar size={40} src={userInfo.avatar || '/public/assets/images/default/avatar.jpeg'} className="avatar-icon" />
+                <Avatar
+                  size={40}
+                  src={userInfo.avatar || '/public/assets/images/default/avatar.jpeg'}
+                  className="avatar-icon"
+                />
               </Dropdown>
             ) : (
               <a href={`/account/login?redirect=${encodeURIComponent(asPath)}`}>

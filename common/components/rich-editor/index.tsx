@@ -52,7 +52,10 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
   // Upload fileList为[]
   const [fileList, setFileList] = useState<UploadFile[]>([])
   // 本地缓存的曾提及用户
-  const [usedMentions, setUsedMentions] = useLocalStorage<MentionUser[]>('__MENTIONED_USER_LIST__', [])
+  const [usedMentions, setUsedMentions] = useLocalStorage<MentionUser[]>(
+    '__MENTIONED_USER_LIST__',
+    [],
+  )
 
   const { i18n } = useTranslation()
 
@@ -73,14 +76,22 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
     [searchUserName],
   )
 
-  const [loadingUser, userRes, userErr] = useService(userServices.getList, getUserListParams, !searchUserName)
+  const [loadingUser, userRes, userErr] = useService(
+    userServices.getList,
+    getUserListParams,
+    !searchUserName,
+  )
   const userList = useMemo<MentionUser[]>(() => {
     if (!searchUserName) return usedMentions
     if (userErr) {
       message.error(userErr.message || '获取列表失败')
       return []
     }
-    return userRes?.data?.list?.map((user) => ({ id: user.id, nickname: user.nickname, avatar: user.avatar }))
+    return userRes?.data?.list?.map((user) => ({
+      id: user.id,
+      nickname: user.nickname,
+      avatar: user.avatar,
+    }))
   }, [searchUserName, userRes, userErr, usedMentions])
 
   const cancelMention = useCallback<() => void>(() => {
@@ -103,7 +114,10 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
         href: `/user/${userInfo.id}#mention`,
       })
       const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
-      const mentionTextSelection = currentSelectionState.merge({ anchorOffset: start, focusOffset: end })
+      const mentionTextSelection = currentSelectionState.merge({
+        anchorOffset: start,
+        focusOffset: end,
+      })
       const insertingContent = Modifier.replaceText(
         value.getCurrentContent(),
         mentionTextSelection,
@@ -112,7 +126,8 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
         entityKey,
       )
       const newEditorState = EditorState.push(value, insertingContent, 'insert-fragment')
-      if (onChange) onChange(EditorState.forceSelection(newEditorState, insertingContent.getSelectionAfter()))
+      if (onChange)
+        onChange(EditorState.forceSelection(newEditorState, insertingContent.getSelectionAfter()))
       updateLocalStoreMentions(userInfo)
       cancelMention()
     },
@@ -171,7 +186,10 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
       setMentionState((prevValue) =>
         code === 'ArrowDown'
           ? { ...prevValue, index: prevValue.index === userList.length ? 0 : prevValue.index + 1 }
-          : { ...prevValue, index: prevValue.index === -1 ? userList.length - 1 : prevValue.index - 1 },
+          : {
+              ...prevValue,
+              index: prevValue.index === -1 ? userList.length - 1 : prevValue.index - 1,
+            },
       )
     },
     [userList, mentionFlag, mentionState],
@@ -333,7 +351,13 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
             }}
           >
             <List.Item.Meta
-              avatar={<Avatar size="small" icon={<UserOutlined />} src={`${__SERVER_ORIGIN__}/public/assets/images/default/avatar.jpeg`} />}
+              avatar={
+                <Avatar
+                  size="small"
+                  icon={<UserOutlined />}
+                  src={`${__SERVER_ORIGIN__}/public/assets/images/default/avatar.jpeg`}
+                />
+              }
               title={<div style={{ marginLeft: -10, paddingTop: 2 }}>{item.nickname}</div>}
             />
           </List.Item>
@@ -379,7 +403,12 @@ const RichEditor: FC<RichEditorProps> = memo((props) => {
             type: 'component',
             component: (
               <>
-                <Upload accept="image/*" showUploadList={false} fileList={fileList} onChange={uploadHandler}>
+                <Upload
+                  accept="image/*"
+                  showUploadList={false}
+                  fileList={fileList}
+                  onChange={uploadHandler}
+                >
                   <button type="button" className="control-item button">
                     <PictureOutlined />
                   </button>

@@ -40,7 +40,9 @@ const Preview: FC<PreviewProps> = memo((props) => {
   const parsedToken = useMemo(() => {
     if (!token) return null
     if (token.match(/^([^:]*:)?\/\/brief-1302086393[^/]*\/[^?]*\?sign=/)) {
-      const [, , fileKey, signature] = token.match(/^([^:]*:)?\/\/brief-1302086393[^/]*\/([^?]*)\?sign=(.*)$/)
+      const [, , fileKey, signature] = token.match(
+        /^([^:]*:)?\/\/brief-1302086393[^/]*\/([^?]*)\?sign=(.*)$/,
+      )
       return { fileKey, signature }
     }
     if (token.match(/^([^:]*:)?\/\/brief-1302086393[^/]*\//)) {

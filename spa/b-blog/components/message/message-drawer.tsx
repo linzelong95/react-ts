@@ -1,5 +1,17 @@
 import React, { memo, useMemo, useCallback, useRef } from 'react'
-import { Drawer, Button, Divider, Tooltip, Comment, List, Form, Input, Select, InputNumber, message } from 'antd'
+import {
+  Drawer,
+  Button,
+  Divider,
+  Tooltip,
+  Comment,
+  List,
+  Form,
+  Input,
+  Select,
+  InputNumber,
+  message,
+} from 'antd'
 import { SyncOutlined, PaperClipOutlined } from '@ant-design/icons'
 import { useSelector } from 'react-redux'
 import { useService } from '@common/hooks'
@@ -33,7 +45,10 @@ const MessageDrawer: FC<MessageDrawerProps> = memo((props) => {
     }),
     [],
   )
-  const [loading, messageRes, messageErr, forceRequest] = useService(messageServices.getList, getListParams)
+  const [loading, messageRes, messageErr, forceRequest] = useService(
+    messageServices.getList,
+    getListParams,
+  )
 
   const [total, dataSource] = useMemo(() => {
     if (messageErr) {
@@ -64,7 +79,10 @@ const MessageDrawer: FC<MessageDrawerProps> = memo((props) => {
     (item) => {
       const { from, id, parentId: pid, fromMail = '博主' } = item
       const parentId = pid > 0 ? pid : id
-      const to = { label: from.nickname || fromMail, key: from.id || fromMail } as IMessage['formDataWhenEdited']['to']
+      const to = {
+        label: from.nickname || fromMail,
+        key: from.id || fromMail,
+      } as IMessage['formDataWhenEdited']['to']
       form.setFieldsValue({ parentId, to })
       formRef?.current?.scrollIntoView?.({ behavior: 'smooth' })
     },
@@ -74,7 +92,19 @@ const MessageDrawer: FC<MessageDrawerProps> = memo((props) => {
   const getCommentComponent = useCallback<(item: MessageItem) => ReactNode>(
     (item) => {
       const { roleName } = currentUser
-      const { id, createDate, from, isApproved, to, fromMail, toMail, blog, message, parentId, children } = item
+      const {
+        id,
+        createDate,
+        from,
+        isApproved,
+        to,
+        fromMail,
+        toMail,
+        blog,
+        message,
+        parentId,
+        children,
+      } = item
       return (
         <Comment
           key={id}
@@ -84,24 +114,38 @@ const MessageDrawer: FC<MessageDrawerProps> = memo((props) => {
               回复
             </a>,
             (roleName === 'admin' || currentUser.id === from?.id) && (
-              <a onClick={() => onHandleItems('remove', item, forceRequest)} style={{ color: 'red' }}>
+              <a
+                onClick={() => onHandleItems('remove', item, forceRequest)}
+                style={{ color: 'red' }}
+              >
                 删除
               </a>
             ),
             roleName === 'admin' && isApproved === 0 && (
-              <a onClick={() => onHandleItems('approve', item, forceRequest)} style={{ color: '#66CD00' }}>
+              <a
+                onClick={() => onHandleItems('approve', item, forceRequest)}
+                style={{ color: '#66CD00' }}
+              >
                 展示
               </a>
             ),
             roleName === 'admin' && isApproved === 1 && (
-              <a onClick={() => onHandleItems('disapprove', item, forceRequest)} style={{ color: '#BF3EFF' }}>
+              <a
+                onClick={() => onHandleItems('disapprove', item, forceRequest)}
+                style={{ color: '#BF3EFF' }}
+              >
                 隐藏
               </a>
             ),
           ]}
           author={
             <span>
-              {from ? (from.roleName === 'admin' ? '博主' : from.nickname) : `${fromMail || ''}[游客]`}&nbsp;
+              {from
+                ? from.roleName === 'admin'
+                  ? '博主'
+                  : from.nickname
+                : `${fromMail || ''}[游客]`}
+              &nbsp;
               {blog && (
                 <Tooltip title="博客地址">
                   <a href={blog} target="_blank" rel="noopener noreferrer">
@@ -117,7 +161,9 @@ const MessageDrawer: FC<MessageDrawerProps> = memo((props) => {
               )}
             </span>
           }
-          avatar={from?.avatar || `${__SERVER_ORIGIN__ || ''}/public/assets/images/default/avatar.jpeg`}
+          avatar={
+            from?.avatar || `${__SERVER_ORIGIN__ || ''}/public/assets/images/default/avatar.jpeg`
+          }
           content={
             isApproved || roleName === 'admin' ? (
               <span style={{ color: isApproved === 0 ? 'lightgray' : '' }}>{message}</span>
@@ -142,13 +188,21 @@ const MessageDrawer: FC<MessageDrawerProps> = memo((props) => {
             <Select.Option value={'博主'}>博主</Select.Option>
           </Select>
         </Form.Item>
-        <Form.Item label="留言" name="message" rules={[{ required: true, message: '请输入留言内容!' }]}>
+        <Form.Item
+          label="留言"
+          name="message"
+          rules={[{ required: true, message: '请输入留言内容!' }]}
+        >
           <Input.TextArea rows={2} />
         </Form.Item>
         <Form.Item label="博客" name="blog">
           <Input />
         </Form.Item>
-        <Form.Item label="邮箱" name="fromMail" rules={[{ required: Boolean(currentUser.id), type: 'email' }]}>
+        <Form.Item
+          label="邮箱"
+          name="fromMail"
+          rules={[{ required: Boolean(currentUser.id), type: 'email' }]}
+        >
           <Input />
         </Form.Item>
         <Form.Item hidden name="parentId">
@@ -170,7 +224,12 @@ const MessageDrawer: FC<MessageDrawerProps> = memo((props) => {
         <span style={{ margin: '0px 10px' }}>条留言</span>
         <SyncOutlined style={{ color: '#1890FF' }} onClick={forceRequest} />
       </Divider>
-      <List loading={loading} itemLayout="horizontal" dataSource={dataSource} renderItem={getCommentComponent} />
+      <List
+        loading={loading}
+        itemLayout="horizontal"
+        dataSource={dataSource}
+        renderItem={getCommentComponent}
+      />
     </Drawer>
   )
 })

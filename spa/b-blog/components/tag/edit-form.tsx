@@ -15,7 +15,14 @@ interface EditFormProps extends ModalProps {
 type FormDataWhenEdited = ITag['formDataWhenEdited']
 
 const EditForm: FC<EditFormProps> = memo((props) => {
-  const { initialValues, visible, allSortList, onSave, onToggleEditorialPanel, ...restProps } = props
+  const {
+    initialValues,
+    visible,
+    allSortList,
+    onSave,
+    onToggleEditorialPanel,
+    ...restProps
+  } = props
   const [form] = Form.useForm<FormDataWhenEdited>()
 
   const handleCancel = useCallback<ModalProps['onCancel']>(() => {
@@ -54,7 +61,12 @@ const EditForm: FC<EditFormProps> = memo((props) => {
       maskClosable={false}
       {...restProps}
     >
-      <Form labelCol={{ span: 5 }} wrapperCol={{ span: 17 }} form={form} initialValues={editingFormData}>
+      <Form
+        labelCol={{ span: 5 }}
+        wrapperCol={{ span: 17 }}
+        form={form}
+        initialValues={editingFormData}
+      >
         <Form.Item label="名称" name="name" rules={[{ required: true, message: '请输入名称!' }]}>
           <Input />
         </Form.Item>
@@ -67,7 +79,12 @@ const EditForm: FC<EditFormProps> = memo((props) => {
             ))}
           </Select>
         </Form.Item>
-        <Form.Item label="状态" name="isEnable" rules={[{ required: true, message: '请选择状态!' }]} style={{ marginBottom: 0 }}>
+        <Form.Item
+          label="状态"
+          name="isEnable"
+          rules={[{ required: true, message: '请选择状态!' }]}
+          style={{ marginBottom: 0 }}
+        >
           <Select>
             <Select.Option value={1}>可用</Select.Option>
             <Select.Option value={0}>不可用</Select.Option>

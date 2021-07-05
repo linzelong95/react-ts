@@ -85,7 +85,10 @@ const CropImg: FC<CropImgProps> = memo((props) => {
         formattedFile.status = 'done'
         onChange({
           file: formattedFile,
-          fileList: [...fileList.filter(({ url }) => url && url !== formattedFile.url), formattedFile],
+          fileList: [
+            ...fileList.filter(({ url }) => url && url !== formattedFile.url),
+            formattedFile,
+          ],
           event: null,
         })
       },
@@ -94,7 +97,13 @@ const CropImg: FC<CropImgProps> = memo((props) => {
 
   return (
     <>
-      <Upload useInUploadCrop fileList={fileList} onChange={onChange} beforeUpload={handleBeforeUpload} {...uploadProps}>
+      <Upload
+        useInUploadCrop
+        fileList={fileList}
+        onChange={onChange}
+        beforeUpload={handleBeforeUpload}
+        {...uploadProps}
+      >
         {children}
       </Upload>
       <Modal

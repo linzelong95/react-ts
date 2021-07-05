@@ -28,7 +28,11 @@ const EditForm: FC<EditFormProps> = memo((props) => {
     }),
     [articleSearch],
   )
-  const [articleLoading, articleRes, articleErr] = useService(articleServices.getList, getListParams, Boolean(initialValues?.id))
+  const [articleLoading, articleRes, articleErr] = useService(
+    articleServices.getList,
+    getListParams,
+    Boolean(initialValues?.id),
+  )
   const articleList = useMemo(() => {
     if (articleErr) {
       message.error(articleErr.message || '获取列表失败')
@@ -81,7 +85,12 @@ const EditForm: FC<EditFormProps> = memo((props) => {
       maskClosable={false}
       {...restProps}
     >
-      <Form labelCol={{ span: 5 }} wrapperCol={{ span: 17 }} form={form} initialValues={editingFormData}>
+      <Form
+        labelCol={{ span: 5 }}
+        wrapperCol={{ span: 17 }}
+        form={form}
+        initialValues={editingFormData}
+      >
         <Form.Item label="文章" name="article" rules={[{ required: true, message: '请选择文章!' }]}>
           <Select
             labelInValue
@@ -103,16 +112,27 @@ const EditForm: FC<EditFormProps> = memo((props) => {
           <>
             <Form.Item label="回复对象" name="to">
               <Select disabled labelInValue>
-                <Select.Option value={editingFormData?.to?.key}>{editingFormData?.to?.label}</Select.Option>
+                <Select.Option value={editingFormData?.to?.key}>
+                  {editingFormData?.to?.label}
+                </Select.Option>
               </Select>
             </Form.Item>
             <Form.Item label="原评论">{initialValues.reply}</Form.Item>
           </>
         )}
-        <Form.Item label="评论" name="reply" rules={[{ required: true, message: '请输入评论内容!' }]}>
+        <Form.Item
+          label="评论"
+          name="reply"
+          rules={[{ required: true, message: '请输入评论内容!' }]}
+        >
           <Input.TextArea rows={2} />
         </Form.Item>
-        <Form.Item label="置顶" name="isTop" rules={[{ required: true, message: '请选择是否置顶!' }]} style={{ marginBottom: 0 }}>
+        <Form.Item
+          label="置顶"
+          name="isTop"
+          rules={[{ required: true, message: '请选择是否置顶!' }]}
+          style={{ marginBottom: 0 }}
+        >
           <Select>
             <Select.Option value={1}>是</Select.Option>
             <Select.Option value={0}>否</Select.Option>

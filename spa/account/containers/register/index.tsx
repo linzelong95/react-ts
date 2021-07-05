@@ -47,23 +47,53 @@ const Register: FC<RouteComponentProps<never>> = memo(() => {
   }, [isMobile])
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f0f2f5', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    <div
+      style={{
+        minHeight: '100vh',
+        background: '#f0f2f5',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
       <Card
         style={{
           width: 600,
-          ...(isMobile ? { width: '100vw', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' } : {}),
+          ...(isMobile
+            ? {
+                width: '100vw',
+                height: '100vh',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }
+            : {}),
         }}
         bodyStyle={isMobile ? { width: '100%' } : undefined}
       >
-        <div className="mt15 mb20" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <img src={`${__SERVER_ORIGIN__ || ''}/public/assets/images/logo.png`} style={{ width: 40, height: 40, borderRadius: '50%' }} />
+        <div
+          className="mt15 mb20"
+          style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+        >
+          <img
+            src={`${__SERVER_ORIGIN__ || ''}/public/assets/images/logo.png`}
+            style={{ width: 40, height: 40, borderRadius: '50%' }}
+          />
           <span style={{ fontSize: 36, fontWeight: 'bold', marginLeft: 16 }}>briefNull</span>
         </div>
         <Form labelCol={{ span: 5 }} wrapperCol={{ span: 16 }} form={form} name="register">
-          <Form.Item label="Account" name="account" rules={[{ required: true, message: 'Please input your account!' }]}>
+          <Form.Item
+            label="Account"
+            name="account"
+            rules={[{ required: true, message: 'Please input your account!' }]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item label="Password" name="password" rules={[{ required: true, message: 'Please input your password!' }]}>
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[{ required: true, message: 'Please input your password!' }]}
+          >
             <Input.Password />
           </Form.Item>
           <Form.Item
@@ -77,7 +107,9 @@ const Register: FC<RouteComponentProps<never>> = memo(() => {
                   if (!value || getFieldValue('password') === value) {
                     return Promise.resolve()
                   }
-                  return Promise.reject(new Error('The two passwords that you entered do not match!'))
+                  return Promise.reject(
+                    new Error('The two passwords that you entered do not match!'),
+                  )
                 },
               }),
             ]}
@@ -87,7 +119,11 @@ const Register: FC<RouteComponentProps<never>> = memo(() => {
           <Form.Item label="Captcha" required>
             <Row gutter={8}>
               <Col span={18}>
-                <Form.Item noStyle name="captcha" rules={[{ required: true, message: 'Please input captcha!' }]}>
+                <Form.Item
+                  noStyle
+                  name="captcha"
+                  rules={[{ required: true, message: 'Please input captcha!' }]}
+                >
                   <Input placeholder="captcha" />
                 </Form.Item>
               </Col>
@@ -95,7 +131,13 @@ const Register: FC<RouteComponentProps<never>> = memo(() => {
                 <img
                   alt="验证码"
                   src={captchaRes?.data?.item && `data:image/png;base64,${captchaRes.data.item}`}
-                  style={{ height: 31, width: '100%', border: '1px solid gray', padding: 3, cursor: 'pointer' }}
+                  style={{
+                    height: 31,
+                    width: '100%',
+                    border: '1px solid gray',
+                    padding: 3,
+                    cursor: 'pointer',
+                  }}
                   onClick={forceRequest}
                 />
               </Col>

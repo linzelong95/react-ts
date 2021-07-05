@@ -30,7 +30,8 @@ const EditForm: FC<EditFormProps> = memo((props) => {
         const { to, isTop, message } = values
         const parentId = initialValues?.parentId === 0 ? id : initialValues?.parentId
         const toId = to?.key
-        const toMail = to?.key !== undefined && typeof to.key !== 'number' && to.key !== '博主' ? to.key : '无'
+        const toMail =
+          to?.key !== undefined && typeof to.key !== 'number' && to.key !== '博主' ? to.key : '无'
         onSave({ toMail, toId, parentId, isTop, message }, () => {
           form.resetFields()
           onToggleEditorialPanel()
@@ -57,21 +58,37 @@ const EditForm: FC<EditFormProps> = memo((props) => {
       maskClosable={false}
       {...restProps}
     >
-      <Form labelCol={{ span: 5 }} wrapperCol={{ span: 17 }} form={form} initialValues={editingFormData}>
+      <Form
+        labelCol={{ span: 5 }}
+        wrapperCol={{ span: 17 }}
+        form={form}
+        initialValues={editingFormData}
+      >
         {initialValues?.id && (
           <>
             <Form.Item label="回复对象" name="to">
               <Select disabled labelInValue>
-                <Select.Option value={editingFormData?.to?.key}>{editingFormData?.to?.label}</Select.Option>
+                <Select.Option value={editingFormData?.to?.key}>
+                  {editingFormData?.to?.label}
+                </Select.Option>
               </Select>
             </Form.Item>
             <Form.Item label="原留言">{initialValues.message}</Form.Item>
           </>
         )}
-        <Form.Item label="留言" name="message" rules={[{ required: true, message: '请输入留言内容!' }]}>
+        <Form.Item
+          label="留言"
+          name="message"
+          rules={[{ required: true, message: '请输入留言内容!' }]}
+        >
           <Input.TextArea rows={2} />
         </Form.Item>
-        <Form.Item label="是否置顶" name="isTop" rules={[{ required: true, message: '请选择是否置顶!' }]} style={{ marginBottom: 0 }}>
+        <Form.Item
+          label="是否置顶"
+          name="isTop"
+          rules={[{ required: true, message: '请选择是否置顶!' }]}
+          style={{ marginBottom: 0 }}
+        >
           <Select>
             <Select.Option value={1}>是</Select.Option>
             <Select.Option value={0}>否</Select.Option>

@@ -1,5 +1,18 @@
 import React, { memo, useCallback, useMemo } from 'react'
-import { Avatar, Row, Col, Button, List, Tag, Input, Tooltip, Menu, Divider, message, Spin } from 'antd'
+import {
+  Avatar,
+  Row,
+  Col,
+  Button,
+  List,
+  Tag,
+  Input,
+  Tooltip,
+  Menu,
+  Divider,
+  message,
+  Spin,
+} from 'antd'
 import { TagsOutlined, HomeOutlined, GithubOutlined, CheckOutlined } from '@ant-design/icons'
 import { articleServices, tagServices, sortServices } from '@ssr/blog/services'
 import { useService } from '@ssr/common/hooks'
@@ -67,7 +80,14 @@ const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
   const { articleInfo } = props
   const router = useRouter()
   const { pathname, query } = router
-  const { page = 1, size = 10, orderName = 'default', search = '', categoryIds = '', tagIds = '' } = (query as unknown) as FilterLinkProps
+  const {
+    page = 1,
+    size = 10,
+    orderName = 'default',
+    search = '',
+    categoryIds = '',
+    tagIds = '',
+  } = (query as unknown) as FilterLinkProps
 
   const getListParams = useMemo<(ISort | ITag)['getListParams']>(() => {
     return {
@@ -112,12 +132,20 @@ const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
         <div className={styles.nav}>
           <Menu mode="horizontal" selectedKeys={[orderName]}>
             <Menu.Item key="default">
-              <FilterLink {...{ ...query, orderName: 'default' }} pathname={pathname} done={orderName === 'default'}>
+              <FilterLink
+                {...{ ...query, orderName: 'default' }}
+                pathname={pathname}
+                done={orderName === 'default'}
+              >
                 默认
               </FilterLink>
             </Menu.Item>
             <Menu.Item key="createDate">
-              <FilterLink {...{ ...query, orderName: 'createDate' }} pathname={pathname} done={orderName === 'createDate'}>
+              <FilterLink
+                {...{ ...query, orderName: 'createDate' }}
+                pathname={pathname}
+                done={orderName === 'createDate'}
+              >
                 时间
               </FilterLink>
             </Menu.Item>
@@ -160,7 +188,9 @@ const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
               <List.Item
                 key={item.id}
                 actions={[
-                  <span key="createDate">{moment(new Date(item.createDate)).format('YYYY-MM-DD')}</span>,
+                  <span key="createDate">
+                    {moment(new Date(item.createDate)).format('YYYY-MM-DD')}
+                  </span>,
                   item.tags?.length > 0 && (
                     <span key="tag">
                       {item.tags.map(({ id, name }) => (
@@ -169,7 +199,13 @@ const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
                     </span>
                   ),
                 ].filter(Boolean)}
-                extra={<img width={184} alt="article cover" src={item.imageUrl || '/public/assets/images/default/article.jpeg'} />}
+                extra={
+                  <img
+                    width={184}
+                    alt="article cover"
+                    src={item.imageUrl || '/public/assets/images/default/article.jpeg'}
+                  />
+                }
                 style={{ position: 'relative', overflow: 'hidden' }}
               >
                 {item.isTop === 1 && (
@@ -190,10 +226,18 @@ const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
                   </div>
                 )}
                 <List.Item.Meta
-                  avatar={<Avatar src={item.user?.avatar || '/public/assets/images/default/avatar.jpeg'} />}
+                  avatar={
+                    <Avatar
+                      src={item.user?.avatar || '/public/assets/images/default/avatar.jpeg'}
+                    />
+                  }
                   style={{ marginBottom: 0 }}
                   title={
-                    <a href={`/blog/article/detail?id=${item.id}`} target="_blank" rel="noreferrer noopener">
+                    <a
+                      href={`/blog/article/detail?id=${item.id}`}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                    >
                       <span className="mr10">{item.title}</span>
                       <Tag color="purple">
                         <TagsOutlined />
@@ -226,7 +270,19 @@ const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
             <div style={{ marginTop: -10, marginBottom: 15 }}>
               <Spin spinning={tagLoading}>
                 {tagList.map?.(({ id, name }) => {
-                  const colorArr = ['magenta', 'red', 'volcano', 'orange', 'gold', 'lime', 'green', 'cyan', 'blue', 'geekblue', 'purple']
+                  const colorArr = [
+                    'magenta',
+                    'red',
+                    'volcano',
+                    'orange',
+                    'gold',
+                    'lime',
+                    'green',
+                    'cyan',
+                    'blue',
+                    'geekblue',
+                    'purple',
+                  ]
                   const color = colorArr[Math.floor(Math.random() * (colorArr.length - 1))]
                   return (
                     <FilterLink {...query} pathname={pathname} tagId={id} key={id}>
@@ -256,7 +312,11 @@ const Article: NextPage<ArticleProps, Promise<ArticleProps>> = memo((props) => {
                         {sort.categories.map(({ id, name }) => {
                           return (
                             <FilterLink {...query} pathname={pathname} categoryId={id} key={id}>
-                              <Tag.CheckableTag checked={categoryIds.split(',').includes(String(id))}>{name}</Tag.CheckableTag>
+                              <Tag.CheckableTag
+                                checked={categoryIds.split(',').includes(String(id))}
+                              >
+                                {name}
+                              </Tag.CheckableTag>
                             </FilterLink>
                           )
                         })}

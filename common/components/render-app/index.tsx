@@ -47,7 +47,10 @@ function renderApp(options: RenderAppProps): void {
   // const release = (window as any).__INITIAL_STATE__.release
   // if (dsn && release) init({ dsn, release })
 
-  render(<Framework key={basename} {...frameworkOptions} store={store} />, document.querySelector('#root'))
+  render(
+    <Framework key={basename} {...frameworkOptions} store={store} />,
+    document.querySelector('#root'),
+  )
 }
 
 export default renderApp

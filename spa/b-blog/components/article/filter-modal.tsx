@@ -1,4 +1,12 @@
-import React, { memo, useCallback, useState, useEffect, useMemo, useImperativeHandle, forwardRef } from 'react'
+import React, {
+  memo,
+  useCallback,
+  useState,
+  useEffect,
+  useMemo,
+  useImperativeHandle,
+  forwardRef,
+} from 'react'
 import { Modal, Button, Row, Col, Tag, Radio, Badge, Alert, Tree, message } from 'antd'
 import { useService } from '@common/hooks'
 import { tagServices, sortServices } from '@b-blog/services'
@@ -125,7 +133,12 @@ const FilterModal: ForwardRefRenderFunction<FilterModalRef, FilterModalProps> = 
       ]}
     >
       <div style={{ textAlign: 'center' }}>
-        <Radio.Group size="small" value={filterType} buttonStyle="solid" onChange={({ target }) => setFilterType(target.value)}>
+        <Radio.Group
+          size="small"
+          value={filterType}
+          buttonStyle="solid"
+          onChange={({ target }) => setFilterType(target.value)}
+        >
           <Radio.Button value="catalog">
             <Badge dot={temporaryCondition?.filteredSortArr?.length > 0}>
               <span style={{ marginLeft: 10, marginRight: 10 }}>按分类</span>
@@ -138,17 +151,32 @@ const FilterModal: ForwardRefRenderFunction<FilterModalRef, FilterModalProps> = 
           </Radio.Button>
         </Radio.Group>
       </div>
-      <Alert message="筛选分两种类别，请注意您是否需要同时进行两种类别的筛选！" type="warning" showIcon style={{ margin: '15px 0px' }} />
+      <Alert
+        message="筛选分两种类别，请注意您是否需要同时进行两种类别的筛选！"
+        type="warning"
+        showIcon
+        style={{ margin: '15px 0px' }}
+      />
       {filterType === 'catalog' && (
         <Tree
           checkable
           showLine
-          onCheck={(value) => setTemporaryCondition((prevValue) => ({ ...prevValue, filteredSortArr: (value as unknown) as string[] }))}
+          onCheck={(value) =>
+            setTemporaryCondition((prevValue) => ({
+              ...prevValue,
+              filteredSortArr: (value as unknown) as string[],
+            }))
+          }
           expandedKeys={temporaryCondition?.filteredSortArr || []}
           checkedKeys={temporaryCondition?.filteredSortArr || []}
         >
           {allSortList.map((item) => (
-            <Tree.TreeNode title={item.name} key={`${item.id}`} selectable={false} disabled={item.isEnable === 0}>
+            <Tree.TreeNode
+              title={item.name}
+              key={`${item.id}`}
+              selectable={false}
+              disabled={item.isEnable === 0}
+            >
               {item.categories.map((category) => (
                 <Tree.TreeNode
                   title={category.name}

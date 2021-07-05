@@ -19,7 +19,10 @@ import 'braft-editor/dist/index.css'
 interface ArticleDetailProps {
   detailInfo: IArticle['getDetailRes']
 }
-type HandleReplyItems = (type: 'remove' | 'approve' | 'disapprove' | 'top' | 'unTop', record: IReply['listItem']) => void
+type HandleReplyItems = (
+  type: 'remove' | 'approve' | 'disapprove' | 'top' | 'unTop',
+  record: IReply['listItem'],
+) => void
 
 const ArticleDetail: NextPage<ArticleDetailProps, Promise<ArticleDetailProps>> = memo((props) => {
   const { detailInfo = {} as IArticle['getDetailRes'] } = props
@@ -36,7 +39,10 @@ const ArticleDetail: NextPage<ArticleDetailProps, Promise<ArticleDetailProps>> =
       articleIds: detailInfo.id,
     }
   }, [detailInfo])
-  const [replyLoading, replyRes, replyErr, replyForceRequest] = useService(replyServices.getList, getListParams)
+  const [replyLoading, replyRes, replyErr, replyForceRequest] = useService(
+    replyServices.getList,
+    getListParams,
+  )
   const [replyTotal, replyList] = useMemo(() => {
     if (replyErr) {
       message.error(replyErr.message || '获取评论列表失败')
@@ -73,7 +79,12 @@ const ArticleDetail: NextPage<ArticleDetailProps, Promise<ArticleDetailProps>> =
     const parentId = repliedTo?.replyId
     const toId = repliedTo?.id || detailInfo.user.id
     message.loading({ content: '正在提交...', key: 'saveData', duration: 0 })
-    const [, saveErr] = await replyServices.save({ toId, parentId, reply, articleId: detailInfo.id })
+    const [, saveErr] = await replyServices.save({
+      toId,
+      parentId,
+      reply,
+      articleId: detailInfo.id,
+    })
     if (saveErr) {
       message.error({ content: saveErr.message || '提交失败', key: 'saveData' })
       return
@@ -124,7 +135,11 @@ const ArticleDetail: NextPage<ArticleDetailProps, Promise<ArticleDetailProps>> =
               回复
             </a>,
             currentUser.id === from?.id && (
-              <a key="delete" onClick={() => handleReplyItems('remove', item)} style={{ color: 'red', marginLeft: 10 }}>
+              <a
+                key="delete"
+                onClick={() => handleReplyItems('remove', item)}
+                style={{ color: 'red', marginLeft: 10 }}
+              >
                 删除
               </a>
             ),
@@ -178,7 +193,19 @@ const ArticleDetail: NextPage<ArticleDetailProps, Promise<ArticleDetailProps>> =
               <span className="ml20">
                 标签：
                 {detailInfo.tags.map(({ id, name }) => {
-                  const colorArr = ['magenta', 'red', 'volcano', 'orange', 'gold', 'lime', 'green', 'cyan', 'blue', 'geekblue', 'purple']
+                  const colorArr = [
+                    'magenta',
+                    'red',
+                    'volcano',
+                    'orange',
+                    'gold',
+                    'lime',
+                    'green',
+                    'cyan',
+                    'blue',
+                    'geekblue',
+                    'purple',
+                  ]
                   const color = colorArr[Math.floor(Math.random() * (colorArr.length - 1))]
                   return (
                     <Tag color={color} key={id}>
@@ -190,11 +217,22 @@ const ArticleDetail: NextPage<ArticleDetailProps, Promise<ArticleDetailProps>> =
             )}
           </div>
           {detailInfo.abstract && <p className={styles.abstract}>摘要：{detailInfo.abstract}</p>}
-          <img className={styles.cover} src={detailInfo.imageUrl || '/public/assets/images/default/article/jpeg'} />
-          <div className={styles['rich-text-container']} dangerouslySetInnerHTML={{ __html: detailInfo.content }} />
+          <img
+            className={styles.cover}
+            src={detailInfo.imageUrl || '/public/assets/images/default/article/jpeg'}
+          />
+          <div
+            className={styles['rich-text-container']}
+            dangerouslySetInnerHTML={{ __html: detailInfo.content }}
+          />
         </div>
         <div className={styles.reply} ref={replyBoxRef}>
-          <Input.TextArea rows={4} value={replyContent} ref={replyTextAreaRef} onChange={replyContentChange} />
+          <Input.TextArea
+            rows={4}
+            value={replyContent}
+            ref={replyTextAreaRef}
+            onChange={replyContentChange}
+          />
           <div className={styles['comment-btn']}>
             <Button size="small" type="primary" onClick={handleComment}>
               发表评论
@@ -207,14 +245,22 @@ const ArticleDetail: NextPage<ArticleDetailProps, Promise<ArticleDetailProps>> =
                 <span style={{ margin: '0px 10px' }}>条留言</span>
                 <SyncOutlined style={{ color: '#1890FF' }} onClick={replyForceRequest} />
               </Divider>
-              <List loading={replyLoading} itemLayout="horizontal" dataSource={replyList} renderItem={getCommentComponent} />
+              <List
+                loading={replyLoading}
+                itemLayout="horizontal"
+                dataSource={replyList}
+                renderItem={getCommentComponent}
+              />
             </>
           )}
         </div>
       </div>
       <div className={styles['author-recommend']}>
         <div style={{ textAlign: 'center' }}>
-          <Avatar size={200} src={detailInfo.user.avatar || '/public/assets/images/default/avatar.jpeg'} />
+          <Avatar
+            size={200}
+            src={detailInfo.user.avatar || '/public/assets/images/default/avatar.jpeg'}
+          />
           <p style={{ fontSize: 25, fontWeight: 'bold', margin: 10 }}>{detailInfo.user.nickname}</p>
           <Divider style={{ margin: '5px 0px' }}>
             {detailInfo.user?.github && (

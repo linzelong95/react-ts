@@ -2,7 +2,14 @@ import React, { memo, useCallback, useState, useRef, useMemo, useEffect } from '
 import { WrappedContainer } from '@spa/common/components'
 import { useService } from '@common/hooks'
 import { message, Table, Button, Tag, Input, Row, Col, Tooltip, Badge } from 'antd'
-import { UnlockOutlined, LockOutlined, DeleteOutlined, HomeOutlined, ReloadOutlined, PlusOutlined } from '@ant-design/icons'
+import {
+  UnlockOutlined,
+  LockOutlined,
+  DeleteOutlined,
+  HomeOutlined,
+  ReloadOutlined,
+  PlusOutlined,
+} from '@ant-design/icons'
 import moment from 'moment'
 import { tagServices, sortServices } from '@b-blog/services'
 import EditForm from '@b-blog/components/tag/edit-form'
@@ -21,7 +28,10 @@ type HandleItems = (type: 'remove' | 'lock' | 'unlock', record?: ListItem) => vo
 const TagManagement: FC<RouteComponentProps> = memo(() => {
   const inputSearchRef = useRef<Input>(null)
   const [selectedItems, setSelectedItems] = useState<ListItem[]>([])
-  const [pagination, setPagination] = useState<{ current: number; pageSize: number }>({ current: 1, pageSize: 10 })
+  const [pagination, setPagination] = useState<{ current: number; pageSize: number }>({
+    current: 1,
+    pageSize: 10,
+  })
   const [allSortList, setAllSortList] = useState<ISort['getListRes']['list']>([])
   const [conditionQuery, setConditionQuery] = useState<ITag['getListParams']['conditionQuery']>({})
   const [filters, setFilters] = useState<Partial<{ sort: number[]; isEnable: number[] }>>({})
@@ -45,7 +55,9 @@ const TagManagement: FC<RouteComponentProps> = memo(() => {
     return [tagRes?.data?.total || 0, tagRes?.data?.list || []]
   }, [tagRes, tagErr])
 
-  const showDataByDefaultWay = useCallback<(event: React.MouseEvent<HTMLElement, MouseEvent>) => void>(() => {
+  const showDataByDefaultWay = useCallback<
+    (event: React.MouseEvent<HTMLElement, MouseEvent>) => void
+  >(() => {
     setConditionQuery({})
     setFilters({})
     inputSearchRef.current?.setValue?.('')
@@ -63,28 +75,43 @@ const TagManagement: FC<RouteComponentProps> = memo(() => {
       if (selectedItems.length === keys.length) {
         newItems = items
       } else if (selectedItems.length < keys.length) {
-        newItems = [...selectedItems.filter((selectedItem) => items.every((item) => selectedItem.id !== item.id)), ...items]
+        newItems = [
+          ...selectedItems.filter((selectedItem) =>
+            items.every((item) => selectedItem.id !== item.id),
+          ),
+          ...items,
+        ]
       } else {
-        newItems = selectedItems.filter((selectedItem) => keys.some((key) => key === selectedItem.id))
+        newItems = selectedItems.filter((selectedItem) =>
+          keys.some((key) => key === selectedItem.id),
+        )
       }
       setSelectedItems(newItems)
     },
     [selectedItems],
   )
 
-  const handleTableChange = useCallback<TableProps<ListItem>['onChange']>((pagination, filters, sorter) => {
-    setPagination({ current: pagination.current, pageSize: pagination.pageSize })
-    const { columnKey, order } = sorter as SorterResult<ListItem>
-    const orderBy = order ? { name: columnKey, by: order === 'descend' ? 'DESC' : 'ASC' } : {}
-    const isEnable = filters?.isEnable?.[0] as 0 | 1
-    const sortIdsArr = (filters?.sort as number[]) || []
-    setFilters(filters)
-    setConditionQuery((prevValue) => ({ ...prevValue, orderBy, isEnable, sortIdsArr } as typeof conditionQuery))
-  }, [])
+  const handleTableChange = useCallback<TableProps<ListItem>['onChange']>(
+    (pagination, filters, sorter) => {
+      setPagination({ current: pagination.current, pageSize: pagination.pageSize })
+      const { columnKey, order } = sorter as SorterResult<ListItem>
+      const orderBy = order ? { name: columnKey, by: order === 'descend' ? 'DESC' : 'ASC' } : {}
+      const isEnable = filters?.isEnable?.[0] as 0 | 1
+      const sortIdsArr = (filters?.sort as number[]) || []
+      setFilters(filters)
+      setConditionQuery(
+        (prevValue) => ({ ...prevValue, orderBy, isEnable, sortIdsArr } as typeof conditionQuery),
+      )
+    },
+    [],
+  )
 
   const handleItems = useCallback<HandleItems>(
     async (type, record) => {
-      const handlingItems = (record ? [record] : selectedItems).map((item) => ({ id: item.id, name: item.name }))
+      const handlingItems = (record ? [record] : selectedItems).map((item) => ({
+        id: item.id,
+        name: item.name,
+      }))
       const [, err] = await tagServices[type]({ items: handlingItems })
       if (err) {
         message.error('操作失败')
@@ -202,11 +229,23 @@ const TagManagement: FC<RouteComponentProps> = memo(() => {
         </Col>
         <Col xs={2} sm={2} md={1} lg={1} xl={1}>
           <Tooltip title="默认展示">
-            <Button type="primary" icon={<HomeOutlined />} shape="circle" size="small" onClick={showDataByDefaultWay} />
+            <Button
+              type="primary"
+              icon={<HomeOutlined />}
+              shape="circle"
+              size="small"
+              onClick={showDataByDefaultWay}
+            />
           </Tooltip>
         </Col>
         <Col xs={10} sm={9} md={8} lg={7} xl={6}>
-          <Input.Search ref={inputSearchRef} placeholder="Enter something" onSearch={handleSearch} enterButton allowClear />
+          <Input.Search
+            ref={inputSearchRef}
+            placeholder="Enter something"
+            onSearch={handleSearch}
+            enterButton
+            allowClear
+          />
         </Col>
       </Row>
     )
@@ -256,7 +295,9 @@ const TagManagement: FC<RouteComponentProps> = memo(() => {
             ],
             filterMultiple: false,
             filteredValue: filters?.isEnable || [],
-            render: (val) => <Tag color={val === 1 ? 'blue' : 'gray'}>{val === 1 ? '可用' : '不可用'}</Tag>,
+            render: (val) => (
+              <Tag color={val === 1 ? 'blue' : 'gray'}>{val === 1 ? '可用' : '不可用'}</Tag>
+            ),
           },
           {
             title: '操作',
@@ -299,7 +340,10 @@ const TagManagement: FC<RouteComponentProps> = memo(() => {
         ]}
         rowKey="id"
         onChange={handleTableChange}
-        rowSelection={{ selectedRowKeys: selectedItems.map((item) => item.id), onChange: handleSelectRows }}
+        rowSelection={{
+          selectedRowKeys: selectedItems.map((item) => item.id),
+          onChange: handleSelectRows,
+        }}
         loading={loading}
         dataSource={dataSource}
         pagination={{

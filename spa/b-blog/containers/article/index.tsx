@@ -21,7 +21,10 @@ import {
 } from '@ant-design/icons'
 import EditForm from '@b-blog/components/article/edit-form'
 import DetailDrawer from '@b-blog/components/article/detail-drawer'
-import FilterModal, { FilterModalRef, TemporaryCondition } from '@b-blog/components/article/filter-modal'
+import FilterModal, {
+  FilterModalRef,
+  TemporaryCondition,
+} from '@b-blog/components/article/filter-modal'
 import moment from 'moment'
 import { sortServices, articleServices } from '@b-blog/services'
 import type { FC, ReactNode } from 'react'
@@ -35,7 +38,11 @@ import type { TagProps } from 'antd/lib/tag'
 export type ListItem = IArticle['listItem']
 export type ToggleEditorialPanel = (record?: ListItem) => void
 export type SaveData = (params: IArticle['editParams'], callback?: () => void) => void
-export type HandleItems = (type: 'remove' | 'lock' | 'unlock' | 'top' | 'unTop', record?: ListItem, callback?: () => void) => void
+export type HandleItems = (
+  type: 'remove' | 'lock' | 'unlock' | 'top' | 'unTop',
+  record?: ListItem,
+  callback?: () => void,
+) => void
 export type ConditionQuery = IArticle['getListParams']['conditionQuery'] & TemporaryCondition
 type ToggleReadArticle = (record?: ListItem) => void
 export type DetailItem = ListItem & { content: string }
@@ -43,7 +50,10 @@ export type DetailItem = ListItem & { content: string }
 const ArticleManagement: FC<RouteComponentProps> = memo(() => {
   const inputSearchRef = useRef<Input>(null)
   const filterModalRef = useRef<FilterModalRef>(null)
-  const [pagination, setPagination] = useState<{ current: number; pageSize: number }>({ current: 1, pageSize: 10 })
+  const [pagination, setPagination] = useState<{ current: number; pageSize: number }>({
+    current: 1,
+    pageSize: 10,
+  })
   const [editFormVisible, setEditFormVisible] = useState<boolean>(false)
   const [editFormData, setEditFormData] = useState<DetailItem>(null)
   const [selectedItems, setSelectedItems] = useState<ListItem[]>([])
@@ -55,7 +65,11 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
   const [oneDetail, setOneDetail] = useState<DetailItem>(null)
 
   const getListParams = useMemo<IArticle['getListParams']>(() => {
-    const neededConditionQuery = { ...conditionQuery, tagIdsArr: undefined, filteredSortArr: undefined }
+    const neededConditionQuery = {
+      ...conditionQuery,
+      tagIdsArr: undefined,
+      filteredSortArr: undefined,
+    }
     return {
       index: pagination.current,
       size: pagination.pageSize,
@@ -63,7 +77,10 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
     }
   }, [pagination, conditionQuery])
 
-  const [loading, articleRes, articleErr, forceRequest] = useService(articleServices.getList, getListParams)
+  const [loading, articleRes, articleErr, forceRequest] = useService(
+    articleServices.getList,
+    getListParams,
+  )
 
   const [total, dataSource] = useMemo(() => {
     if (articleErr) {
@@ -73,7 +90,9 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
     return [articleRes?.data?.total || 0, articleRes?.data?.list || []]
   }, [articleRes, articleErr])
 
-  const showDataByDefaultWay = useCallback<(event: React.MouseEvent<HTMLElement, MouseEvent>) => void>(() => {
+  const showDataByDefaultWay = useCallback<
+    (event: React.MouseEvent<HTMLElement, MouseEvent>) => void
+  >(() => {
     setConditionQuery({})
     filterModalRef.current?.clear()
     inputSearchRef.current?.setValue?.('')
@@ -122,9 +141,13 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
 
   const toggleSelectAll = useCallback<ButtonProps['onClick']>(() => {
     if (!dataSource?.length) return
-    const uniqueSelectedItems = dataSource.filter((dataItem) => !selectedItems.some((selectedItem) => selectedItem.id === dataItem.id))
+    const uniqueSelectedItems = dataSource.filter(
+      (dataItem) => !selectedItems.some((selectedItem) => selectedItem.id === dataItem.id),
+    )
     const newSelectedItems = allSelectedFlag
-      ? selectedItems.filter((selectedItem) => !dataSource.some((dataItem) => dataItem.id === selectedItem.id))
+      ? selectedItems.filter(
+          (selectedItem) => !dataSource.some((dataItem) => dataItem.id === selectedItem.id),
+        )
       : [...selectedItems, ...uniqueSelectedItems]
     setSelectedItems(newSelectedItems)
     setAllSelectedFlag(!allSelectedFlag)
@@ -139,7 +162,9 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
       setAllSelectedFlag(
         !dataSource?.length
           ? false
-          : dataSource.every((listItem) => newSelectedItems.some((selectedItem) => selectedItem.id === listItem.id)),
+          : dataSource.every((listItem) =>
+              newSelectedItems.some((selectedItem) => selectedItem.id === listItem.id),
+            ),
       )
     },
     [selectedItems, dataSource],
@@ -209,7 +234,11 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
 
   useEffect(() => {
     setAllSelectedFlag(
-      !dataSource?.length ? false : dataSource.every((listItem) => selectedItems.some((selectedItem) => selectedItem.id === listItem.id)),
+      !dataSource?.length
+        ? false
+        : dataSource.every((listItem) =>
+            selectedItems.some((selectedItem) => selectedItem.id === listItem.id),
+          ),
     )
   }, [selectedItems, dataSource])
 
@@ -238,7 +267,9 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
             <Button
               icon={<FilterOutlined />}
               type="primary"
-              danger={Boolean(conditionQuery?.filteredSortArr?.length || conditionQuery?.tagIdsArr?.length)}
+              danger={Boolean(
+                conditionQuery?.filteredSortArr?.length || conditionQuery?.tagIdsArr?.length,
+              )}
               size="small"
               onClick={() => {
                 setFilterModalVisible(true)
@@ -271,11 +302,23 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
           </Col>
           <Col xs={2} sm={2} md={1} lg={1} xl={1}>
             <Tooltip title="默认展示">
-              <Button type="primary" icon={<HomeOutlined />} shape="circle" size="small" onClick={showDataByDefaultWay} />
+              <Button
+                type="primary"
+                icon={<HomeOutlined />}
+                shape="circle"
+                size="small"
+                onClick={showDataByDefaultWay}
+              />
             </Tooltip>
           </Col>
           <Col xs={10} sm={9} md={8} lg={7} xl={6}>
-            <Input.Search ref={inputSearchRef} placeholder="Enter something" onSearch={handleSearch} enterButton allowClear />
+            <Input.Search
+              ref={inputSearchRef}
+              placeholder="Enter something"
+              onSearch={handleSearch}
+              enterButton
+              allowClear
+            />
           </Col>
         </Row>
         {(selectedItems?.length > 0 || showSorterFlag) && (
@@ -357,28 +400,51 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
             <Col>
               {showSorterFlag && (
                 <>
-                  <Tag color="magenta" id="default" style={{ marginLeft: 10, cursor: 'pointer' }} onClick={handleSort}>
+                  <Tag
+                    color="magenta"
+                    id="default"
+                    style={{ marginLeft: 10, cursor: 'pointer' }}
+                    onClick={handleSort}
+                  >
                     默认
                   </Tag>
-                  <Tag color="magenta" id="createDate" style={{ cursor: 'pointer' }} onClick={handleSort}>
+                  <Tag
+                    color="magenta"
+                    id="createDate"
+                    style={{ cursor: 'pointer' }}
+                    onClick={handleSort}
+                  >
                     时间
-                    {conditionQuery?.orderBy?.name === 'createDate' && conditionQuery?.orderBy?.by === 'DESC' ? (
+                    {conditionQuery?.orderBy?.name === 'createDate' &&
+                    conditionQuery?.orderBy?.by === 'DESC' ? (
                       <CaretDownOutlined />
                     ) : (
                       <CaretUpOutlined />
                     )}
                   </Tag>
-                  <Tag color="magenta" id="isApproved" style={{ cursor: 'pointer' }} onClick={handleSort}>
+                  <Tag
+                    color="magenta"
+                    id="isApproved"
+                    style={{ cursor: 'pointer' }}
+                    onClick={handleSort}
+                  >
                     显示
-                    {conditionQuery?.orderBy?.name === 'isEnable' && conditionQuery?.orderBy?.by === 'DESC' ? (
+                    {conditionQuery?.orderBy?.name === 'isEnable' &&
+                    conditionQuery?.orderBy?.by === 'DESC' ? (
                       <CaretDownOutlined />
                     ) : (
                       <CaretUpOutlined />
                     )}
                   </Tag>
-                  <Tag color="magenta" id="isTop" style={{ cursor: 'pointer' }} onClick={handleSort}>
+                  <Tag
+                    color="magenta"
+                    id="isTop"
+                    style={{ cursor: 'pointer' }}
+                    onClick={handleSort}
+                  >
                     置顶
-                    {conditionQuery?.orderBy?.name === 'isTop' && conditionQuery?.orderBy?.by === 'DESC' ? (
+                    {conditionQuery?.orderBy?.name === 'isTop' &&
+                    conditionQuery?.orderBy?.by === 'DESC' ? (
                       <CaretDownOutlined />
                     ) : (
                       <CaretUpOutlined />
@@ -425,15 +491,39 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
           <List.Item style={{ background: 'lightgray', borderRadius: 5 }}>
             <Card
               size="small"
-              cover={<img alt="cover" src={item.imageUrl || `${__SERVER_ORIGIN__ || ''}/public/assets/images/default/article.jpeg`} />}
+              cover={
+                <img
+                  alt="cover"
+                  src={
+                    item.imageUrl ||
+                    `${__SERVER_ORIGIN__ || ''}/public/assets/images/default/article.jpeg`
+                  }
+                />
+              }
               actions={[
-                <Button key="form" size="small" type="primary" onClick={() => toggleEditorialPanel(item)}>
+                <Button
+                  key="form"
+                  size="small"
+                  type="primary"
+                  onClick={() => toggleEditorialPanel(item)}
+                >
                   编辑
                 </Button>,
-                <Button key="delete" size="small" type="primary" danger onClick={() => handleItems('remove', item)}>
+                <Button
+                  key="delete"
+                  size="small"
+                  type="primary"
+                  danger
+                  onClick={() => handleItems('remove', item)}
+                >
                   删除
                 </Button>,
-                <Button key="whetherTop" size="small" type="primary" onClick={() => handleItems(item.isTop === 1 ? 'unTop' : 'top', item)}>
+                <Button
+                  key="whetherTop"
+                  size="small"
+                  type="primary"
+                  onClick={() => handleItems(item.isTop === 1 ? 'unTop' : 'top', item)}
+                >
                   {item.isTop === 1 ? '取置' : '置顶'}
                 </Button>,
                 <Button
@@ -444,14 +534,20 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
                 >
                   {item.isEnable === 1 ? '禁用' : '启用'}
                 </Button>,
-                <div key="select" style={{ width: '100%', height: '100%' }} onClick={() => toggleSelectOne(item)}>
+                <div
+                  key="select"
+                  style={{ width: '100%', height: '100%' }}
+                  onClick={() => toggleSelectOne(item)}
+                >
                   <Checkbox checked={selectedItems.some(({ id }) => id === item.id)} />,
                 </div>,
               ]}
               style={{
                 position: 'relative',
                 overflow: 'hidden',
-                background: (selectedItems.some(({ id }) => id === item.id) && '#FFFFE0') || (!item.isEnable && '#fafafa'),
+                background:
+                  (selectedItems.some(({ id }) => id === item.id) && '#FFFFE0') ||
+                  (!item.isEnable && '#fafafa'),
               }}
             >
               <Card.Meta
@@ -467,7 +563,9 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
                     <div style={{ marginBottom: 5, fontSize: 12 }}>
                       <Ellipsis lines={1}>
                         标签：
-                        {item?.tags?.length > 0 ? item.tags.map((tag) => <Tag key={tag.id}>{tag.name}</Tag>) : '无'}
+                        {item?.tags?.length > 0
+                          ? item.tags.map((tag) => <Tag key={tag.id}>{tag.name}</Tag>)
+                          : '无'}
                       </Ellipsis>
                     </div>
                     <Ellipsis lines={2} style={{ height: 40 }}>
@@ -475,8 +573,12 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
                       {item?.abstract || '无'}
                     </Ellipsis>
                     <div style={{ marginTop: 5, fontSize: 12 }}>
-                      <div style={{ float: 'left' }}>{moment(new Date(item.createDate)).format('YYYY-MM-DD')}</div>
-                      <div style={{ float: 'right' }}>{moment(new Date(item.updateDate)).format('YYYY-MM-DD')}</div>
+                      <div style={{ float: 'left' }}>
+                        {moment(new Date(item.createDate)).format('YYYY-MM-DD')}
+                      </div>
+                      <div style={{ float: 'right' }}>
+                        {moment(new Date(item.updateDate)).format('YYYY-MM-DD')}
+                      </div>
                     </div>
                   </>
                 }
@@ -546,7 +648,15 @@ const ArticleManagement: FC<RouteComponentProps> = memo(() => {
   }, [editFormVisible, editFormData, allSortList, toggleEditorialPanel, saveData])
 
   const detailDrawerComponent = useMemo<ReactNode>(() => {
-    return oneDetail && <DetailDrawer detailItem={oneDetail} visible={Boolean(oneDetail)} onClose={() => toggleReadArticle()} />
+    return (
+      oneDetail && (
+        <DetailDrawer
+          detailItem={oneDetail}
+          visible={Boolean(oneDetail)}
+          onClose={() => toggleReadArticle()}
+        />
+      )
+    )
   }, [oneDetail, toggleReadArticle])
 
   return (
