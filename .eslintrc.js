@@ -76,6 +76,7 @@ module.exports = {
     'unicorn/no-reduce': 'off',
     'unicorn/no-null': 'off',
     'unicorn/prevent-abbreviations': 'off',
+    'unicorn/no-nested-ternary': 'off', // 旨在允许使用多个三目表达式
     'unicorn/no-useless-undefined': 'off', // 允许设置undefined
     'unicorn/explicit-length-check': 'off', // 允许length不跟某个值比较， 如'xxx'.length?1:0
     'unicorn/no-unreadable-array-destructuring': 'off', // 此配置旨在允许不读取多个元组元素，如[, , fileKey]
