@@ -1,7 +1,4 @@
 module.exports = {
-  root: true,
-  // 开启eslint支持
-  eslintIntegration: true,
   // 一行最多 100 字符
   printWidth: 100,
   // 行尾不要有分号

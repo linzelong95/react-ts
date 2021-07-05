@@ -16,5 +16,7 @@ export function isMobile(includeIPad: boolean): boolean {
     /\b(crios|chrome).+mobile/i,
     /mobile.+firefox\b/i,
   ]
-  return /ipad/i.test(userAgent) && !includeIPad ? false : regExps.some((regex) => regex.test(userAgent))
+  return /ipad/i.test(userAgent) && !includeIPad
+    ? false
+    : regExps.some((regex) => regex.test(userAgent))
 }

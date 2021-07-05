@@ -10,7 +10,8 @@ export interface UseMobileParams {
 
 function useMobile(params: UseMobileParams = {}): boolean {
   const { includePad, includeTraditionalSmallViewPort, initialValue } = params
-  const extraMaxWith = typeof includeTraditionalSmallViewPort === 'number' ? includeTraditionalSmallViewPort : 575
+  const extraMaxWith =
+    typeof includeTraditionalSmallViewPort === 'number' ? includeTraditionalSmallViewPort : 575
   const isSmallViewPort = useMedia(`(max-width: ${extraMaxWith}px)`)
   const isMobileType = isMobile(includePad)
   const [state, setState] = useState<boolean>(isClient ? Boolean(initialValue) : false)

@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react'
 import { isClient } from '@common/utils'
 
 function useMedia(query: string, defaultState?: boolean): boolean {
-  const [state, setState] = useState(isClient ? () => window.matchMedia(query).matches : Boolean(defaultState))
+  const [state, setState] = useState(
+    isClient ? () => window.matchMedia(query).matches : Boolean(defaultState),
+  )
 
   useEffect(() => {
     if (!isClient) return

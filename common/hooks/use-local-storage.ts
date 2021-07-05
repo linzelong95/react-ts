@@ -57,14 +57,17 @@ const useLocalStorage = <T>(
   const set = useCallback<Dispatch<SetStateAction<T | undefined>>>(
     (valOrFunc) => {
       try {
-        const newState = typeof valOrFunc === 'function' ? (valOrFunc as (prevState: T) => T)(state) : valOrFunc
+        const newState =
+          typeof valOrFunc === 'function' ? (valOrFunc as (prevState: T) => T)(state) : valOrFunc
         if (typeof newState === 'undefined') return
         let value: string
         if (options) {
           if (options.raw) {
             value = typeof newState === 'string' ? newState : JSON.stringify(newState)
           } else {
-            value = (options as any).serializer ? (options as any).serializer(newState) : JSON.stringify(newState)
+            value = (options as any).serializer
+              ? (options as any).serializer(newState)
+              : JSON.stringify(newState)
           }
         } else {
           value = JSON.stringify(newState)

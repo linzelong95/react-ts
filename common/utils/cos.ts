@@ -2,9 +2,16 @@ import { COS_URL } from '@common/constants/cos'
 import moment from 'moment'
 import { v4 as uuid } from 'uuid'
 import type { RcFile, UploadFile } from 'antd/lib/upload/interface'
-import type { UploadRequestOption, UploadRequestError, UploadProgressEvent } from 'rc-upload/lib/interface'
+import type {
+  UploadRequestOption,
+  UploadRequestError,
+  UploadProgressEvent,
+} from 'rc-upload/lib/interface'
 
-export function getFileKeyAndUrl(file: File | RcFile | UploadFile, dirName = 'blog_system'): [string, string] {
+export function getFileKeyAndUrl(
+  file: File | RcFile | UploadFile,
+  dirName = 'blog_system',
+): [string, string] {
   const key = `${dirName}/${moment().format('YYYYMM')}/${uuid()}_${file.name}`
   const url = `${COS_URL}/${key}`
   ;(file as UploadFile).url = url
@@ -49,7 +56,18 @@ function getBody(xhr: XMLHttpRequest) {
 
 // 参考 https://github.com/react-component/upload/blob/master/src/request.ts
 export function upload(option: UploadRequestOption): { abort: () => void } {
-  const { headers = {}, data = {}, method = 'POST', action, file, filename, withCredentials, onProgress, onError, onSuccess } = option
+  const {
+    headers = {},
+    data = {},
+    method = 'POST',
+    action,
+    file,
+    filename,
+    withCredentials,
+    onProgress,
+    onError,
+    onSuccess,
+  } = option
   const xhr = new XMLHttpRequest()
 
   const formData = new FormData()

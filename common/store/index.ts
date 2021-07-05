@@ -15,5 +15,9 @@ export default function getCombinedStore(
   const combinedReducers = combineReducers({ ...reducers, ...reducerMap })
   const middlewareArr = [applyMiddleware(ReduxThunk)]
   if (__IS_DEV_MODE__) middlewareArr.push(applyMiddleware(reduxLogger))
-  return createStore(combinedReducers, { user: initialUserState, ...stateMap }, compose(...middlewareArr))
+  return createStore(
+    combinedReducers,
+    { user: initialUserState, ...stateMap },
+    compose(...middlewareArr),
+  )
 }
