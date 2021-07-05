@@ -36,10 +36,6 @@ module.exports = {
     'plugin:prettier/recommended',
   ],
   plugins: ['react', 'react-hooks', 'unicorn', 'promise', '@typescript-eslint'],
-  // 全局变量的校验规则
-  // globals: {
-  //   _: 'readonly',
-  // },
   env: {
     browser: true,
     node: true,
