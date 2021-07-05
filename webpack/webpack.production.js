@@ -24,7 +24,14 @@ const templateParameters = require('./template-parameters')
 
 const commonConfig = require('./webpack.common')
 
-const { BUILD_MODULES, WEB_ROOT, SERVER_ROOT, PUBLIC_ROOT, MANIFEST_ROOT, RELEASE_TAG } = require('./constants')
+const {
+  BUILD_MODULES,
+  WEB_ROOT,
+  SERVER_ROOT,
+  PUBLIC_ROOT,
+  MANIFEST_ROOT,
+  RELEASE_TAG,
+} = require('./constants')
 
 const productionConfig = {
   mode: 'production',
@@ -35,7 +42,10 @@ const productionConfig = {
     // filename: '[name]/js/[name]_[contenthash].js',
     // chunkFilename: (pathData) => `${pathData.chunk.runtime}/js/chunks/[id]_[contenthash].js`,
     // assetModuleFilename: (pathData) => `${pathData.runtime}/js/asset/[name]_[hash][ext][query]`,
-    filename: (pathData) => (pathData.chunk.name.includes('runtime') ? '[name]_[contenthash].js' : '[name]/[name]_[contenthash].js'),
+    filename: (pathData) =>
+      pathData.chunk.name.includes('runtime')
+        ? '[name]_[contenthash].js'
+        : '[name]/[name]_[contenthash].js',
     chunkFilename: (pathData) => `${pathData.chunk.runtime}/[name]_[id]_[contenthash].js`,
     assetModuleFilename: (pathData) => `${pathData.runtime}/asset/[name]_[hash][ext][query]`,
   },
@@ -87,7 +97,10 @@ const productionConfig = {
     new MiniCssExtractPlugin({
       // filename: '[name]/css/[name]_[contenthash].css',
       // chunkFilename: (pathData) => `${pathData.chunk.runtime}/css/chunks/[id]_[contenthash].css`,
-      filename: (pathData) => (pathData.chunk.name.includes('runtime') ? '[name]_[contenthash].css' : '[name]/[name]_[contenthash].css'),
+      filename: (pathData) =>
+        pathData.chunk.name.includes('runtime')
+          ? '[name]_[contenthash].css'
+          : '[name]/[name]_[contenthash].css',
       chunkFilename: (pathData) => `${pathData.chunk.runtime}/[name]_[id]_[contenthash].css`,
     }),
 
@@ -168,13 +181,15 @@ const productionConfig = {
                   ...glob.sync(`${PUBLIC_ROOT}/base/**/*.css`, { nodir: true }).map(
                     (path) => `/${path.split('/').slice(-2).join('/')}`, // '/base/css/xxx.css'
                   ),
-                  ...((templateParameters[moduleName] && templateParameters[moduleName].cssList) || []),
+                  ...((templateParameters[moduleName] && templateParameters[moduleName].cssList) ||
+                    []),
                 ],
                 jsList: [
                   ...glob.sync(`${PUBLIC_ROOT}/dll/*.js`, { nodir: true }).map(
                     (path) => `/${path.split('/').slice(-2).join('/')}`, // '/dll/xxx.js', TODO:确保react、react-dom在最前面
                   ),
-                  ...((templateParameters[moduleName] && templateParameters[moduleName].jsList) || []),
+                  ...((templateParameters[moduleName] && templateParameters[moduleName].jsList) ||
+                    []),
                 ],
               },
               minify: {

@@ -10,7 +10,7 @@
     "next": "next build",
     "analyzer": "node ./webpack/build.js analyzer",
     "lint": "eslint --config ./.eslintrc.js */**/*.{ts,tsx,js}",
-    "prettier": "prettier --write */**/*.{ts,tsx,js,css,scss,json}"
+    "prettier": "prettier --write ./**/*.{ts,tsx,js,css,scss,json}"
   },
   "repository": {
     "type": "git",

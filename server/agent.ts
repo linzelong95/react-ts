@@ -25,7 +25,10 @@ module.exports = (agent: Agent) => {
   agent.messenger.on('egg-ready', () => {
     runInProd(config.env, () => {
       alarm.sendWorkWX(
-        'Node 进程启动成功\n' + `部署时间：${moment().format('YYYY-MM-DD HH:mm:ss')}\n` + `环境：${config.env}\n` + `IP：${currentIp}`,
+        'Node 进程启动成功\n' +
+          `部署时间：${moment().format('YYYY-MM-DD HH:mm:ss')}\n` +
+          `环境：${config.env}\n` +
+          `IP：${currentIp}`,
       )
     })
   })
@@ -41,7 +44,9 @@ module.exports = (agent: Agent) => {
     }
     runInProd(config.env, () => {
       alarm.send(
-        `Node 告警（${moment().format('YYYY-MM-DD HH:mm:ss')} / ${config.env} / ${currentIp} / ${seqId}）\n${message || error.stack}`,
+        `Node 告警（${moment().format('YYYY-MM-DD HH:mm:ss')} / ${
+          config.env
+        } / ${currentIp} / ${seqId}）\n${message || error.stack}`,
         title,
       )
     })

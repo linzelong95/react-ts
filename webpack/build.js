@@ -35,7 +35,10 @@ const commonParams = { cwd: WEB_ROOT, buffer: false, stdio: 'inherit' }
 
 if (['dev'].includes(mode)) {
   env.NODE_ENV = 'development'
-  execa('webpack', ['serve', '--config', 'webpack/webpack.development.js'], { ...commonParams, env })
+  execa('webpack', ['serve', '--config', 'webpack/webpack.development.js'], {
+    ...commonParams,
+    env,
+  })
   // execa('webpack-dev-server', ['--config', 'webpack/webpack.development.js'], { ...commonParams, env }) // webpack 4
 }
 
@@ -48,13 +51,22 @@ if (['build', 'build-all', 'analyzer'].includes(mode)) {
       .map((file) => file.name)
       .join('&')
   }
-  execa('webpack', [mode === 'analyzer' && '--profile', '--config', 'webpack/webpack.production.js'].filter(Boolean), {
-    ...commonParams,
-    env,
-  })
+  execa(
+    'webpack',
+    [mode === 'analyzer' && '--profile', '--config', 'webpack/webpack.production.js'].filter(
+      Boolean,
+    ),
+    {
+      ...commonParams,
+      env,
+    },
+  )
 }
 
 if (['dll'].includes(mode)) {
   env.NODE_ENV = 'development'
-  execa('webpack', ['--config', 'webpack/webpack.dll.js', '--progress', '--profile'], { ...commonParams, env })
+  execa('webpack', ['--config', 'webpack/webpack.dll.js', '--progress', '--profile'], {
+    ...commonParams,
+    env,
+  })
 }
