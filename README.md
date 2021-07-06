@@ -187,18 +187,11 @@ http {
             X-Forwarded-For $proxy_add_x_forwarded_for
 
             proxy_set_header Host $http_host;
-
-            # 响应头设置禁用缓存标志
-            # add_header Pragma   no-cache;
-            # add_header Expires  0;
-            # add_header Cache-Control no-cache,no-store,must-revalidate;
         }
 
-        # 访问的是egg.js渲染的模板，不缓存
-        location ^~ /b-blog|account/ {
-            add_header Pragma   no-cache;
-            add_header Expires  0;
-            add_header Cache-Control no-cache,no-store,must-revalidate;
+        location ~* \.(js|css|png|jpg|jpeg|gif|svg|ico) {
+            expires 30d;
+            add_header Cache-Control "public,max-age=30672000";
         }
         # 模板不缓存
         location ~* \.(html|ejs)$ {

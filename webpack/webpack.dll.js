@@ -56,7 +56,6 @@ generatedCompiler({ [__BASIC_CORE__]: ['react', 'react-dom'] }, false, (error) =
       react_lib: ['react-router', 'react-router-dom', 'redux', 'react-redux'],
       tool_lib: [
         'moment',
-        'xlsx',
         'axios',
         'i18next',
         'react-i18next',

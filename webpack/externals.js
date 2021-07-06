@@ -6,7 +6,6 @@ module.exports = {
   'react-router': 'ReactRouter',
   'react-router-dom': 'ReactRouterDOM',
   moment: 'moment',
-  xlsx: 'XLSX',
   axios: 'axios',
   i18next: 'i18next',
   'react-i18next': 'reactI18next',

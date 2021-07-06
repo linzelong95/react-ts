@@ -54,6 +54,21 @@ const productionConfig = {
 
   optimization: {
     splitChunks: false,
+    // splitChunks: {
+    //   cacheGroups: {
+    //     defaultVendors: false,
+    //     default: false,
+    //     react_core: {
+    //       name: 'common/react_core',
+    //       filename: (pathData) => `${pathData.chunk.name}_[contenthash].js`,
+    //       chunks: 'all',
+    //       test: /[/\\]node_modules[/\\](react|react-dom|react-router)[/\\]/,
+    //       enforce: true,
+    //       reuseExistingChunk: true,
+    //       priority: 10,
+    //     },
+    //   },
+    // },
     runtimeChunk: !BUILD_MODULES.includes('base') && {
       name: (entry) => `${entry.name}/runtime~${entry.name}`,
     },

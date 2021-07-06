@@ -153,38 +153,6 @@ textarea {
   font-size: 24;
 }
 
-// 文字加粗
 .bold {
   font-weight: bold;
-}
-
-// 文字换行
-.word-break {
-  overflow: 'hidden';
-  white-space: 'pre-wrap';
-  word-wrap: 'break-word';
-}
-
-// 链接禁用
-.link-disabled {
-  color: #999;
-  cursor: not-allowed;
-  &:hover,
-  &:active {
-    color: #999;
-  }
-}
-
-// 布局
-.float-left {
-  float: left;
-}
-
-.float-right {
-  float: right;
-}
-
-// 鼠标样式
-.pointer {
-  cursor: pointer;
 }

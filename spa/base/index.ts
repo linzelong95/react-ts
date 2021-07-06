@@ -9,7 +9,6 @@ import * as ReactRouterDOM from 'react-router-dom'
 import * as Redux from 'redux'
 import * as ReactRedux from 'react-redux'
 import moment from 'moment'
-import XLSX from 'xlsx'
 import axios from 'axios'
 import i18next from 'i18next'
 import * as reactI18next from 'react-i18next'
@@ -18,8 +17,6 @@ import enUS from 'antd/lib/locale/en_US'
 import zhCN from 'antd/lib/locale/zh_CN'
 import * as Sentry from '@sentry/browser'
 
-// 公共样式
-import '@common/styles/globals.scss'
 import 'antd/dist/antd.css'
 
 // 注入全局变量
@@ -30,7 +27,6 @@ import 'antd/dist/antd.css'
 ;(window as any).Redux = Redux
 ;(window as any).ReactRedux = ReactRedux
 ;(window as any).moment = moment
-;(window as any).XLSX = XLSX
 ;(window as any).axios = axios
 ;(window as any).i18next = i18next
 ;(window as any).reactI18next = reactI18next

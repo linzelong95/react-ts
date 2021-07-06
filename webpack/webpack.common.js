@@ -1,6 +1,7 @@
 const path = require('path')
 const webpack = require('webpack')
 const autoprefixer = require('autoprefixer')
+const tailwindcss = require('tailwindcss')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const ProgressBarPlugin = require('progress-bar-webpack-plugin')
 const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin')
@@ -84,7 +85,10 @@ module.exports = {
         use: [
           isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader,
           { loader: 'css-loader', options: { importLoaders: 1, modules: true } },
-          { loader: 'postcss-loader', options: { postcssOptions: { plugins: [autoprefixer] } } },
+          {
+            loader: 'postcss-loader',
+            options: { postcssOptions: { plugins: [tailwindcss, autoprefixer] } },
+          },
           { loader: 'less-loader', options: { lessOptions: { javascriptEnabled: true } } },
         ],
       },
@@ -94,7 +98,10 @@ module.exports = {
         use: [
           isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader,
           { loader: 'css-loader', options: { importLoaders: 1 } },
-          { loader: 'postcss-loader', options: { postcssOptions: { plugins: [autoprefixer] } } },
+          {
+            loader: 'postcss-loader',
+            options: { postcssOptions: { plugins: [tailwindcss, autoprefixer] } },
+          },
           { loader: 'less-loader', options: { lessOptions: { javascriptEnabled: true } } },
         ],
       },
@@ -104,7 +111,10 @@ module.exports = {
         use: [
           isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader,
           { loader: 'css-loader', options: { importLoaders: 1 } },
-          { loader: 'postcss-loader', options: { postcssOptions: { plugins: [autoprefixer] } } },
+          {
+            loader: 'postcss-loader',
+            options: { postcssOptions: { plugins: [tailwindcss, autoprefixer] } },
+          },
           { loader: 'sass-loader', options: { sassOptions: { javascriptEnabled: true } } },
         ],
       },
@@ -114,7 +124,10 @@ module.exports = {
         use: [
           isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader,
           { loader: 'css-loader', options: { importLoaders: 1, modules: true } },
-          { loader: 'postcss-loader', options: { postcssOptions: { plugins: [autoprefixer] } } },
+          {
+            loader: 'postcss-loader',
+            options: { postcssOptions: { plugins: [tailwindcss, autoprefixer] } },
+          },
           { loader: 'sass-loader', options: { sassOptions: { javascriptEnabled: true } } },
         ],
       },
@@ -123,7 +136,10 @@ module.exports = {
         use: [
           isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader,
           { loader: 'css-loader', options: { importLoaders: 1 } },
-          { loader: 'postcss-loader', options: { postcssOptions: { plugins: [autoprefixer] } } },
+          {
+            loader: 'postcss-loader',
+            options: { postcssOptions: { plugins: [tailwindcss, autoprefixer] } },
+          },
         ],
       },
       // {

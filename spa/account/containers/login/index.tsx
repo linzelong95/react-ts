@@ -203,7 +203,7 @@ const Login: FC<RouteComponentProps<never>> = memo(() => {
             <Row>
               <Col span={14}>
                 其他方式
-                <GithubOutlined className="font24 ml10 pointer" />
+                <GithubOutlined className="font24 ml10 cursor-pointer" />
               </Col>
               <Col span={10} className="text-right">
                 <Link to="/register">注册账户</Link>

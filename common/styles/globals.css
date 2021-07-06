@@ -18,15 +18,6 @@ a {
   color: #1890ff;
 }
 
-img {
-  border: none;
-  vertical-align: middle;
-  &[src=''],
-  &:not([src]) {
-    opacity: 0;
-  }
-}
-
 table {
   border-collapse: collapse;
   table-layout: fixed;
@@ -38,7 +29,6 @@ textarea {
   border: none;
 }
 
-// 边距
 .mt0 {
   margin-top: 0;
 }
@@ -119,7 +109,6 @@ textarea {
   margin-bottom: 20px;
 }
 
-// 文字对齐
 .text-left {
   text-align: left;
 }
@@ -132,7 +121,6 @@ textarea {
   text-align: center;
 }
 
-// 文字大小
 .font16 {
   font-size: 16px;
 }
@@ -153,38 +141,21 @@ textarea {
   font-size: 24;
 }
 
-// 文字加粗
 .bold {
   font-weight: bold;
 }
+/* 将上面移除 */
 
-// 文字换行
-.word-break {
-  overflow: 'hidden';
-  white-space: 'pre-wrap';
-  word-wrap: 'break-word';
-}
-
-// 链接禁用
-.link-disabled {
-  color: #999;
-  cursor: not-allowed;
-  &:hover,
-  &:active {
-    color: #999;
+/* @tailwind base; */
+@layer base {
+  img {
+    border: none;
+    vertical-align: middle;
+    &[src=''],
+    &:not([src]) {
+      opacity: 0;
+    }
   }
 }
-
-// 布局
-.float-left {
-  float: left;
-}
-
-.float-right {
-  float: right;
-}
-
-// 鼠标样式
-.pointer {
-  cursor: pointer;
-}
+@tailwind components;
+@tailwind utilities;
